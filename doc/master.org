@@ -1,0 +1,35 @@
+* Typesystem
+Simplification of any possible concept of a typesystem down to the absolute
+bare miminum...
+
+** Types
+*** Atom
+Internally we use 64-bit reals. That allows us to store ints up to
+2^52 which allows us to completely address any memory on modern systems
+which have a 48-bit effective address space.
+
+*** Vector
+A fixed/resizable array of Numbers (all 64-bit wide) which also implies that
+all strings internally are utf-32, these are immutable? maybe idk...
+struct xerxzema_vector
+{
+    double* buffer;
+    double  size;
+};
+
+*** Token
+Parameterized opaque values used as pointers and other magic numbers to interface with
+the runtime
+
+*** Function
+Procedural/Functional-isms
+
+*** Program
+Dataflow
+
+*** ABI
+Figure out some simple abi, that can easily be expressed as a bunch of c primitives
+that will make interop with external stuff really simple...
+
+
+
