@@ -10,6 +10,13 @@ public:
 	virtual std::string Name() = 0;
 };
 
+class TypeProvider
+{
+public:
+	virtual bool is_type(const std::string& name) = 0;
+	virtual Type* type(const std::string& name) = 0;
+};
+
 class Atom : public Type
 {
 public:

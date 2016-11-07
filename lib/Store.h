@@ -6,7 +6,7 @@
 namespace xerxzema
 {
 
-class Store
+class Store : public TypeProvider
 {
 public:
 	Store();
