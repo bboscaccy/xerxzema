@@ -3,5 +3,6 @@ add_library(xerxzema SHARED
   Type.cpp
   Store.cpp
   Register.cpp
+  Program.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})
