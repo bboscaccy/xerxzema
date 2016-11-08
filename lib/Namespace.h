@@ -21,6 +21,10 @@ public:
 	void import(Namespace* ns);
 	void add_type(const std::string& name, std::unique_ptr<Type>&& type);
 	Type* type(const std::string& name);
+	inline bool is_type(const std::string& name)
+	{
+		return type(name) != nullptr;
+	}
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
