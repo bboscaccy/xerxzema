@@ -1,5 +1,6 @@
 add_executable(unittest
   StoreTests.cpp
+  NamespaceTests.cpp
   )
 
 include_directories(../lib)

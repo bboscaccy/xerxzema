@@ -17,7 +17,7 @@ Namespace* Namespace::get_namespace(const std::string& name)
 	auto it = namespaces.find(name);
 	if(it != namespaces.end())
 		return it->second.get();
-	namespaces.emplace(name, std::make_unique<Namespace>(_world, name, parent));
+	namespaces.emplace(name, std::make_unique<Namespace>(_world, name, this));
 	return namespaces[name].get();
 }
 
@@ -29,5 +29,12 @@ std::vector<std::string> Namespace::namespace_list() const
 		names.push_back(itm.first);
 	}
 	return names;
+}
+
+std::string Namespace::full_name() const
+{
+	if(parent)
+		return parent->full_name() + "." + _name;
+	return _name;
 }
 };

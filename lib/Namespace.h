@@ -16,6 +16,7 @@ public:
 	std::vector<std::string> namespace_list() const;
 	inline World* world() const { return _world; }
 	inline const std::string& name() const { return _name; }
+	std::string full_name() const;
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
