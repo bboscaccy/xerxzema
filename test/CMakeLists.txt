@@ -1,5 +1,4 @@
 add_executable(unittest
-  StoreTests.cpp
   NamespaceTests.cpp
   )
 
