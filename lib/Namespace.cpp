@@ -37,4 +37,9 @@ std::string Namespace::full_name() const
 		return parent->full_name() + "." + _name;
 	return _name;
 }
+
+void Namespace::import(xerxzema::Namespace *ns)
+{
+	imports.push_back(ns);
+}
 };

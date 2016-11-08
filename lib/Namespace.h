@@ -17,9 +17,11 @@ public:
 	inline World* world() const { return _world; }
 	inline const std::string& name() const { return _name; }
 	std::string full_name() const;
+	void import(Namespace* ns);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
+	std::vector<Namespace*> imports;
 	World* _world;
 	Namespace* parent;
 	std::string _name;
