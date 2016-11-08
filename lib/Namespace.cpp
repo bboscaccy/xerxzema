@@ -42,4 +42,24 @@ void Namespace::import(xerxzema::Namespace *ns)
 {
 	imports.push_back(ns);
 }
+
+void Namespace::add_type(const std::string &name, std::unique_ptr<Type> &&type)
+{
+	types.emplace(name, std::move(type));
+}
+
+Type* Namespace::type(const std::string& name)
+{
+	if(types.find(name) != types.end())
+		return types[name].get();
+
+	for(auto& ns : imports)
+	{
+		auto type = ns->type(name);
+		if(type)
+			return type;
+	}
+	return nullptr;
+}
+
 };

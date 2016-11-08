@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include "Type.h"
 
 namespace xerxzema
 {
@@ -18,10 +19,13 @@ public:
 	inline const std::string& name() const { return _name; }
 	std::string full_name() const;
 	void import(Namespace* ns);
+	void add_type(const std::string& name, std::unique_ptr<Type>&& type);
+	Type* type(const std::string& name);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::vector<Namespace*> imports;
+	std::map<std::string, std::unique_ptr<Type>> types;
 	World* _world;
 	Namespace* parent;
 	std::string _name;
