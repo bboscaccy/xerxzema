@@ -2,7 +2,7 @@
 
 namespace xerxzema
 {
-Program::Program(const std::string& name) : _name(name)
+Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name)
 {
 
 }

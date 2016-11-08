@@ -21,6 +21,15 @@ Namespace* Namespace::get_namespace(const std::string& name)
 	return namespaces[name].get();
 }
 
+Program* Namespace::get_program(const std::string &name)
+{
+	auto it = programs.find(name);
+	if(it != programs.end())
+		return it->second.get();
+	programs.emplace(name, std::make_unique<Program>(this, name));
+	return programs[name].get();
+}
+
 std::vector<std::string> Namespace::namespace_list() const
 {
 	std::vector<std::string> names;

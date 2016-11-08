@@ -16,6 +16,4 @@ private:
 	void create_core_namespace();
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 };
-
-
 };

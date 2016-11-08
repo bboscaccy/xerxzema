@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "Type.h"
+#include "Program.h"
 
 namespace xerxzema
 {
@@ -25,9 +26,11 @@ public:
 	{
 		return type(name) != nullptr;
 	}
+	Program* get_program(const std::string& name);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
+	std::map<std::string, std::unique_ptr<Program>> programs;
 	std::vector<Namespace*> imports;
 	std::map<std::string, std::unique_ptr<Type>> types;
 	World* _world;

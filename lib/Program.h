@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <string>
 #include <memory>
@@ -5,17 +6,18 @@
 
 namespace xerxzema
 {
-
+class Namespace;
 class Program
 {
 public:
-	Program(const std::string& name);
+	Program(Namespace* parent, const std::string& name);
 	void add_input(const std::string& name, Type* type);
 	void add_output(const std::string& name, Type* type);
 
 private:
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::string _name;
+	Namespace* parent;
 };
 
 
