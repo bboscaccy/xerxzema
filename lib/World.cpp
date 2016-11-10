@@ -13,11 +13,11 @@ namespace xerxzema
 World::World()
 {
 	create_core_namespace();
-	llvm::InitializeAllTargetInfos();
-	llvm::InitializeAllTargets();
-	llvm::InitializeAllTargetMCs();
-	llvm::InitializeAllAsmParsers();
-	llvm::InitializeAllAsmPrinters();
+	llvm::InitializeNativeTarget();
+	llvm::InitializeNativeTargetAsmParser();
+	llvm::InitializeNativeTargetAsmPrinter();
+	llvm::InitializeNativeTargetDisassembler();
+
 }
 
 Namespace* World::get_namespace(const std::string& name)
