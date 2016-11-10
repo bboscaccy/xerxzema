@@ -8,22 +8,32 @@ Type::Type()
 
 }
 
-std::string Atom::Name()
+std::string Atom::name()
 {
 	return "atom";
 }
 
-std::string Unit::Name()
+std::string Unit::name()
 {
 	return "unit";
 }
 
-std::string Buffer::Name()
+std::string Real::name()
+{
+	return "real";
+}
+
+std::string Int::name()
+{
+	return "int";
+}
+
+std::string Buffer::name()
 {
 	return "buffer";
 }
 
-std::string Token::Name()
+std::string Token::name()
 {
 	return "token";
 }
