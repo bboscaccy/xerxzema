@@ -1,3 +1,10 @@
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/TargetRegistry.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+
+
 #include "World.h"
 #include "Type.h"
 
@@ -6,6 +13,11 @@ namespace xerxzema
 World::World()
 {
 	create_core_namespace();
+	llvm::InitializeAllTargetInfos();
+	llvm::InitializeAllTargets();
+	llvm::InitializeAllTargetMCs();
+	llvm::InitializeAllAsmParsers();
+	llvm::InitializeAllAsmPrinters();
 }
 
 Namespace* World::get_namespace(const std::string& name)
