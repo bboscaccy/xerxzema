@@ -21,4 +21,9 @@ void Program::add_output(const std::string &name, xerxzema::Type *type)
 	registers.emplace(name, std::move(r));
 }
 
+void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
+{
+
+}
+
 };

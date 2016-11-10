@@ -18,6 +18,10 @@ Namespace::~Namespace()
 
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
+	for(auto& program: programs)
+	{
+		program.second->code_gen(module, context);
+	}
 	module->dump();
 }
 
