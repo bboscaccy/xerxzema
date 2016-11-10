@@ -16,6 +16,11 @@ Namespace::~Namespace()
 {
 }
 
+void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
+{
+	module->dump();
+}
+
 Namespace* Namespace::get_namespace(const std::string& name)
 {
 	auto it = namespaces.find(name);
@@ -38,7 +43,7 @@ bool Namespace::is_program(const std::string &name)
 {
 	return programs.find(name) != programs.end();
 }
-	
+
 std::vector<std::string> Namespace::namespace_list() const
 {
 	std::vector<std::string> names;

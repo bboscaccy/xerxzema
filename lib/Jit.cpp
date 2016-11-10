@@ -33,6 +33,7 @@ void Jit::create_module(Namespace* ns)
 void Jit::compile_namespace(Namespace* ns)
 {
 	create_module(ns);
+	ns->codegen(modules[ns->full_name()], _context);
 }
 
 };

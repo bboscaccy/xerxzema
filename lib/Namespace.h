@@ -6,6 +6,10 @@
 #include "Type.h"
 #include "Program.h"
 
+#include "llvm/IR/Module.h"
+#include "llvm/IR/LLVMContext.h"
+
+
 namespace xerxzema
 {
 class World;
@@ -29,6 +33,7 @@ public:
 	}
 	Program* get_program(const std::string& name);
 	bool is_program(const std::string& name);
+	void codegen(llvm::Module* module, llvm::LLVMContext& context);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
