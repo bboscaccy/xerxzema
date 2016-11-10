@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../lib/World.h"
+#include <stdio.h>
 
 TEST(TestNamespace, TestCreation)
 {

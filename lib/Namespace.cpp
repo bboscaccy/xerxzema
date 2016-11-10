@@ -12,6 +12,10 @@ Namespace::Namespace(World* w, const std::string& n, Namespace* p) : _world(w), 
 {
 }
 
+Namespace::~Namespace()
+{
+}
+
 Namespace* Namespace::get_namespace(const std::string& name)
 {
 	auto it = namespaces.find(name);

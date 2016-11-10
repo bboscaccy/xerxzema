@@ -14,6 +14,7 @@ class Namespace
 public:
 	Namespace(World* world, const std::string& name);
 	Namespace(World* world, const std::string& name, Namespace* parent);
+	~Namespace();
 	Namespace* get_namespace(const std::string& name);
 	std::vector<std::string> namespace_list() const;
 	inline World* world() const { return _world; }
