@@ -18,6 +18,8 @@ public:
 	void add_output(const std::string& name, Type* type);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
+	llvm::FunctionType* function_type(llvm::LLVMContext& context);
+
 private:
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::string _name;

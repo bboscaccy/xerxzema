@@ -22,7 +22,7 @@ void Program::add_output(const std::string &name, xerxzema::Type *type)
 	registers.emplace(name, std::move(r));
 }
 
-void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
+llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;
 	data_types.push_back(llvm::Type::getInt64Ty(context)); //frame counter
@@ -36,9 +36,13 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(program_data->getPointerTo());
 
-	auto function_type = llvm::FunctionType::get(llvm::Type::getInt64Ty(context),
-												 arg_types, false);
-	auto fn = llvm::Function::Create(function_type,
+	return llvm::FunctionType::get(llvm::Type::getInt64Ty(context), arg_types, false);
+}
+
+void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
+{
+	auto ftype = function_type(context);
+	auto fn = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									 _name, module);
 
