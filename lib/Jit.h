@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/IRBuilder.h"
@@ -34,9 +35,13 @@ class Jit
 public:
 	Jit(World* world);
 	inline llvm::LLVMContext& context() { return _context; }
+	void compile_namespace(Namespace* ns);
 
 private:
+	void create_module(Namespace* ns);
 	llvm::LLVMContext _context;
 	World* _world;
+	std::map<std::string, llvm::Module*> modules;
+	std::map<std::string, std::unique_ptr<llvm::ExecutionEngine>> engines;
 };
 };

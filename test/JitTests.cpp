@@ -6,4 +6,5 @@ TEST(TestJit, TestCreation)
 {
 	xerxzema::World world;
 	auto jit = world.create_jit();
+	jit->compile_namespace(world.get_namespace("core"));
 }
