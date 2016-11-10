@@ -5,5 +5,6 @@ add_library(xerxzema SHARED
   Program.cpp
   World.cpp
   Namespace.cpp
+  Jit.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})
