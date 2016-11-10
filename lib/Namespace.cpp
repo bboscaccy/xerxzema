@@ -34,6 +34,11 @@ Program* Namespace::get_program(const std::string &name)
 	return programs[name].get();
 }
 
+bool Namespace::is_program(const std::string &name)
+{
+	return programs.find(name) != programs.end();
+}
+	
 std::vector<std::string> Namespace::namespace_list() const
 {
 	std::vector<std::string> names;

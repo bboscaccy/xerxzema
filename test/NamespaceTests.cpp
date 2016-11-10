@@ -23,3 +23,11 @@ TEST(TestNamespace, TestCoreTypes)
 	auto foo = world.get_namespace("foo");
 	ASSERT_EQ(true, foo->is_type("unit"));
 }
+
+TEST(TestNamespace, TestProgramCreation)
+{
+	xerxzema::World world;
+	auto foo = world.get_namespace("foo");
+	auto prog = foo->get_program("test");
+	ASSERT_TRUE(foo->is_program("test"));
+}

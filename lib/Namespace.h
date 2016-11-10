@@ -28,6 +28,7 @@ public:
 		return type(name) != nullptr;
 	}
 	Program* get_program(const std::string& name);
+	bool is_program(const std::string& name);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
