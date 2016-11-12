@@ -22,6 +22,9 @@ public:
 
 private:
 	std::map<std::string, std::unique_ptr<Register>> registers;
+	std::vector<Register*> inputs;
+	std::vector<Register*> outputs;
+	std::vector<Register*> locals;
 	std::string _name;
 	Namespace* parent;
 };
