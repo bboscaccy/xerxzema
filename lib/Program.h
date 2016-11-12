@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "Register.h"
+#include "Instruction.h"
 
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
@@ -16,9 +17,7 @@ public:
 	Program(Namespace* parent, const std::string& name);
 	void add_input(const std::string& name, Type* type);
 	void add_output(const std::string& name, Type* type);
-	void instruction(const std::string& name,
-					 const std::vector<std::string>& inputs,
-					 const std::vector<std::string>& outputs);
+	void instruction(std::unique_ptr<Instruction>&& inst);
 	Register* reg(const std::string& name);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
@@ -29,6 +28,7 @@ private:
 	std::vector<Register*> inputs;
 	std::vector<Register*> outputs;
 	std::vector<Register*> locals;
+	std::vector<std::unique_ptr<Instruction>> instructions;
 	std::string _name;
 	Namespace* parent;
 	llvm::Type* state_type;

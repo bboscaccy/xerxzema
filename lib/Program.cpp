@@ -36,12 +36,9 @@ Register* Program::reg(const std::string &name)
 	return result;
 }
 
-void Program::instruction(const std::string &name,
-						  const std::vector<std::string> &inputs,
-						  const std::vector<std::string> &outputs)
+void Program::instruction(std::unique_ptr<Instruction>&& inst)
 {
-
-
+	instructions.push_back(std::move(inst));
 }
 
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)

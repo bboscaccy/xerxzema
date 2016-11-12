@@ -74,6 +74,8 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 									llvm::Value *state,
 									llvm::BasicBlock *next_block)
 {
+	auto mask_ptr = builder.CreateStructGEP(state_type, state, _offset);
+	builder.CreateStore(mask_ptr, llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
 	for(auto& r:_outputs)
 	{
 		r->do_activations(context, builder, state_type, state);
