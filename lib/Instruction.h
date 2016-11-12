@@ -29,11 +29,9 @@ public:
 	virtual std::vector<Type*> output_types();
 	virtual bool has_variadic_output();
 
-	inline void input(Register* reg)
-	{
-		_inputs.push_back(reg);
-	}
-
+	void input(Register* reg);
+	void dependent(Register* reg);
+	void sample(Register* reg);
 	inline std::vector<Register*>& inputs()
 	{
 		return _inputs;
@@ -77,6 +75,7 @@ public:
 protected:
 	std::vector<Register*> _inputs;
 	std::vector<Register*> _outputs;
+	std::vector<Register*> _deps;
 	uint32_t _offset;
 	uint16_t mask;
 };

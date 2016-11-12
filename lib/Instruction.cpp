@@ -24,6 +24,23 @@ std::vector<Type*> Instruction::output_types()
 	return std::vector<Type*>();
 }
 
+void Instruction::input(xerxzema::Register *reg)
+{
+	_inputs.push_back(reg);
+	dependent(reg);
+}
+
+void Instruction::dependent(xerxzema::Register *reg)
+{
+	reg->activation(this, 1 << _deps.size());
+	_deps.push_back(reg);
+}
+
+void Instruction::sample(xerxzema::Register *reg)
+{
+	_inputs.push_back(reg);
+}
+
 void Instruction::generate_check(llvm::LLVMContext& context,
 								 llvm::IRBuilder<> &builder,
 								 llvm::Type* state_type,
