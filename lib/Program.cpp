@@ -49,12 +49,12 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
-	auto fn = llvm::Function::Create(ftype,
+	frame_function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									 _name, module);
+									 _name + "-frame", module);
 
 	llvm::IRBuilder<> builder(context);
-	auto block = llvm::BasicBlock::Create(context, "entry", fn);
+	auto block = llvm::BasicBlock::Create(context, "do_frame", frame_function);
 	builder.SetInsertPoint(block);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }

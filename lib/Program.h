@@ -27,6 +27,11 @@ private:
 	std::vector<Register*> locals;
 	std::string _name;
 	Namespace* parent;
+
+	llvm::Function* init_function;
+	llvm::Function* exit_function;
+	llvm::Function* frame_function;
+	llvm::Function* driver_function;
 };
 
 
