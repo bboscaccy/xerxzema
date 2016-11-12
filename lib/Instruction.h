@@ -2,6 +2,10 @@
 #include <vector>
 #include "Type.h"
 
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Module.h"
+
 namespace xerxzema
 {
 
@@ -51,10 +55,30 @@ public:
 		_offset = o;
 	}
 
+	virtual void generate_check(llvm::LLVMContext& context,
+								llvm::IRBuilder<> &builder,
+								llvm::Type* state_type,
+								llvm::Value* state,
+								llvm::BasicBlock* check_block,
+								llvm::BasicBlock* op_block,
+								llvm::BasicBlock* next_block);
+
+	virtual void generate_operation(llvm::LLVMContext& context,
+									llvm::IRBuilder<> &builder,
+									llvm::Type* state_type,
+									llvm::Value* state);
+
+	virtual void generate_prolouge(llvm::LLVMContext& context,
+								   llvm::IRBuilder<> &builder,
+								   llvm::Type* state_type,
+								   llvm::Value* state,
+								   llvm::BasicBlock* next_block);
+
 protected:
 	std::vector<Register*> _inputs;
 	std::vector<Register*> _outputs;
 	uint32_t _offset;
+	uint16_t mask;
 };
 
 DEF_INST(Add)
