@@ -18,4 +18,32 @@ void Register::activation(xerxzema::Instruction *instruction, uint16_t value)
 	activations.push_back({instruction, value});
 }
 
+void Register::offset(uint32_t o)
+{
+	state_offset = o;
+}
+
+llvm::Value* Register::fetch_value(llvm::LLVMContext& context,
+								   llvm::IRBuilder<> &builder,
+								   llvm::Type* state_type,
+								   llvm::Value* state)
+{
+	std::vector<llvm::Value*> idx =
+		{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
+		 llvm::ConstantInt::get(context, llvm::APInt(32, state_offset))};
+	auto ptr = builder.CreateGEP(state_type, state, idx);
+	return builder.CreateLoad(ptr);
+}
+
+llvm::Value* Register::fetch_value_raw(llvm::LLVMContext& context,
+									   llvm::IRBuilder<> &builder,
+									   llvm::Type* state_type,
+									   llvm::Value* state)
+{
+	std::vector<llvm::Value*> idx =
+		{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
+		 llvm::ConstantInt::get(context, llvm::APInt(32, state_offset))};
+	return builder.CreateGEP(state_type, state, idx);
+}
+
 };
