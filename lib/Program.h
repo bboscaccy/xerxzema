@@ -16,6 +16,10 @@ public:
 	Program(Namespace* parent, const std::string& name);
 	void add_input(const std::string& name, Type* type);
 	void add_output(const std::string& name, Type* type);
+	void instruction(const std::string& name,
+					 const std::vector<std::string>& inputs,
+					 const std::vector<std::string>& outputs);
+	Register* reg(const std::string& name);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);

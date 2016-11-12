@@ -25,6 +25,24 @@ void Program::add_output(const std::string &name, xerxzema::Type *type)
 	registers.emplace(name, std::move(r));
 }
 
+Register* Program::reg(const std::string &name)
+{
+	if(registers.find(name) != registers.end())
+		return registers[name].get();
+	auto r = std::make_unique<Register>(name);
+	auto result = r.get();
+	registers.emplace(name, std::move(r));
+	return result;
+}
+
+void Program::instruction(const std::string &name,
+						  const std::vector<std::string> &inputs,
+						  const std::vector<std::string> &outputs)
+{
+
+
+}
+
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;
