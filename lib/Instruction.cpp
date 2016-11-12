@@ -54,7 +54,7 @@ void Instruction::generate_check(llvm::LLVMContext& context,
 	auto mask_value = builder.CreateLoad(mask_ptr);
 	auto comp_value = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_EQ,
 										 mask_value,
-										 llvm::ConstantInt::get(context, llvm::APInt(16, mask)));
+										 llvm::ConstantInt::get(context, llvm::APInt(64, mask)));
 	builder.CreateCondBr(comp_value, op_block, next_block);
 }
 
@@ -63,8 +63,8 @@ void Instruction::generate_operation(llvm::LLVMContext &context,
 									 llvm::Type *state_type,
 									 llvm::Value *state)
 {
-	builder.CreateAdd(llvm::ConstantInt::get(context, llvm::APInt(1, 0)),
-					  llvm::ConstantInt::get(context, llvm::APInt(1, 0)));
+	builder.CreateAdd(llvm::ConstantInt::get(context, llvm::APInt(1, 1)),
+					  llvm::ConstantInt::get(context, llvm::APInt(1, 1)));
 
 }
 

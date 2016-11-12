@@ -1,12 +1,11 @@
 #include "Program.h"
 #include "llvm/IR/IRBuilder.h"
-#include "Instruction.h"
 
 namespace xerxzema
 {
 Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name)
 {
-
+	reg("head");
 }
 
 void Program::add_input(const std::string &name, xerxzema::Type *type)
@@ -83,9 +82,53 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 									 _name + "-frame", module);
 
 	llvm::IRBuilder<> builder(context);
-	auto block = llvm::BasicBlock::Create(context, "do_frame", frame_function);
-	builder.SetInsertPoint(block);
+	auto state = &*frame_function->arg_begin();
+	auto head_block = llvm::BasicBlock::Create(context, "head", frame_function);
+	auto tail_block = llvm::BasicBlock::Create(context, "tail", frame_function);
+	builder.SetInsertPoint(head_block);
+	reg("head")->do_activations(context, builder, state_type, state);
 
+	llvm::BasicBlock* next_condition = nullptr;
+	llvm::BasicBlock* condition = nullptr;
+	llvm::BasicBlock* op_block = nullptr;
+
+	int inst = 0;
+	auto it = instructions.begin();
+	while(it != instructions.end())
+	{
+		if(next_condition != nullptr)
+		{
+			condition = next_condition;
+		}
+		else
+		{
+			condition = llvm::BasicBlock::Create(context,
+												 "inst_cond" + std::to_string(inst),
+												 frame_function);
+			builder.CreateBr(condition);
+		}
+		if(inst + 1 == instructions.size())
+		{
+			next_condition = tail_block;
+		}
+		else
+		{
+			next_condition = llvm::BasicBlock::Create(context,
+													  "inst_cond" + std::to_string(inst + 1),
+													  frame_function);
+		}
+		op_block = llvm::BasicBlock::Create(context,
+											"inst_op" + std::to_string(inst),
+											frame_function);
+		(*it)->generate_check(context, builder, state_type, state,condition,op_block,next_condition);
+		builder.SetInsertPoint(op_block);
+		(*it)->generate_operation(context, builder, state_type, state);
+		(*it)->generate_prolouge(context, builder, state_type, state, next_condition);
+		inst++;
+		it++;
+	}
+
+	builder.SetInsertPoint(tail_block);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
 
