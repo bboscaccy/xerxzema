@@ -37,6 +37,10 @@ public:
 							 llvm::IRBuilder<> &builder,
 							 llvm::Type* state_type,
 							 llvm::Value* state);
+	void do_activations(llvm::LLVMContext& context,
+						llvm::IRBuilder<> &builder,
+						llvm::Type* state_type,
+						llvm::Value* state);
 private:
 	std::string _name;
 	Type* _type;

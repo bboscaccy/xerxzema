@@ -1,4 +1,5 @@
 #include "Register.h"
+#include "Instruction.h"
 
 namespace xerxzema
 {
@@ -46,4 +47,21 @@ llvm::Value* Register::fetch_value_raw(llvm::LLVMContext& context,
 	return builder.CreateGEP(state_type, state, idx);
 }
 
+void Register::do_activations(llvm::LLVMContext &context,
+							  llvm::IRBuilder<> &builder,
+							  llvm::Type *state_type,
+							  llvm::Value* state)
+{
+	for(auto& activate:activations)
+	{
+		std::vector<llvm::Value*> idx =
+			{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
+			 llvm::ConstantInt::get(context, llvm::APInt(32, activate.instruction->offset()))};
+		auto ptr = builder.CreateGEP(state_type, state, idx);
+		auto mask = builder.CreateLoad(ptr);
+		auto update = builder.CreateOr(mask, llvm::APInt(16, activate.value));
+		builder.CreateStore(update, ptr);
+	}
+
+}
 };

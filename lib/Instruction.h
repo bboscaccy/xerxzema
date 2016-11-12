@@ -27,30 +27,36 @@ public:
 
 	inline void input(Register* reg)
 	{
-		inputs.push_back(reg);
+		_inputs.push_back(reg);
 	}
 
-	inline std::vector<Register*>& get_inputs()
+	inline std::vector<Register*>& inputs()
 	{
-		return inputs;
+		return _inputs;
 	}
 
 	inline void output(Register* reg)
 	{
-		outputs.push_back(reg);
+		_outputs.push_back(reg);
 	}
 
-	inline std::vector<Register*>& get_outputs()
+	inline std::vector<Register*>& outputs()
 	{
-		return outputs;
+		return _outputs;
+	}
+
+	inline uint32_t offset() { return _offset; }
+	inline void offset(uint32_t o)
+	{
+		_offset = o;
 	}
 
 protected:
-	std::vector<Register*> inputs;
-	std::vector<Register*> outputs;
+	std::vector<Register*> _inputs;
+	std::vector<Register*> _outputs;
+	uint32_t _offset;
 };
 
 DEF_INST(Add)
 
 };
-
