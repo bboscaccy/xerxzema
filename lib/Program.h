@@ -31,7 +31,7 @@ private:
 	std::vector<Register*> locals;
 	std::string _name;
 	Namespace* parent;
-
+	llvm::Type* state_type;
 	llvm::Function* init_function;
 	llvm::Function* exit_function;
 	llvm::Function* frame_function;
