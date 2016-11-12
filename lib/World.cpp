@@ -37,9 +37,10 @@ std::vector<std::string> World::namespace_list() const
 void World::create_core_namespace()
 {
 	auto core = std::make_unique<Namespace>(this, "core");
-	core->add_type("atom", std::make_unique<Atom>());
+	core->add_type("bool", std::make_unique<Bool>());
+	core->add_type("int", std::make_unique<Int>());
+	core->add_type("real", std::make_unique<Real>());
 	core->add_type("unit", std::make_unique<Unit>());
-	core->add_type("buffer", std::make_unique<Buffer>());
 	core->add_type("token", std::make_unique<Token>());
 	namespaces.emplace("core", std::move(core));
 
