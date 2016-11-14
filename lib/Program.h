@@ -34,6 +34,7 @@ private:
 	std::string _name;
 	Namespace* parent;
 	llvm::Type* state_type;
+	llvm::Value* activation_counter;
 	llvm::Function* init_function;
 	llvm::Function* exit_function;
 	llvm::Function* frame_function;

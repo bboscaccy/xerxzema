@@ -62,8 +62,7 @@ void Instruction::generate_operation(llvm::LLVMContext &context,
 									 llvm::Type *state_type,
 									 llvm::Value *state)
 {
-	builder.CreateAdd(llvm::ConstantInt::get(context, llvm::APInt(1, 1)),
-					  llvm::ConstantInt::get(context, llvm::APInt(1, 1)));
+	builder.CreateAlloca(llvm::Type::getVoidTy(context), nullptr, "noop");
 
 }
 
@@ -73,6 +72,10 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 									llvm::Value *state,
 									llvm::BasicBlock *next_block)
 {
+	auto p = builder.CreateLoad(state);
+	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+	builder.CreateStore(i, state);
+
 	builder.CreateStore(_value, llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
 	for(auto& r:_outputs)
 	{
