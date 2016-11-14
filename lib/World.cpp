@@ -45,4 +45,5 @@ void World::create_core_namespace()
 	namespaces.emplace("core", std::move(core));
 
 }
+
 };

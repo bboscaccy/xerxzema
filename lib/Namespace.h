@@ -38,8 +38,7 @@ public:
 	void codegen(llvm::Module* module, llvm::LLVMContext& context);
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
 	InstructionDefinition* resolve_instruction(const std::string& name,
-											   const std::vector<Type*>& inputs,
-											   const std::vector<Type*>& outputs);
+											   const std::vector<Type*>& inputs);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;

@@ -11,6 +11,15 @@
 namespace xerxzema
 {
 class Namespace;
+
+struct DeferredInstruction
+{
+	std::string name;
+	std::vector<std::string> inputs;
+	std::vector<std::string> outputs;
+	bool solved;
+};
+
 class Program
 {
 public:
@@ -18,12 +27,18 @@ public:
 	void add_input(const std::string& name, Type* type);
 	void add_output(const std::string& name, Type* type);
 	void instruction(std::unique_ptr<Instruction>&& inst);
+	void instruction(const std::string& name,
+					 const std::vector<std::string>& inputs,
+					 const std::vector<std::string>& outputs);
 	Register* reg(const std::string& name);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
 
 private:
+	bool check_instruction(const std::string& name,
+						   const std::vector<std::string>& inputs,
+						   const std::vector<std::string>& outputs);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Value* state);
 	std::map<std::string, std::unique_ptr<Register>> registers;
@@ -36,6 +51,7 @@ private:
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;
 	llvm::Function* function;
+	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
 };
 
 

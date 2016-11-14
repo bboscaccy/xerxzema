@@ -11,25 +11,10 @@ namespace xerxzema
 {
 
 class Register;
-
-#define DEF_INST(x) class x : public Instruction { \
-	std::vector<Type*> input_types();  \
-	std::vector<Type*> output_types(); };
-
-#define DEF_INST_VAR(x) class x : public Instruction { \
-	std::vector<Type*> input_types(); \
-	std::vector<Type*> output_types(); \
-	inline bool has_variadic_output() { return true; } };\
-
-
 class Instruction
 {
 public:
 	Instruction();
-	virtual std::vector<Type*> input_types();
-	virtual std::vector<Type*> output_types();
-	virtual bool has_variadic_output();
-
 	void input(Register* reg);
 	void dependent(Register* reg);
 	void sample(Register* reg);
@@ -84,7 +69,4 @@ protected:
 	uint32_t _offset;
 	uint16_t mask;
 };
-
-DEF_INST(Add)
-
 };

@@ -9,21 +9,6 @@ Instruction::Instruction()
 
 }
 
-bool Instruction::has_variadic_output()
-{
-	return false;
-}
-
-std::vector<Type*> Instruction::input_types()
-{
-	return std::vector<Type*>();
-}
-
-std::vector<Type*> Instruction::output_types()
-{
-	return std::vector<Type*>();
-}
-
 void Instruction::input(xerxzema::Register *reg)
 {
 	_inputs.push_back(reg);

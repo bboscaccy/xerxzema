@@ -44,6 +44,106 @@ void Program::instruction(std::unique_ptr<Instruction>&& inst)
 	instructions.push_back(std::move(inst));
 }
 
+void Program::instruction(const std::string &name,
+						  const std::vector<std::string> &inputs,
+						  const std::vector<std::string> &outputs)
+{
+	if(!check_instruction(name, inputs, outputs))
+	{
+		auto def = std::make_unique<DeferredInstruction>();
+		def->name = name;
+		def->inputs = inputs;
+		def->outputs = outputs;
+		def->solved = false;
+
+		for(auto& r: inputs)
+		{
+			reg(r)->deffered.push_back(def.get());
+		}
+
+		deferred.push_back(std::move(def));
+	}
+
+}
+
+bool Program::check_instruction(const std::string &name,
+								const std::vector<std::string> &inputs,
+								const std::vector<std::string> &outputs)
+{
+	bool resolved = true;
+	std::vector<Type*> input_types;
+	for(auto reg_name: inputs)
+	{
+		if(!reg(reg_name)->type())
+		{
+			resolved = false;
+			break;
+		}
+		else
+		{
+			input_types.push_back(reg(reg_name)->type());
+		}
+	}
+	if(resolved)
+	{
+		auto def = parent->resolve_instruction(name, input_types);
+		if(def)
+		{
+			auto output_types = def->output_types(parent);
+			if(output_types.size() == outputs.size())
+			{
+				auto it = outputs.begin();
+				for(auto& type: output_types)
+				{
+					auto out_reg = reg(*it);
+					if(out_reg->type())
+					{
+						if(out_reg->type() != type)
+						{
+							//invalid type, register is already type deduced
+						}
+					}
+					else
+					{
+						out_reg->type(type);
+						for(auto& retry:out_reg->deffered)
+						{
+							if(!retry->solved)
+							{
+								if(check_instruction(retry->name, retry->inputs, retry->outputs))
+								{
+									retry->solved = true;
+								}
+							}
+						}
+					}
+					it++;
+				}
+				auto inst = def->create();
+				for(auto& n:inputs)
+				{
+					inst->input(reg(n));
+				}
+				for(auto& n:outputs)
+				{
+					inst->output(reg(n));
+				}
+				instruction(std::move(inst));
+				return true;
+			}
+			else
+			{
+				//output arg number mismatch.
+			}
+		}
+		else
+		{
+			//invalid/unknown instruction
+		}
+	}
+	return false;
+}
+
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;

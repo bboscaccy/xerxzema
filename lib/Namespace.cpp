@@ -94,4 +94,43 @@ void Namespace::add_instruction(std::unique_ptr<InstructionDefinition> &&def)
 	instructions[def->name()].push_back(std::move(def));
 }
 
+InstructionDefinition* Namespace::resolve_instruction(const std::string &name,
+													  const std::vector<Type *> &inputs)
+{
+	auto it = instructions.find(name);
+	if(it == instructions.end())
+	{
+		for(auto& ns : imports)
+		{
+			auto def = ns->resolve_instruction(name, inputs);
+			if(def)
+				return def;
+		}
+	}
+	else
+	{
+		for(auto& def : it->second)
+		{
+			auto target_types = def->input_types(this);
+			if(target_types.size() == inputs.size())
+			{
+				auto target = target_types.begin();
+				bool valid = true;
+				for(auto& type:inputs)
+				{
+					if(*target != type)
+					{
+						valid = false;
+						break;
+					}
+					target++;
+				}
+				if(valid)
+					return def.get();
+			}
+		}
+	}
+	return nullptr;
+}
+
 };

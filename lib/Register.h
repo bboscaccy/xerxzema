@@ -10,12 +10,14 @@
 namespace xerxzema
 {
 class Instruction;
+struct DeferredInstruction;
 
 struct ActivationMask
 {
 	Instruction* instruction;
 	uint16_t value;
 };
+
 
 class Register
 {
@@ -44,6 +46,8 @@ public:
 						llvm::IRBuilder<> &builder,
 						llvm::Type* state_type,
 						llvm::Value* state);
+
+	std::vector<DeferredInstruction*> deffered;
 private:
 	llvm::Value* _value;
 	std::string _name;
