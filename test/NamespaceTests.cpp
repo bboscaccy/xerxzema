@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../lib/World.h"
+#include "../lib/Instruction.h"
 #include <stdio.h>
 
 TEST(TestNamespace, TestCreation)
@@ -30,4 +31,17 @@ TEST(TestNamespace, TestProgramCreation)
 	auto foo = world.get_namespace("foo");
 	auto prog = foo->get_program("test");
 	ASSERT_TRUE(foo->is_program("test"));
+}
+
+
+TEST(TestInstructionDef, TestCreation)
+{
+	xerxzema::World world;
+	auto core = world.get_namespace("core");
+	auto fake_def = xerxzema::BasicDefinition<xerxzema::Instruction>("foobar", {"unit"}, {"real"});
+	auto v = fake_def.input_types(core);
+	ASSERT_EQ(v[0], core->type("unit"));
+	auto v1 = fake_def.output_types(core);
+	ASSERT_EQ(v1[0], core->type("real"));
+
 }
