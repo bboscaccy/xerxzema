@@ -50,11 +50,10 @@ void Instruction::generate_check(llvm::LLVMContext& context,
 								 llvm::BasicBlock* next_block)
 {
 	builder.SetInsertPoint(check_block);
-	auto mask_ptr = builder.CreateStructGEP(state_type, state, _offset);
-	auto mask_value = builder.CreateLoad(mask_ptr);
+	auto mask_value = builder.CreateLoad(_value);
 	auto comp_value = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_EQ,
 										 mask_value,
-										 llvm::ConstantInt::get(context, llvm::APInt(64, mask)));
+										 llvm::ConstantInt::get(context, llvm::APInt(16, mask)));
 	builder.CreateCondBr(comp_value, op_block, next_block);
 }
 
@@ -74,8 +73,7 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 									llvm::Value *state,
 									llvm::BasicBlock *next_block)
 {
-	auto mask_ptr = builder.CreateStructGEP(state_type, state, _offset);
-	builder.CreateStore(mask_ptr, llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
+	builder.CreateStore(_value, llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
 	for(auto& r:_outputs)
 	{
 		r->do_activations(context, builder, state_type, state);

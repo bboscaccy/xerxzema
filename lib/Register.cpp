@@ -55,13 +55,9 @@ void Register::do_activations(llvm::LLVMContext &context,
 
 	for(auto& activate:activations)
 	{
-		std::vector<llvm::Value*> idx =
-			{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
-			 llvm::ConstantInt::get(context, llvm::APInt(32, activate.instruction->offset()))};
-		auto ptr = builder.CreateGEP(state_type, state, idx);
-		auto mask = builder.CreateLoad(ptr);
+		auto mask = builder.CreateLoad(activate.instruction->value());
 		auto update = builder.CreateOr(mask, llvm::APInt(16, activate.value));
-		builder.CreateStore(update, ptr);
+		builder.CreateStore(update, activate.instruction->value());
 	}
 
 }
