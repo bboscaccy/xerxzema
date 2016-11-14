@@ -123,6 +123,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;
 	llvm::BasicBlock* op_block = nullptr;
+	llvm::BasicBlock* first_block = nullptr;
 
 	int inst = 0;
 	auto it = instructions.begin();
@@ -134,9 +135,8 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			condition = llvm::BasicBlock::Create(context,
-												 "inst_cond" + std::to_string(inst),
-												 frame_function);
+			condition = llvm::BasicBlock::Create(context, "", frame_function);
+			first_block = condition;
 			builder.CreateBr(condition);
 		}
 		if(inst + 1 == instructions.size())
@@ -145,13 +145,9 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			next_condition = llvm::BasicBlock::Create(context,
-													  "inst_cond" + std::to_string(inst + 1),
-													  frame_function);
+			next_condition = llvm::BasicBlock::Create(context, "", frame_function);
 		}
-		op_block = llvm::BasicBlock::Create(context,
-											"inst_op" + std::to_string(inst),
-											frame_function);
+		op_block = llvm::BasicBlock::Create(context, "", frame_function);
 		(*it)->generate_check(context, builder, state_type, state,condition,op_block,next_condition);
 		builder.SetInsertPoint(op_block);
 		(*it)->generate_operation(context, builder, state_type, state);
@@ -161,6 +157,18 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	}
 
 	builder.SetInsertPoint(tail_block);
+	auto reenter_block = llvm::BasicBlock::Create(context, "reenter", frame_function);
+	auto exit_block = llvm::BasicBlock::Create(context, "exit", frame_function);
+	auto counter_value = builder.CreateLoad(activation_counter);
+	auto reenter = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_EQ, counter_value,
+										llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
+	builder.CreateCondBr(reenter, exit_block, reenter_block);
+
+	builder.SetInsertPoint(reenter_block);
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(64, 0)), activation_counter);
+	builder.CreateBr(first_block);
+
+	builder.SetInsertPoint(exit_block);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
 
