@@ -35,10 +35,7 @@ private:
 	Namespace* parent;
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;
-	llvm::Function* init_function;
-	llvm::Function* exit_function;
-	llvm::Function* frame_function;
-	llvm::Function* driver_function;
+	llvm::Function* function;
 };
 
 

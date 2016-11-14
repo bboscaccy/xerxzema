@@ -108,14 +108,14 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
-	frame_function = llvm::Function::Create(ftype,
+	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									 _name + "-frame", module);
+									 _name , module);
 
 	llvm::IRBuilder<> builder(context);
-	auto state = &*frame_function->arg_begin();
-	auto head_block = llvm::BasicBlock::Create(context, "head", frame_function);
-	auto tail_block = llvm::BasicBlock::Create(context, "tail", frame_function);
+	auto state = &*function->arg_begin();
+	auto head_block = llvm::BasicBlock::Create(context, "head", function);
+	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
 	builder.SetInsertPoint(head_block);
 	allocate_registers(context, builder, state);
 	reg("head")->do_activations(context, builder, state_type, state);
@@ -135,7 +135,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			condition = llvm::BasicBlock::Create(context, "", frame_function);
+			condition = llvm::BasicBlock::Create(context, "", function);
 			first_block = condition;
 			builder.CreateBr(condition);
 		}
@@ -145,9 +145,9 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			next_condition = llvm::BasicBlock::Create(context, "", frame_function);
+			next_condition = llvm::BasicBlock::Create(context, "", function);
 		}
-		op_block = llvm::BasicBlock::Create(context, "", frame_function);
+		op_block = llvm::BasicBlock::Create(context, "", function);
 		(*it)->generate_check(context, builder, state_type, state,condition,op_block,next_condition);
 		builder.SetInsertPoint(op_block);
 		(*it)->generate_operation(context, builder, state_type, state);
@@ -157,8 +157,8 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	}
 
 	builder.SetInsertPoint(tail_block);
-	auto reenter_block = llvm::BasicBlock::Create(context, "reenter", frame_function);
-	auto exit_block = llvm::BasicBlock::Create(context, "exit", frame_function);
+	auto reenter_block = llvm::BasicBlock::Create(context, "reenter", function);
+	auto exit_block = llvm::BasicBlock::Create(context, "exit", function);
 	auto counter_value = builder.CreateLoad(activation_counter);
 	auto reenter = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_EQ, counter_value,
 										llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
