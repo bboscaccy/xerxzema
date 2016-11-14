@@ -89,4 +89,9 @@ Type* Namespace::type(const std::string& name)
 	return nullptr;
 }
 
+void Namespace::add_instruction(std::unique_ptr<InstructionDefinition> &&def)
+{
+	instructions[def->name()].push_back(std::move(def));
+}
+
 };

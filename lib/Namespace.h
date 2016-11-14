@@ -14,6 +14,7 @@
 namespace xerxzema
 {
 class World;
+class InstructionDefinition;
 class Namespace
 {
 public:
@@ -35,12 +36,17 @@ public:
 	Program* get_program(const std::string& name);
 	bool is_program(const std::string& name);
 	void codegen(llvm::Module* module, llvm::LLVMContext& context);
+	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
+	InstructionDefinition* resolve_instruction(const std::string& name,
+											   const std::vector<Type*>& inputs,
+											   const std::vector<Type*>& outputs);
 
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<Program>> programs;
 	std::vector<Namespace*> imports;
 	std::map<std::string, std::unique_ptr<Type>> types;
+	std::map<std::string, std::vector<std::unique_ptr<InstructionDefinition>>> instructions;
 	World* _world;
 	Namespace* parent;
 	std::string _name;
