@@ -52,6 +52,7 @@ void Register::do_activations(llvm::LLVMContext &context,
 							  llvm::Type *state_type,
 							  llvm::Value* state)
 {
+
 	for(auto& activate:activations)
 	{
 		std::vector<llvm::Value*> idx =

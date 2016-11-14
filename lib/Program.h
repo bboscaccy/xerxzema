@@ -24,6 +24,7 @@ public:
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
 
 private:
+	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::vector<Register*> inputs;
 	std::vector<Register*> outputs;

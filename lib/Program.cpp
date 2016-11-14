@@ -1,4 +1,6 @@
 #include "Program.h"
+#include "Namespace.h"
+#include "World.h"
 #include "llvm/IR/IRBuilder.h"
 
 namespace xerxzema
@@ -6,6 +8,7 @@ namespace xerxzema
 Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name)
 {
 	reg("head");
+	reg("head")->type(p->world()->get_namespace("core")->type("unit"));
 }
 
 void Program::add_input(const std::string &name, xerxzema::Type *type)
@@ -32,6 +35,7 @@ Register* Program::reg(const std::string &name)
 	auto r = std::make_unique<Register>(name);
 	auto result = r.get();
 	registers.emplace(name, std::move(r));
+	locals.push_back(result);
 	return result;
 }
 
@@ -61,9 +65,9 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	}
 	for(auto r: locals)
 	{
-		data_types.push_back(r->type()->type(context));
-		r->offset(i);
-		i++;
+		//data_types.push_back(r->type()->type(context));
+		//r->offset(i);
+		//i++;
 	}
 
 	auto state_type = llvm::StructType::create(context, data_types, _name + "_data");
@@ -72,6 +76,19 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	arg_types.push_back(state_type->getPointerTo());
 
 	return llvm::FunctionType::get(llvm::Type::getInt64Ty(context), arg_types, false);
+}
+
+
+void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder)
+{
+	for(auto r: locals)
+	{
+		r->value(builder.CreateAlloca(r->type()->type(context)));
+	}
+	for(auto& i: instructions)
+	{
+		i->value(builder.CreateAlloca(llvm::Type::getInt16Ty(context)));
+	}
 }
 
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
@@ -86,6 +103,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto head_block = llvm::BasicBlock::Create(context, "head", frame_function);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", frame_function);
 	builder.SetInsertPoint(head_block);
+	allocate_registers(context, builder);
 	reg("head")->do_activations(context, builder, state_type, state);
 
 	llvm::BasicBlock* next_condition = nullptr;

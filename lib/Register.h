@@ -28,6 +28,8 @@ public:
 	inline bool is_inferred() const { return type() != nullptr; }
 	inline const std::string& name() const { return _name; }
 
+	inline void value(llvm::Value* val) { _value = val; }
+
 	void activation(Instruction* instruction, uint16_t value);
 	llvm::Value* fetch_value(llvm::LLVMContext& context,
 							 llvm::IRBuilder<> &builder,
@@ -42,6 +44,7 @@ public:
 						llvm::Type* state_type,
 						llvm::Value* state);
 private:
+	llvm::Value* _value;
 	std::string _name;
 	Type* _type;
 	std::vector<ActivationMask> activations;

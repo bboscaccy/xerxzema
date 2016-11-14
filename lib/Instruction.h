@@ -73,7 +73,11 @@ public:
 								   llvm::Value* state,
 								   llvm::BasicBlock* next_block);
 
+	inline void value(llvm::Value* val) { _value = val; }
+	inline llvm::Value* value() { return _value; }
+
 protected:
+	llvm::Value* _value;
 	std::vector<Register*> _inputs;
 	std::vector<Register*> _outputs;
 	std::vector<Register*> _deps;
