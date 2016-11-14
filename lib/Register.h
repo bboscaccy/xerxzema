@@ -24,6 +24,7 @@ public:
 	inline Type* type() const { return _type; }
 	void type(Type* t);
 	void offset(uint32_t o);
+	inline uint32_t offset() { return state_offset; }
 
 	inline bool is_inferred() const { return type() != nullptr; }
 	inline const std::string& name() const { return _name; }

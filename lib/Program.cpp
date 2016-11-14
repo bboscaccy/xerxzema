@@ -79,8 +79,21 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 }
 
 
-void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder)
+void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+								 llvm::Value* state)
 {
+	for(auto r: inputs)
+	{
+		auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
+		r->value(ptr);
+	}
+
+	for(auto r: outputs)
+	{
+		auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
+		r->value(ptr);
+	}
+
 	for(auto r: locals)
 	{
 		r->value(builder.CreateAlloca(r->type()->type(context), nullptr, r->name()));
@@ -103,7 +116,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto head_block = llvm::BasicBlock::Create(context, "head", frame_function);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", frame_function);
 	builder.SetInsertPoint(head_block);
-	allocate_registers(context, builder);
+	allocate_registers(context, builder, state);
 	reg("head")->do_activations(context, builder, state_type, state);
 
 	llvm::BasicBlock* next_condition = nullptr;
