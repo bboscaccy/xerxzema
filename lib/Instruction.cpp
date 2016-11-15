@@ -64,7 +64,7 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
 	builder.CreateStore(i, program->activation_counter_value());
 
-	builder.CreateStore(_value, llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)));
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
 	for(auto& r:_outputs)
 	{
 		r->do_activations(context, builder);
