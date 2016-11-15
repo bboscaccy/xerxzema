@@ -1,5 +1,6 @@
 #include "World.h"
 #include "Type.h"
+#include "Instruction.h"
 
 namespace xerxzema
 {
@@ -42,6 +43,7 @@ void World::create_core_namespace()
 	core->add_type("real", std::make_unique<Real>());
 	core->add_type("unit", std::make_unique<Unit>());
 	core->add_type("token", std::make_unique<Token>());
+	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
 	namespaces.emplace("core", std::move(core));
 
 }

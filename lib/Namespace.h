@@ -99,4 +99,11 @@ private:
 
 };
 
+template<class T>
+std::unique_ptr<BasicDefinition<T>> create_def(const std::string& name,
+											   const std::vector<std::string>& inputs,
+											   const std::vector<std::string>& outputs)
+{
+	return std::make_unique<BasicDefinition<T>>(name, inputs, outputs);
+}
 };
