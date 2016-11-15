@@ -147,22 +147,8 @@ bool Program::check_instruction(const std::string &name,
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;
-	data_types.push_back(llvm::Type::getInt64Ty(context)); //frame counter
 	data_types.push_back(llvm::Type::getInt1Ty(context)); //state value
-	data_types.push_back(llvm::Type::getInt64Ty(context)); //offset table
-	int i = 3;
-	for(auto r: inputs)
-	{
-		data_types.push_back(r->type()->type(context));
-		r->offset(i);
-		i++;
-	}
-	for(auto r: outputs)
-	{
-		data_types.push_back(r->type()->type(context));
-		r->offset(i);
-		i++;
-	}
+	int i = 1;
 	for(auto r: locals)
 	{
 		//data_types.push_back(r->type()->type(context));
@@ -174,24 +160,34 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
+	for(auto r: inputs)
+	{
+		arg_types.push_back(r->type()->type(context)->getPointerTo());
+	}
+	for(auto r: outputs)
+	{
+		arg_types.push_back(r->type()->type(context)->getPointerTo());
+	}
 
 	return llvm::FunctionType::get(llvm::Type::getInt64Ty(context), arg_types, false);
 }
 
 
 void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
-								 llvm::Value* state)
+								 llvm::Function* fn)
 {
+	auto it = fn->arg_begin();
+	it++;
 	for(auto r: inputs)
 	{
-		auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
-		r->value(ptr);
+		r->value(&*it);
+		it++;
 	}
 
 	for(auto r: outputs)
 	{
-		auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
-		r->value(ptr);
+		r->value(&*it);
+		it++;
 	}
 
 	for(auto r: locals)
@@ -217,7 +213,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto head_block = llvm::BasicBlock::Create(context, "head", function);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
 	builder.SetInsertPoint(head_block);
-	allocate_registers(context, builder, state);
+	allocate_registers(context, builder, function);
 	reg("head")->do_activations(context, builder);
 
 	llvm::BasicBlock* next_condition = nullptr;

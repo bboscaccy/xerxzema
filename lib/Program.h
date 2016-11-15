@@ -41,7 +41,7 @@ private:
 						   const std::vector<std::string>& inputs,
 						   const std::vector<std::string>& outputs);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
-							llvm::Value* state);
+							llvm::Function* fn);
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::vector<Register*> inputs;
 	std::vector<Register*> outputs;
