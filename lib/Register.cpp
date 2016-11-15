@@ -29,11 +29,7 @@ llvm::Value* Register::fetch_value(llvm::LLVMContext& context,
 								   llvm::Type* state_type,
 								   llvm::Value* state)
 {
-	std::vector<llvm::Value*> idx =
-		{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
-		 llvm::ConstantInt::get(context, llvm::APInt(32, state_offset))};
-	auto ptr = builder.CreateGEP(state_type, state, idx);
-	return builder.CreateLoad(ptr);
+	return builder.CreateLoad(_value);
 }
 
 llvm::Value* Register::fetch_value_raw(llvm::LLVMContext& context,
@@ -41,10 +37,7 @@ llvm::Value* Register::fetch_value_raw(llvm::LLVMContext& context,
 									   llvm::Type* state_type,
 									   llvm::Value* state)
 {
-	std::vector<llvm::Value*> idx =
-		{llvm::ConstantInt::get(context, llvm::APInt(64, 0)),
-		 llvm::ConstantInt::get(context, llvm::APInt(32, state_offset))};
-	return builder.CreateGEP(state_type, state, idx);
+	return _value;
 }
 
 void Register::do_activations(llvm::LLVMContext &context,

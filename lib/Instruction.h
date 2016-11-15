@@ -69,4 +69,17 @@ protected:
 	uint32_t _offset;
 	uint16_t mask;
 };
+
+class ValueReal : public Instruction
+{
+public:
+	ValueReal(double v);
+	void generate_operation(llvm::LLVMContext& context,
+									llvm::IRBuilder<> &builder,
+									llvm::Type* state_type,
+									llvm::Value* state);
+private:
+	double value;
+};
+
 };

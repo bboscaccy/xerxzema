@@ -47,7 +47,7 @@ void Instruction::generate_operation(llvm::LLVMContext &context,
 									 llvm::Type *state_type,
 									 llvm::Value *state)
 {
-	builder.CreateAlloca(llvm::Type::getVoidTy(context), nullptr, "noop");
+	builder.CreateAlloca(llvm::Type::getVoidTy(context), nullptr, "nop");
 
 }
 
@@ -67,6 +67,15 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 		r->do_activations(context, builder, state_type, state);
 	}
 	builder.CreateBr(next_block);
+}
+
+ValueReal::ValueReal(double v):value(v)	{}
+void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								   llvm::Type *state_type, llvm::Value *state)
+{
+	auto const_value = llvm::ConstantFP::get(llvm::Type::getDoubleTy(context), value);
+	auto target = _outputs[0]->fetch_value_raw(context, builder, state_type, state);
+	auto p = builder.CreateStore(target, const_value);
 }
 
 };
