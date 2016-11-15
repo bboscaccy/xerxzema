@@ -34,6 +34,7 @@ public:
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
+	inline llvm::Value* activation_counter_value() { return activation_counter; }
 
 private:
 	bool check_instruction(const std::string& name,

@@ -35,17 +35,12 @@ public:
 
 	void activation(Instruction* instruction, uint16_t value);
 	llvm::Value* fetch_value(llvm::LLVMContext& context,
-							 llvm::IRBuilder<> &builder,
-							 llvm::Type* state_type,
-							 llvm::Value* state);
+							 llvm::IRBuilder<> &builder);
 	llvm::Value* fetch_value_raw(llvm::LLVMContext& context,
-							 llvm::IRBuilder<> &builder,
-							 llvm::Type* state_type,
-							 llvm::Value* state);
+								 llvm::IRBuilder<> &builder);
 	void do_activations(llvm::LLVMContext& context,
-						llvm::IRBuilder<> &builder,
-						llvm::Type* state_type,
-						llvm::Value* state);
+						llvm::IRBuilder<> &builder);
+
 
 	std::vector<DeferredInstruction*> deffered;
 private:

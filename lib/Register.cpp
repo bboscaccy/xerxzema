@@ -25,25 +25,19 @@ void Register::offset(uint32_t o)
 }
 
 llvm::Value* Register::fetch_value(llvm::LLVMContext& context,
-								   llvm::IRBuilder<> &builder,
-								   llvm::Type* state_type,
-								   llvm::Value* state)
+								   llvm::IRBuilder<> &builder)
 {
 	return builder.CreateLoad(_value);
 }
 
 llvm::Value* Register::fetch_value_raw(llvm::LLVMContext& context,
-									   llvm::IRBuilder<> &builder,
-									   llvm::Type* state_type,
-									   llvm::Value* state)
+									   llvm::IRBuilder<> &builder)
 {
 	return _value;
 }
 
 void Register::do_activations(llvm::LLVMContext &context,
-							  llvm::IRBuilder<> &builder,
-							  llvm::Type *state_type,
-							  llvm::Value* state)
+							  llvm::IRBuilder<> &builder)
 {
 
 	for(auto& activate:activations)

@@ -218,7 +218,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
 	builder.SetInsertPoint(head_block);
 	allocate_registers(context, builder, state);
-	reg("head")->do_activations(context, builder, state_type, state);
+	reg("head")->do_activations(context, builder);
 
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;
@@ -248,10 +248,10 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 			next_condition = llvm::BasicBlock::Create(context, "", function);
 		}
 		op_block = llvm::BasicBlock::Create(context, "", function);
-		(*it)->generate_check(context, builder, state_type, state,condition,op_block,next_condition);
+		(*it)->generate_check(context, builder, this, condition,op_block, next_condition);
 		builder.SetInsertPoint(op_block);
-		(*it)->generate_operation(context, builder, state_type, state);
-		(*it)->generate_prolouge(context, builder, state_type, activation_counter, next_condition);
+		(*it)->generate_operation(context, builder, this);
+		(*it)->generate_prolouge(context, builder, this, next_condition);
 		inst++;
 		it++;
 	}

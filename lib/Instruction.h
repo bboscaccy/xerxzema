@@ -11,6 +11,7 @@ namespace xerxzema
 {
 
 class Register;
+class Program;
 class Instruction
 {
 public:
@@ -41,21 +42,18 @@ public:
 
 	virtual void generate_check(llvm::LLVMContext& context,
 								llvm::IRBuilder<> &builder,
-								llvm::Type* state_type,
-								llvm::Value* state,
+								Program* program,
 								llvm::BasicBlock* check_block,
 								llvm::BasicBlock* op_block,
 								llvm::BasicBlock* next_block);
 
 	virtual void generate_operation(llvm::LLVMContext& context,
 									llvm::IRBuilder<> &builder,
-									llvm::Type* state_type,
-									llvm::Value* state);
+									Program* program);
 
 	virtual void generate_prolouge(llvm::LLVMContext& context,
 								   llvm::IRBuilder<> &builder,
-								   llvm::Type* state_type,
-								   llvm::Value* state,
+								   Program* program,
 								   llvm::BasicBlock* next_block);
 
 	inline void value(llvm::Value* val) { _value = val; }
@@ -74,10 +72,8 @@ class ValueReal : public Instruction
 {
 public:
 	ValueReal(double v);
-	void generate_operation(llvm::LLVMContext& context,
-									llvm::IRBuilder<> &builder,
-									llvm::Type* state_type,
-									llvm::Value* state);
+	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
+							Program* program);
 private:
 	double value;
 };
