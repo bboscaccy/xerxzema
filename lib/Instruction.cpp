@@ -81,4 +81,13 @@ void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<>
 	auto p = builder.CreateStore(target, const_value);
 }
 
+void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[0]->fetch_value(context, builder);
+	auto p = builder.CreateFAdd(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
 };

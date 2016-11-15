@@ -10,6 +10,10 @@
 namespace xerxzema
 {
 
+#define DECL_INST(X) class X : public Instruction { \
+	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder, \
+							Program* program); };
+
 class Register;
 class Program;
 class Instruction
@@ -78,5 +82,7 @@ public:
 private:
 	double value;
 };
+
+DECL_INST(AddReal)
 
 };

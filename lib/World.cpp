@@ -44,6 +44,7 @@ void World::create_core_namespace()
 	core->add_type("unit", std::make_unique<Unit>());
 	core->add_type("token", std::make_unique<Token>());
 	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
+	core->add_instruction(create_def<AddReal>("add", {"real", "real"}, {"real"}));
 	namespaces.emplace("core", std::move(core));
 
 }

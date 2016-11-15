@@ -31,5 +31,8 @@ TEST(TestJit, TestCreation)
 	val->dependent(p->reg("head"));
 	p->instruction(std::move(val));
 
+	p->instruction("add", {"hi", "hi"}, {"res"});
+
+
 	jit->compile_namespace(world.get_namespace("core"));
 }
