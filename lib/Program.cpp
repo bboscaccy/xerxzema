@@ -215,6 +215,10 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	builder.SetInsertPoint(head_block);
 	allocate_registers(context, builder, function);
 	reg("head")->do_activations(context, builder);
+	for(auto r: inputs)
+	{
+		r->do_activations(context, builder);
+	}
 
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;

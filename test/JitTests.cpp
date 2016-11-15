@@ -9,6 +9,7 @@ TEST(TestJit, TestCreation)
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
+	p->add_input("bye", world.get_namespace("core")->type("real"));
 
 	auto foo = p->reg("foo");
 	foo->type(world.get_namespace("core")->type("real"));
@@ -31,7 +32,7 @@ TEST(TestJit, TestCreation)
 	val->dependent(p->reg("head"));
 	p->instruction(std::move(val));
 
-	p->instruction("add", {"hi", "hi"}, {"res"});
+	p->instruction("add", {"hi", "hi"}, {"bye"});
 
 
 	jit->compile_namespace(world.get_namespace("core"));
