@@ -19,12 +19,17 @@ void Instruction::input(xerxzema::Register *reg)
 void Instruction::dependent(xerxzema::Register *reg)
 {
 	reg->activation(this, 1 << _deps.size());
+	mask |= (1 << _deps.size());
 	_deps.push_back(reg);
+
 }
 
 void Instruction::sample(xerxzema::Register *reg)
 {
 	_inputs.push_back(reg);
+	reg->activation(this, 1 << _deps.size());
+	reset_mask |= (1 << _deps.size());
+	_deps.push_back(reg);
 }
 
 void Instruction::generate_check(llvm::LLVMContext& context,
@@ -59,7 +64,7 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
 	builder.CreateStore(i, program->activation_counter_value());
 
-	builder.CreateStore(_value, llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
+	builder.CreateStore(_value, llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)));
 	for(auto& r:_outputs)
 	{
 		r->do_activations(context, builder);

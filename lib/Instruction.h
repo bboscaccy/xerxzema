@@ -66,6 +66,7 @@ protected:
 	std::vector<Register*> _deps;
 	uint32_t _offset;
 	uint16_t mask;
+	uint16_t reset_mask;
 };
 
 class ValueReal : public Instruction
