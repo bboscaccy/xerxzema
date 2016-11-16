@@ -52,3 +52,33 @@ TEST(TestJit, TestAddConst)
 	(*testpointer)(nullptr, &in, &out);
 	ASSERT_EQ(out, 44.0);
 }
+
+TEST(TestJit, TestAddChainConst)
+{
+	xerxzema::World world;
+	auto jit = world.create_jit();
+	auto p = world.get_namespace("core")->get_program("test");
+	p->add_input("hi", world.get_namespace("core")->type("real"));
+	p->add_input("bye", world.get_namespace("core")->type("real"));
+
+	auto baz = p->reg("baz");
+	baz->type(world.get_namespace("core")->type("real"));
+	auto val = std::make_unique<xerxzema::ValueReal>(42.0);
+	val->output(baz);
+	val->dependent(p->reg("head"));
+	p->instruction(std::move(val));
+
+
+	p->instruction("add", {"hi", "baz"}, {"bar"});
+	p->instruction("add", {"bar", "baz"}, {"bye"});
+
+
+	jit->compile_namespace(world.get_namespace("core"));
+
+	void (*testpointer)(void*, double*, double*);
+	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
+	double in = 2.0;
+	double out = 3.0;
+	(*testpointer)(nullptr, &in, &out);
+	ASSERT_EQ(out, 86.0);
+}
