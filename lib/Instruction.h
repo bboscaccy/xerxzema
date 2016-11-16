@@ -44,6 +44,14 @@ public:
 		_offset = o;
 	}
 
+	virtual bool is_ugen();
+
+	virtual llvm::Type* state_type();
+
+	virtual void generate_read(llvm::LLVMContext& context,
+							   llvm::IRBuilder<> &builder,
+							   Program* program);
+
 	virtual void generate_check(llvm::LLVMContext& context,
 								llvm::IRBuilder<> &builder,
 								Program* program,
@@ -63,8 +71,16 @@ public:
 	inline void value(llvm::Value* val) { _value = val; }
 	inline llvm::Value* value() { return _value; }
 
+	inline llvm::Value* state_value() { return _state_value; }
+	inline void state_value(llvm::Value* val ) { _state_value = val; }
+
+	inline llvm::Value* eof_value() { return _eof_value; }
+	inline void eof_value(llvm::Value* val ) { _eof_value = val; }
+
 protected:
 	llvm::Value* _value;
+	llvm::Value* _state_value;
+	llvm::Value* _eof_value;
 	std::vector<Register*> _inputs;
 	std::vector<Register*> _outputs;
 	std::vector<Register*> _deps;

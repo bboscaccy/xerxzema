@@ -32,6 +32,23 @@ void Instruction::sample(xerxzema::Register *reg)
 	_deps.push_back(reg);
 }
 
+bool Instruction::is_ugen()
+{
+	return false;
+}
+
+llvm::Type* Instruction::state_type()
+{
+	return nullptr;
+}
+
+void Instruction::generate_read(llvm::LLVMContext& context,
+								llvm::IRBuilder<> &builder,
+								Program* program)
+{
+
+}
+
 void Instruction::generate_check(llvm::LLVMContext& context,
 								 llvm::IRBuilder<> &builder,
 								 Program* program,
