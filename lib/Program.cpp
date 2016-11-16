@@ -197,6 +197,7 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	for(auto& i: instructions)
 	{
 		i->value(builder.CreateAlloca(llvm::Type::getInt16Ty(context)));
+		builder.CreateStore(llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), 0), i->value());
 	}
 	activation_counter = builder.CreateAlloca(llvm::Type::getInt64Ty(context), nullptr, "counter");
 }
@@ -219,6 +220,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	{
 		r->do_activations(context, builder);
 	}
+
 
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;
@@ -269,6 +271,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(exit_block);
+
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
 

@@ -37,22 +37,30 @@ void Jit::compile_namespace(Namespace* ns)
 	ns->codegen(modules[ns->full_name()], _context);
 
 	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(modules[ns->full_name()]);
+
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
-	fpm->add(llvm::createConstantPropagationPass());
-	fpm->add(llvm::createConstantHoistingPass());
+	fpm->add(llvm::createLoadCombinePass());
+	fpm->add(llvm::createInstructionCombiningPass());
 	fpm->add(llvm::createDeadCodeEliminationPass());
+	fpm->add(llvm::createConstantPropagationPass());
 	fpm->add(llvm::createJumpThreadingPass());
 	fpm->add(llvm::createFlattenCFGPass());
-	fpm->add(llvm::createGVNHoistPass());
+	fpm->add(llvm::createReassociatePass());
 
-    fpm->doInitialization();
+	fpm->doInitialization();
 
-	for(auto& f: *modules[ns->full_name()])
-    {
+	for(auto& f: modules[ns->full_name()]->functions())
+	{
 		fpm->run(f);
-    }
+	}
 	modules[ns->full_name()]->dump();
 	engines[ns->full_name()]->finalizeObject();
+}
+
+void* Jit::get_jitted_function(const std::string& ns, const std::string &name)
+{
+	auto fn = modules[ns]->getFunction(name);
+	return engines[ns]->getPointerToFunction(fn);
 }
 
 };

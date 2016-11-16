@@ -35,6 +35,7 @@ public:
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
 	inline llvm::Value* activation_counter_value() { return activation_counter; }
+	inline llvm::Function* function_value() { return function; }
 
 private:
 	bool check_instruction(const std::string& name,
