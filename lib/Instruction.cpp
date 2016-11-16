@@ -90,4 +90,30 @@ void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &
 	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
 }
 
+void SubReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFSub(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void MulReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFMul(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void DivReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFDiv(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
 };

@@ -84,5 +84,8 @@ private:
 };
 
 DECL_INST(AddReal)
+DECL_INST(SubReal)
+DECL_INST(MulReal)
+DECL_INST(DivReal)
 
 };
