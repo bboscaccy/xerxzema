@@ -193,6 +193,7 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	for(auto r: locals)
 	{
 		r->value(builder.CreateAlloca(r->type()->type(context), nullptr, r->name()));
+		//TODO initalize these...
 	}
 	for(auto& i: instructions)
 	{
