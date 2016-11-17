@@ -46,7 +46,7 @@ public:
 
 	virtual bool is_ugen();
 
-	virtual llvm::Type* state_type();
+	virtual llvm::Type* state_type(llvm::LLVMContext& context);
 
 	virtual void generate_read(llvm::LLVMContext& context,
 							   llvm::IRBuilder<> &builder,
@@ -104,6 +104,14 @@ class Counter : public Instruction
 public:
 	inline bool is_ugen() { return true; }
 
+};
+
+class Delay : public Instruction
+{
+public:
+	llvm::Type* state_type(llvm::LLVMContext& context);
+private:
+	llvm::Type* _state_type;
 };
 
 DECL_INST(AddReal)

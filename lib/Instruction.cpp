@@ -37,7 +37,7 @@ bool Instruction::is_ugen()
 	return false;
 }
 
-llvm::Type* Instruction::state_type()
+llvm::Type* Instruction::state_type(llvm::LLVMContext& context)
 {
 	return nullptr;
 }
@@ -133,4 +133,15 @@ void DivReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &
 	auto p = builder.CreateFDiv(lhs, rhs);
 	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
 }
+
+llvm::Type* Delay::state_type(llvm::LLVMContext &context)
+{
+	std::vector<llvm::Type*> data_types;
+	data_types.push_back(llvm::Type::getInt1Ty(context));
+	data_types.push_back(_inputs[0]->type()->type(context));
+
+	_state_type = llvm::StructType::create(context, data_types);
+	return _state_type;
+}
+
 };
