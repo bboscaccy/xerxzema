@@ -89,6 +89,15 @@ void Instruction::generate_prolouge(llvm::LLVMContext &context,
 	builder.CreateBr(next_block);
 }
 
+void Instruction::generate_state_initializer(llvm::LLVMContext &context,
+											 llvm::IRBuilder<> &builder,
+											 xerxzema::Program *program)
+{
+	auto size = llvm::ConstantExpr::getSizeOf(_state_type);
+	auto ptr = builder.CreateBitCast(_state_value, llvm::Type::getInt8PtrTy(context));
+	builder.CreateMemSet(ptr, llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), 0), size, 0);
+}
+
 ValueReal::ValueReal(double v):value(v)	{}
 void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								   Program* program)

@@ -68,6 +68,10 @@ public:
 								   Program* program,
 								   llvm::BasicBlock* next_block);
 
+	virtual void generate_state_initializer(llvm::LLVMContext& context,
+											llvm::IRBuilder<> &builder,
+											Program* program);
+
 	inline void value(llvm::Value* val) { _value = val; }
 	inline llvm::Value* value() { return _value; }
 
@@ -87,6 +91,7 @@ protected:
 	uint32_t _offset;
 	uint16_t mask;
 	uint16_t reset_mask;
+	llvm::Type* _state_type;
 };
 
 class ValueReal : public Instruction
@@ -110,8 +115,6 @@ class Delay : public Instruction
 {
 public:
 	llvm::Type* state_type(llvm::LLVMContext& context);
-private:
-	llvm::Type* _state_type;
 };
 
 DECL_INST(AddReal)
