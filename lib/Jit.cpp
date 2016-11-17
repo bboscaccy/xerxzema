@@ -43,8 +43,6 @@ void Jit::compile_namespace(Namespace* ns)
 	fpm->add(llvm::createInstructionCombiningPass());
 	fpm->add(llvm::createDeadCodeEliminationPass());
 	fpm->add(llvm::createConstantPropagationPass());
-	fpm->add(llvm::createJumpThreadingPass());
-	fpm->add(llvm::createFlattenCFGPass());
 	fpm->add(llvm::createReassociatePass());
 
 	fpm->doInitialization();

@@ -151,9 +151,22 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	int i = 1;
 	for(auto r: locals)
 	{
-		//data_types.push_back(r->type()->type(context));
-		//r->offset(i);
-		//i++;
+		if(r->type()->name() != "unit")
+		{
+			data_types.push_back(r->type()->type(context));
+			r->offset(i);
+			i++;
+		}
+	}
+	for(auto& r: instructions)
+	{
+		data_types.push_back(llvm::Type::getInt16Ty(context));
+		r->offset(i);
+		i++;
+		if(r->state_type(context))
+		{
+			data_types.push_back(r->state_type(context));
+		}
 	}
 
 	auto state_type = llvm::StructType::create(context, data_types, _name + "_data");
