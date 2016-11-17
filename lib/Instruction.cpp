@@ -153,4 +153,48 @@ llvm::Type* Delay::state_type(llvm::LLVMContext &context)
 	return _state_type;
 }
 
+void Delay::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							   Program *program)
+{
+	//TODO refactor this into a propery type based copy operation
+	auto size = llvm::ConstantExpr::getSizeOf(_inputs[0]->type()->type(context));
+	auto val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
+	builder.CreateMemCpy(val_ptr, _inputs[0]->fetch_value_raw(context,builder), size, 0);
+}
+
+void Delay::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program, llvm::BasicBlock *next_block)
+{
+
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+
+
+	auto fire_block = llvm::BasicBlock::Create(context, "fire_delay", program->function_value());
+	auto skip_block = llvm::BasicBlock::Create(context, "skip_delay", program->function_value());
+
+	auto bool_ptr = builder.CreateStructGEP(_state_type, _state_value, 0);
+	auto bool_val = builder.CreateLoad(bool_ptr);
+	builder.CreateCondBr(bool_val, fire_block, skip_block);
+
+	builder.SetInsertPoint(skip_block);
+	bool_ptr = builder.CreateStructGEP(_state_type, _state_value, 0);
+	builder.CreateStore(llvm::ConstantInt::get(bool_val->getType(), 1), bool_ptr);
+	builder.CreateBr(next_block);
+
+	builder.SetInsertPoint(fire_block);
+
+	auto size = llvm::ConstantExpr::getSizeOf(_inputs[0]->type()->type(context));
+	auto val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
+	builder.CreateMemCpy(_outputs[0]->fetch_value_raw(context,builder), val_ptr, size, 0);
+
+	auto p = builder.CreateLoad(program->activation_counter_value());
+	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+	builder.CreateStore(i, program->activation_counter_value());
+
+	for(auto& r:_outputs)
+	{
+		r->do_activations(context, builder);
+	}
+	builder.CreateBr(next_block);
+}
 };

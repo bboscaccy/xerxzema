@@ -115,6 +115,13 @@ class Delay : public Instruction
 {
 public:
 	llvm::Type* state_type(llvm::LLVMContext& context);
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	void generate_prolouge(llvm::LLVMContext& context,
+						   llvm::IRBuilder<> &builder,
+						   Program* program,
+						   llvm::BasicBlock* next_block);
 };
 
 DECL_INST(AddReal)
