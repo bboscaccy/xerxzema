@@ -200,6 +200,12 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	{
 		i->value(builder.CreateAlloca(llvm::Type::getInt16Ty(context)));
 		builder.CreateStore(llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), 0), i->value());
+		auto instruction_state_type = i->state_type(context);
+		if(instruction_state_type != nullptr)
+		{
+			i->state_value(builder.CreateAlloca(instruction_state_type));
+			i->generate_state_initializer(context, builder, this);
+		}
 	}
 	activation_counter = builder.CreateAlloca(llvm::Type::getInt64Ty(context), nullptr, "counter");
 }
