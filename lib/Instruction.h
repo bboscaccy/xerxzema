@@ -99,6 +99,13 @@ private:
 	double value;
 };
 
+class Counter : public Instruction
+{
+public:
+	inline bool is_ugen() { return true; }
+
+};
+
 DECL_INST(AddReal)
 DECL_INST(SubReal)
 DECL_INST(MulReal)
