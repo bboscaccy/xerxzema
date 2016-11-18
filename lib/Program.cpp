@@ -285,7 +285,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto counter_value = builder.CreateLoad(activation_counter);
 	auto reenter = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_EQ, counter_value,
 										llvm::ConstantInt::get(context, llvm::APInt(64, 0)));
-	builder.CreateCondBr(reenter, exit_block, reenter_block);
+	auto tail_ret = builder.CreateCondBr(reenter, exit_block, reenter_block);
 
 	builder.SetInsertPoint(reenter_block);
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(64, 0)), activation_counter);

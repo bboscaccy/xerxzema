@@ -5,7 +5,8 @@
 namespace xerxzema
 {
 
-Instruction::Instruction()
+Instruction::Instruction() :  _offset(0), mask(0), reset_mask(0), _state_type(nullptr),
+							  _value(nullptr), _state_value(nullptr), _eof_value(nullptr)
 {
 
 }

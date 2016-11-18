@@ -36,7 +36,7 @@ public:
 	Jit(World* world);
 	inline llvm::LLVMContext& context() { return _context; }
 	void compile_namespace(Namespace* ns);
-	void* get_jitted_function(const std::string&, const std::string& name);
+	void* get_jitted_function(const std::string& ns, const std::string& name);
 
 private:
 	void create_module(Namespace* ns);
