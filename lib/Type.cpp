@@ -8,6 +8,20 @@ Type::Type()
 
 }
 
+void Type::move(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				llvm::Value *dst_ptr, llvm::Value *src_ptr)
+{
+	auto v = builder.CreateLoad(src_ptr);
+	builder.CreateStore(v, dst_ptr);
+}
+
+void Type::copy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				llvm::Value *dst_ptr, llvm::Value *src_ptr)
+{
+	auto v = builder.CreateLoad(src_ptr);
+	builder.CreateStore(v, dst_ptr);
+}
+
 std::string Bool::name()
 {
 	return "bool";
@@ -17,6 +31,7 @@ llvm::Type* Bool::type(llvm::LLVMContext &context)
 {
 	return llvm::Type::getInt1Ty(context);
 }
+
 
 void Bool::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
 {

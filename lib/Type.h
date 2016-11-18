@@ -15,6 +15,10 @@ public:
 	virtual std::string name() = 0;
 	virtual llvm::Type* type(llvm::LLVMContext& context) = 0;
 	virtual void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val) = 0;
+	virtual void move(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
+	virtual void copy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
 };
 
 #define DECL_TYPE(X) class X : public Type { \
