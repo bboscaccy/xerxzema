@@ -144,6 +144,61 @@ void DivReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &
 	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
 }
 
+
+void EqReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpOEQ(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void NeReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpONE(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void LtReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpOLT(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void LeReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpOLE(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void GtReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpOGT(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
+void GeReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto p = builder.CreateFCmpOGE(lhs, rhs);
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
+
 llvm::Type* Delay::state_type(llvm::LLVMContext &context)
 {
 

@@ -45,9 +45,15 @@ void World::create_core_namespace()
 	core->add_type("token", std::make_unique<Token>());
 	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
 	core->add_instruction(create_def<AddReal>("add", {"real", "real"}, {"real"}));
-	core->add_instruction(create_def<AddReal>("sub", {"real", "real"}, {"real"}));
-	core->add_instruction(create_def<AddReal>("mul", {"real", "real"}, {"real"}));
-	core->add_instruction(create_def<AddReal>("div", {"real", "real"}, {"real"}));
+	core->add_instruction(create_def<SubReal>("sub", {"real", "real"}, {"real"}));
+	core->add_instruction(create_def<MulReal>("mul", {"real", "real"}, {"real"}));
+	core->add_instruction(create_def<DivReal>("div", {"real", "real"}, {"real"}));
+	core->add_instruction(create_def<EqReal>("eq", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<NeReal>("ne", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<LtReal>("lt", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<LeReal>("le", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<GtReal>("gt", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<GeReal>("ge", {"real", "real"}, {"bool"}));
 	namespaces.emplace("core", std::move(core));
 
 }

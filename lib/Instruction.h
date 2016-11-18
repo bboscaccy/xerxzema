@@ -128,5 +128,11 @@ DECL_INST(AddReal)
 DECL_INST(SubReal)
 DECL_INST(MulReal)
 DECL_INST(DivReal)
+DECL_INST(EqReal)
+DECL_INST(NeReal)
+DECL_INST(LtReal)
+DECL_INST(LeReal)
+DECL_INST(GtReal)
+DECL_INST(GeReal)
 
 };
