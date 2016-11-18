@@ -284,6 +284,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 			r->type()->copy(context, builder,r->fetch_value_raw(context, builder), ptr);
 		}
 	}
+
 	for(auto& r: instructions)
 	{
 		auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());

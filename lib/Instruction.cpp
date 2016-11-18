@@ -146,6 +146,10 @@ void DivReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &
 
 llvm::Type* Delay::state_type(llvm::LLVMContext &context)
 {
+
+	if(_state_type)
+		return _state_type;
+
 	std::vector<llvm::Type*> data_types;
 	data_types.push_back(llvm::Type::getInt1Ty(context));
 	data_types.push_back(_inputs[0]->type()->type(context));
