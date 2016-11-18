@@ -20,7 +20,8 @@ TEST(TestJit, TestAdd)
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
-	(*testpointer)(nullptr, &in, &out);
+	char state[128] = {0};
+	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 4.0);
 }
 
@@ -46,10 +47,11 @@ TEST(TestJit, TestAddConst)
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*);
+	char state[128] = {0};
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
-	(*testpointer)(nullptr, &in, &out);
+	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 44.0);
 }
 
@@ -79,7 +81,8 @@ TEST(TestJit, TestAddChainConst)
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
-	(*testpointer)(nullptr, &in, &out);
+	char state[128] = {0};
+	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 86.0);
 }
 
@@ -117,6 +120,7 @@ TEST(TestJit, TestAddChainConstDelay)
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
-	(*testpointer)(nullptr, &in, &out);
+	char state[128] = {0};
+	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 86.0);
 }

@@ -43,6 +43,7 @@ private:
 						   const std::vector<std::string>& outputs);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);
+	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::vector<Register*> inputs;
 	std::vector<Register*> outputs;

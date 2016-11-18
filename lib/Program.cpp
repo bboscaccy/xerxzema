@@ -169,7 +169,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		}
 	}
 
-	auto state_type = llvm::StructType::create(context, data_types, _name + "_data");
+	state_type = llvm::StructType::create(context, data_types, _name + "_data");
 
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
@@ -223,6 +223,18 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	activation_counter = builder.CreateAlloca(llvm::Type::getInt64Ty(context), nullptr, "counter");
 }
 
+void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder)
+{
+	for(auto r: locals)
+	{
+		if(r->type()->name() != "unit")
+		{
+			auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+			r->type()->copy(context, builder, ptr, r->fetch_value_raw(context, builder));
+		}
+	}
+}
+	
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
@@ -292,7 +304,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(exit_block);
-
+	generate_exit_block(context, builder);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
 
