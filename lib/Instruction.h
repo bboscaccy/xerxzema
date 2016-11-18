@@ -124,6 +124,19 @@ public:
 						   llvm::BasicBlock* next_block);
 };
 
+//input[0] is a bool, input[1] is any, output[1] == input[1]
+class When : public Instruction
+{
+public:
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	void generate_prolouge(llvm::LLVMContext& context,
+						   llvm::IRBuilder<> &builder,
+						   Program* program,
+						   llvm::BasicBlock* next_block);
+};
+
 DECL_INST(AddReal)
 DECL_INST(SubReal)
 DECL_INST(MulReal)
