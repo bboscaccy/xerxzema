@@ -38,12 +38,12 @@ void Jit::compile_namespace(Namespace* ns)
 
 	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(modules[ns->full_name()]);
 
-	//fpm->add(llvm::createJumpThreadingPass());
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
 	fpm->add(llvm::createLoadCombinePass());
 	fpm->add(llvm::createInstructionCombiningPass());
 	fpm->add(llvm::createDeadCodeEliminationPass());
 	fpm->add(llvm::createConstantPropagationPass());
+	fpm->add(llvm::createJumpThreadingPass());
 	fpm->add(llvm::createReassociatePass());
 
 	fpm->doInitialization();
