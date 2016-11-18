@@ -166,6 +166,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		if(r->state_type(context))
 		{
 			data_types.push_back(r->state_type(context));
+			i++;
 		}
 	}
 
@@ -233,8 +234,24 @@ void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>&
 			r->type()->copy(context, builder, ptr, r->fetch_value_raw(context, builder));
 		}
 	}
+	for(auto& r: instructions)
+	{
+		auto val = builder.CreateLoad(r->value());
+		auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+		builder.CreateStore(val, ptr);
+
+		auto instruction_state_type = r->state_type(context);
+		if(instruction_state_type != nullptr)
+		{
+			auto sz = llvm::ConstantExpr::getSizeOf(instruction_state_type);
+			auto dst_ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(),
+												   r->offset()+1);
+			auto src_ptr = r->state_value();
+			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
+		}
+	}
 }
-	
+
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
