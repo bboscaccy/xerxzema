@@ -3,6 +3,19 @@
 #include "../lib/Instruction.h"
 #include <stdio.h>
 
+struct delay_state
+{
+	bool fired;
+	double data;
+};
+
+struct test_delay_data
+{
+	bool resume;
+	uint16_t delay_mask;
+	delay_state delay_state_data;
+};
+
 TEST(TestJit, TestAdd)
 {
 	xerxzema::World world;
@@ -91,14 +104,6 @@ TEST(TestJit, TestAddChainConst)
 
 TEST(TestJit, TestAddChainConstDelay)
 {
-	/*
-program test hi:real -> bye:real
-    baz = 42
-    dbaz = delay(baz)
-    bar = hi + baz
-    bye = bar + baz
-	 */
-	
 	xerxzema::World world;
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
@@ -135,4 +140,37 @@ program test hi:real -> bye:real
 	memset(state, 0, 128);
 	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 86.0);
+}
+
+TEST(TestJist, TestDelay)
+{
+	/* program TestDelay(hi:real) -> bye:real
+	   hi~1 -> bye */
+
+	xerxzema::World world;
+	auto jit = world.create_jit();
+	auto p = world.get_namespace("core")->get_program("test");
+	p->add_input("hi", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
+
+
+	auto dval = std::make_unique<xerxzema::Delay>();
+	dval->output(p->reg("bye"));
+	dval->input(p->reg("hi"));
+	p->instruction(std::move(dval));
+
+	jit->compile_namespace(world.get_namespace("core"));
+
+	void (*testpointer)(void*, double*, double*);
+	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
+	double in = 0.0;
+	double out = 0.0;
+	test_delay_data state = {0};
+
+	for(int i = 1; i < 1000; i++)
+	{
+		in = i;
+		(*testpointer)(&state, &in, &out);
+		ASSERT_EQ(in - 1, out);
+	}
 }

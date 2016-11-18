@@ -161,10 +161,7 @@ llvm::Type* Delay::state_type(llvm::LLVMContext &context)
 void Delay::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 							   Program *program)
 {
-	//TODO refactor this into a propery type based copy operation
-	auto size = llvm::ConstantExpr::getSizeOf(_inputs[0]->type()->type(context));
-	auto val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
-	builder.CreateMemCpy(val_ptr, _inputs[0]->fetch_value_raw(context,builder), size, 0);
+
 }
 
 void Delay::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
@@ -184,13 +181,17 @@ void Delay::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &bui
 	builder.SetInsertPoint(skip_block);
 	bool_ptr = builder.CreateStructGEP(_state_type, _state_value, 0);
 	builder.CreateStore(llvm::ConstantInt::get(bool_val->getType(), 1), bool_ptr);
+	auto delay_val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
+	_inputs[0]->type()->copy(context, builder, delay_val_ptr,
+							 _inputs[0]->fetch_value_raw(context, builder));
 	builder.CreateBr(next_block);
 
 	builder.SetInsertPoint(fire_block);
-
-	auto size = llvm::ConstantExpr::getSizeOf(_inputs[0]->type()->type(context));
-	auto val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
-	builder.CreateMemCpy(_outputs[0]->fetch_value_raw(context,builder), val_ptr, size, 0);
+	delay_val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
+	auto in_ptr = _inputs[0]->fetch_value_raw(context, builder);
+	auto out_ptr = _outputs[0]->fetch_value_raw(context, builder);
+	_inputs[0]->type()->copy(context, builder, out_ptr, delay_val_ptr);
+	_inputs[0]->type()->copy(context, builder, delay_val_ptr, in_ptr);
 
 	auto p = builder.CreateLoad(program->activation_counter_value());
 	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));

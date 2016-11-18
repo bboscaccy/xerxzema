@@ -260,17 +260,19 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	auto head_block = llvm::BasicBlock::Create(context, "head", function);
 	auto resume_block = llvm::BasicBlock::Create(context, "resume", function);
 	auto first_block = llvm::BasicBlock::Create(context, "first", function);
+
 	builder.SetInsertPoint(entry_block);
 	allocate_registers(context, builder, function);
+	auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
+	auto reentry_val = builder.CreateLoad(ptr);
+	builder.CreateCondBr(reentry_val, resume_block, head_block);
+
+	builder.SetInsertPoint(head_block);
+	reg("head")->do_activations(context, builder);
 	for(auto r: inputs)
 	{
 		r->do_activations(context, builder);
 	}
-	auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
-	auto reentry_val = builder.CreateLoad(ptr);
-	builder.CreateCondBr(reentry_val, resume_block, head_block);
-	builder.SetInsertPoint(head_block);
-	reg("head")->do_activations(context, builder);
 	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(1, 1)), ptr);
 	builder.CreateBr(first_block);
@@ -301,11 +303,15 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
 		}
 	}
+	for(auto r: inputs)
+	{
+		r->do_activations(context, builder);
+	}
 	builder.CreateBr(first_block);
 	return first_block;
-	
+
 }
-	
+
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
@@ -315,11 +321,11 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 	llvm::IRBuilder<> builder(context);
 	auto state = &*function->arg_begin();
-	
+
 	auto post_entry_block = generate_entry_block(context, builder);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
 	builder.SetInsertPoint(post_entry_block);
-	
+
 
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;
