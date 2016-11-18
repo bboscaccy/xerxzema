@@ -21,6 +21,7 @@ TEST(TestJit, TestAdd)
 	double in = 2.0;
 	double out = 3.0;
 	char state[128] = {0};
+	memset(state, 0, 128);
 	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 4.0);
 }
@@ -48,6 +49,7 @@ TEST(TestJit, TestAddConst)
 
 	void (*testpointer)(void*, double*, double*);
 	char state[128] = {0};
+	memset(state, 0, 128);
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
@@ -82,12 +84,21 @@ TEST(TestJit, TestAddChainConst)
 	double in = 2.0;
 	double out = 3.0;
 	char state[128] = {0};
+	memset(state, 0, 128);
 	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 86.0);
 }
 
 TEST(TestJit, TestAddChainConstDelay)
 {
+	/*
+program test hi:real -> bye:real
+    baz = 42
+    dbaz = delay(baz)
+    bar = hi + baz
+    bye = bar + baz
+	 */
+	
 	xerxzema::World world;
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
@@ -120,7 +131,8 @@ TEST(TestJit, TestAddChainConstDelay)
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 2.0;
 	double out = 3.0;
-	char state[128] = {0};
+	char state[128];
+	memset(state, 0, 128);
 	(*testpointer)(state, &in, &out);
 	ASSERT_EQ(out, 86.0);
 }

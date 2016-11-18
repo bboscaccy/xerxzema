@@ -252,6 +252,59 @@ void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>&
 	}
 }
 
+llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
+												llvm::IRBuilder<>& builder)
+{
+	auto state = &*function->arg_begin();
+	auto entry_block = llvm::BasicBlock::Create(context, "entry", function);
+	auto head_block = llvm::BasicBlock::Create(context, "head", function);
+	auto resume_block = llvm::BasicBlock::Create(context, "resume", function);
+	auto first_block = llvm::BasicBlock::Create(context, "first", function);
+	builder.SetInsertPoint(entry_block);
+	allocate_registers(context, builder, function);
+	for(auto r: inputs)
+	{
+		r->do_activations(context, builder);
+	}
+	auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
+	auto reentry_val = builder.CreateLoad(ptr);
+	builder.CreateCondBr(reentry_val, resume_block, head_block);
+	builder.SetInsertPoint(head_block);
+	reg("head")->do_activations(context, builder);
+	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(1, 1)), ptr);
+	builder.CreateBr(first_block);
+
+	builder.SetInsertPoint(resume_block);
+	for(auto r: locals)
+	{
+		if(r->type()->name() != "unit")
+		{
+			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+			r->type()->copy(context, builder,r->fetch_value_raw(context, builder), ptr);
+		}
+	}
+	for(auto& r: instructions)
+	{
+		auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+		auto val = builder.CreateLoad(ptr);
+		builder.CreateStore(val, r->value());
+
+		auto instruction_state_type = r->state_type(context);
+		if(instruction_state_type != nullptr)
+		{
+			auto sz = llvm::ConstantExpr::getSizeOf(instruction_state_type);
+			auto src_ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(),
+												   r->offset()+1);
+			auto dst_ptr = r->state_value();
+			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
+		}
+	}
+	builder.CreateBr(first_block);
+	return first_block;
+	
+}
+	
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
@@ -261,16 +314,11 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 	llvm::IRBuilder<> builder(context);
 	auto state = &*function->arg_begin();
-	auto head_block = llvm::BasicBlock::Create(context, "head", function);
+	
+	auto post_entry_block = generate_entry_block(context, builder);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
-	builder.SetInsertPoint(head_block);
-	allocate_registers(context, builder, function);
-	reg("head")->do_activations(context, builder);
-	for(auto r: inputs)
-	{
-		r->do_activations(context, builder);
-	}
-
+	builder.SetInsertPoint(post_entry_block);
+	
 
 	llvm::BasicBlock* next_condition = nullptr;
 	llvm::BasicBlock* condition = nullptr;
