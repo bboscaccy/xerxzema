@@ -124,8 +124,23 @@ public:
 						   llvm::BasicBlock* next_block);
 };
 
-//input[0] is a bool, input[1] is any, output[1] == input[1]
+//input[0] is a bool, input[1] is any, output[0] == input[1]
+//when i[0] == True, input[0] is copied to output[0]
+//otherwise output[0] remains unchanges.
+//output[0] is fired regardless
 class When : public Instruction
+{
+public:
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	void generate_prolouge(llvm::LLVMContext& context,
+						   llvm::IRBuilder<> &builder,
+						   Program* program,
+						   llvm::BasicBlock* next_block);
+};
+
+class Cond : public Instruction
 {
 public:
 	void generate_operation(llvm::LLVMContext& context,

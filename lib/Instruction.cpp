@@ -294,4 +294,36 @@ void When::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 
 }
 
+void Cond::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program)
+{
+
+}
+
+void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program, llvm::BasicBlock *next_block)
+{
+	auto true_block = llvm::BasicBlock::Create(context, "cond_true", program->function_value());
+	auto false_block = llvm::BasicBlock::Create(context, "when_false", program->function_value());
+
+	auto test_val = _inputs[0]->fetch_value(context, builder);
+	builder.CreateCondBr(test_val, true_block, false_block);
+
+	builder.SetInsertPoint(true_block);
+	if(_inputs.size() > 1)
+	{
+		_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+								 _inputs[1]->fetch_value_raw(context, builder));
+	}
+	for(auto& r:_outputs)
+	{
+		r->do_activations(context, builder);
+	}
+	builder.CreateBr(next_block);
+
+	builder.SetInsertPoint(false_block);
+	builder.CreateBr(next_block);
+
+}
+
 };
