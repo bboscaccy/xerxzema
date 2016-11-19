@@ -358,4 +358,13 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 	builder.CreateCall(fn, {format_str, _inputs[0]->fetch_value(context, builder)});
 }
 
+void Trace::generate_prolouge(llvm::LLVMContext &context,
+									llvm::IRBuilder<> &builder,
+									Program* program,
+									llvm::BasicBlock *next_block)
+{
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+	builder.CreateBr(next_block);
+}
+
 };
