@@ -318,6 +318,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									 _name , module);
+	_current_module = module;
 
 	llvm::IRBuilder<> builder(context);
 	auto state = &*function->arg_begin();

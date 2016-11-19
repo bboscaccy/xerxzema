@@ -159,6 +159,10 @@ TEST(TestJist, TestDelay)
 	dval->input(p->reg("hi"));
 	p->instruction(std::move(dval));
 
+	auto tracer = std::make_unique<xerxzema::Trace>();
+	tracer->input(p->reg("hi"));
+	p->instruction(std::move(tracer));
+
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*);

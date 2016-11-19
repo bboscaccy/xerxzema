@@ -332,5 +332,30 @@ void Bang::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bui
 
 }
 
+void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program)
+{
+	std::string input_str("(");
+	input_str += _inputs[0]->name();
+	input_str += ") %f\n";
+	auto format_str = builder.CreateGlobalString(input_str);
+
+
+	auto fn = program->current_module()->getFunction("printf");
+	if(!fn)
+	{
+		std::vector<llvm::Type*> printf_arg_types;
+		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(context));
+
+		llvm::FunctionType* printf_type =
+			llvm::FunctionType::get(llvm::Type::getInt32Ty(context), printf_arg_types, true);
+
+		fn = llvm::Function::Create(printf_type, llvm::Function::ExternalLinkage,
+									"printf", program->current_module());
+
+		fn->setCallingConv(llvm::CallingConv::C);
+	}
+	builder.CreateCall(fn, {format_str, _inputs[0]->fetch_value(context, builder)});
+}
 
 };

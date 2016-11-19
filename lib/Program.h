@@ -36,6 +36,7 @@ public:
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
 	inline llvm::Value* activation_counter_value() { return activation_counter; }
 	inline llvm::Function* function_value() { return function; }
+	inline llvm::Module* current_module() { return _current_module; }
 
 private:
 	bool check_instruction(const std::string& name,
@@ -55,6 +56,7 @@ private:
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;
 	llvm::Function* function;
+	llvm::Module* _current_module;
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
 };
 
