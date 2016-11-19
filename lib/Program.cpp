@@ -151,6 +151,11 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	int i = 1;
 	for(auto r: locals)
 	{
+		if(!r->type())
+		{
+			printf("%s is undefined\n", r->name().c_str());
+		}
+
 		if(r->type()->name() != "unit")
 		{
 			data_types.push_back(r->type()->type(context));

@@ -159,7 +159,7 @@ TEST(TestJist, TestDelay)
 	dval->input(p->reg("hi"));
 	p->instruction(std::move(dval));
 
-	p->instruction("trace", {"hi"}, {});
+	//p->instruction("trace", {"hi"}, {});
 
 	jit->compile_namespace(world.get_namespace("core"));
 
@@ -175,4 +175,48 @@ TEST(TestJist, TestDelay)
 		(*testpointer)(&state, &in, &out);
 		ASSERT_EQ(in - 1, out);
 	}
+}
+
+TEST(TestJit, TestWhen)
+{
+	/* program TestDelay(hi:real) -> bye:real
+	   hi~1 -> bye */
+
+	xerxzema::World world;
+	auto jit = world.create_jit();
+	auto p = world.get_namespace("core")->get_program("test");
+	p->add_input("i0", world.get_namespace("core")->type("real"));
+	p->add_input("i1", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
+
+	p->instruction("lt", {"i0", "i1"}, {"cmp"});
+	auto when = std::make_unique<xerxzema::When>();
+	when->input(p->reg("cmp"));
+	when->input(p->reg("i0"));
+	when->output(p->reg("bye"));
+	p->instruction(std::move(when));
+
+	//p->instruction("trace", {"bye"}, {});
+
+	jit->compile_namespace(world.get_namespace("core"));
+
+	void (*testpointer)(void*, double*, double*, double*);
+	testpointer = (void (*)(void*, double*, double*, double*))jit->get_jitted_function("core", "test");
+	double in0 = 1.0;
+	double in1 = 2.0;
+	double out = 0.0;
+
+	char state[128];
+	memset(state, 0, 128);
+	(*testpointer)(&state, &in0, &in1, &out);
+	ASSERT_EQ(out, 1.0);
+
+	in0 = 2.0;
+	in1 = 1.0;
+	out = 0.0;
+
+	(*testpointer)(&state, &in0, &in1, &out);
+	ASSERT_EQ(out, .0);
+
+
 }
