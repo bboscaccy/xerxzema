@@ -152,6 +152,14 @@ public:
 						   llvm::BasicBlock* next_block);
 };
 
+class Bang : public Instruction
+{
+public:
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+};
+
 DECL_INST(AddReal)
 DECL_INST(SubReal)
 DECL_INST(MulReal)

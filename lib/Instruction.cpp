@@ -326,4 +326,11 @@ void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 
 }
 
+void Bang::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program)
+{
+
+}
+
+
 };
