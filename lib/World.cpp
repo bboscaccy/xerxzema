@@ -54,6 +54,7 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<LeReal>("le", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<GtReal>("gt", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<GeReal>("ge", {"real", "real"}, {"bool"}));
+	core->add_instruction(create_def<Trace>("trace", {"real"}, {}));
 	namespaces.emplace("core", std::move(core));
 
 }
