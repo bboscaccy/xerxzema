@@ -142,7 +142,7 @@ TEST(TestJit, TestAddChainConstDelay)
 	ASSERT_EQ(out, 86.0);
 }
 
-TEST(TestJist, TestDelay)
+TEST(TestJit, TestDelay)
 {
 	/* program TestDelay(hi:real) -> bye:real
 	   hi~1 -> bye */
@@ -189,14 +189,20 @@ TEST(TestJit, TestWhen)
 	p->add_input("i1", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
 
+	auto x = p->reg("x");
+	x->type(world.get_namespace("core")->type("real"));
+
 	p->instruction("lt", {"i0", "i1"}, {"cmp"});
 	auto when = std::make_unique<xerxzema::When>();
 	when->input(p->reg("cmp"));
 	when->input(p->reg("i0"));
-	when->output(p->reg("bye"));
+	when->output(p->reg("x"));
 	p->instruction(std::move(when));
 
-	//p->instruction("trace", {"bye"}, {});
+	p->instruction("add", {"x", "i1"}, {"bye"});
+
+	p->instruction("trace", {"bye"}, {});
+	p->instruction("trace", {"x"}, {});
 
 	jit->compile_namespace(world.get_namespace("core"));
 
@@ -209,14 +215,20 @@ TEST(TestJit, TestWhen)
 	char state[128];
 	memset(state, 0, 128);
 	(*testpointer)(&state, &in0, &in1, &out);
-	ASSERT_EQ(out, 1.0);
+	ASSERT_EQ(out, 3.0);
 
 	in0 = 2.0;
 	in1 = 1.0;
 	out = 0.0;
-
 	(*testpointer)(&state, &in0, &in1, &out);
-	ASSERT_EQ(out, .0);
+	ASSERT_EQ(out, 2.0);
+
+	in0 = 2.0;
+	in1 = 1.0;
+	out = 0.0;
+	memset(state, 0, 128);
+	(*testpointer)(&state, &in0, &in1, &out);
+	ASSERT_EQ(out, 1.0);
 
 
 }

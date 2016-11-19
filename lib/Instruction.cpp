@@ -271,6 +271,10 @@ void When::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 	auto true_block = llvm::BasicBlock::Create(context, "when_true", program->function_value());
 	auto false_block = llvm::BasicBlock::Create(context, "when_false", program->function_value());
 
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+	auto p = builder.CreateLoad(program->activation_counter_value());
+	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+	builder.CreateStore(i, program->activation_counter_value());
 	auto test_val = _inputs[0]->fetch_value(context, builder);
 	builder.CreateCondBr(test_val, true_block, false_block);
 
@@ -306,10 +310,14 @@ void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 	auto true_block = llvm::BasicBlock::Create(context, "cond_true", program->function_value());
 	auto false_block = llvm::BasicBlock::Create(context, "when_false", program->function_value());
 
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
 	auto test_val = _inputs[0]->fetch_value(context, builder);
 	builder.CreateCondBr(test_val, true_block, false_block);
 
 	builder.SetInsertPoint(true_block);
+	auto p = builder.CreateLoad(program->activation_counter_value());
+	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+	builder.CreateStore(i, program->activation_counter_value());
 	if(_inputs.size() > 1)
 	{
 		_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
