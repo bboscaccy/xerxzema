@@ -110,7 +110,26 @@ void Token::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::V
 }
 
 
+std::string Array::name()
+{
+	return "array@" + type_params[0]->name() + "@";
+}
 
+llvm::Type* Array::type(llvm::LLVMContext& context)
+{
+	std::vector<llvm::Type*> arg_types;
+	arg_types.push_back(type_params[0]->type(context));
+	arg_types.push_back(llvm::Type::getInt64Ty(context));
+	arg_types.push_back(llvm::Type::getInt64Ty(context));
+	return llvm::StructType::create(context, arg_types, name());
+}
 
+void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *val)
+{
+	auto sz = llvm::ConstantExpr::getSizeOf(type(context));
+	builder.CreateMemSet(val, llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), 0),
+						 sz, 0);
+
+}
 
 };

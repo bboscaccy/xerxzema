@@ -30,6 +30,14 @@ protected:
 	std::vector<Type*> type_params;
 };
 
+class Array : public ParameterizedType
+{
+public:
+	std::string name();
+	llvm::Type* type(llvm::LLVMContext& context);
+	void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val);
+};
+
 #define DECL_TYPE(X) class X : public Type { \
 public:										 \
  std::string name();						 \
