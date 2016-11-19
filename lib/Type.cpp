@@ -22,6 +22,16 @@ void Type::copy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 	builder.CreateStore(v, dst_ptr);
 }
 
+void Type::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *v)
+{
+
+}
+
+void ParameterizedType::instantiate(const std::vector<Type *> &params)
+{
+	type_params = params;
+}
+
 std::string Bool::name()
 {
 	return "bool";
@@ -98,6 +108,8 @@ void Token::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::V
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
+
+
 
 
 

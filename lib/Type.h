@@ -19,6 +19,15 @@ public:
 					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
 	virtual void copy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
+	virtual void destroy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,  llvm::Value* v);
+};
+
+class ParameterizedType : public Type
+{
+public:
+	virtual void instantiate(const std::vector<Type*>& params);
+protected:
+	std::vector<Type*> type_params;
 };
 
 #define DECL_TYPE(X) class X : public Type { \
