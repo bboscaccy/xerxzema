@@ -75,6 +75,12 @@ void Namespace::add_type(const std::string &name, std::unique_ptr<Type> &&type)
 	types.emplace(name, std::move(type));
 }
 
+void Namespace::add_parameterized_type(const std::string &name,
+									   std::unique_ptr<ParameterizedType> &&type)
+{
+	parameterized_types.emplace(name, std::move(type));
+}
+
 Type* Namespace::type(const std::string& name)
 {
 	if(types.find(name) != types.end())
@@ -83,6 +89,34 @@ Type* Namespace::type(const std::string& name)
 	for(auto& ns : imports)
 	{
 		auto type = ns->type(name);
+		if(type)
+			return type;
+	}
+	return nullptr;
+}
+
+Type* Namespace::type(const std::string& name, const std::vector<Type*> params)
+{
+	if(parameterized_types.find(name) != parameterized_types.end())
+	{
+		auto instance = parameterized_types[name]->instantiate(params);
+		if(parameterized_type_instances.find(instance->name()) ==
+		   parameterized_type_instances.end())
+		{
+			auto ret_val = instance.get();
+			parameterized_type_instances.emplace(ret_val->name(), std::move(instance));
+			return ret_val;
+		}
+		else
+		{
+			return parameterized_type_instances[instance->name()].get();
+		}
+	}
+
+
+	for(auto& ns : imports)
+	{
+		auto type = ns->type(name, params);
 		if(type)
 			return type;
 	}

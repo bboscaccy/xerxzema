@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
@@ -25,7 +26,7 @@ public:
 class ParameterizedType : public Type
 {
 public:
-	virtual void instantiate(const std::vector<Type*>& params);
+	virtual std::unique_ptr<ParameterizedType> instantiate(const std::vector<Type*>& params) = 0;
 protected:
 	std::vector<Type*> type_params;
 };
@@ -33,9 +34,13 @@ protected:
 class Array : public ParameterizedType
 {
 public:
+	Array();
 	std::string name();
 	llvm::Type* type(llvm::LLVMContext& context);
+	std::unique_ptr<ParameterizedType> instantiate(const std::vector<Type*>& params);
 	void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val);
+private:
+	llvm::Type* cached_type;
 };
 
 #define DECL_TYPE(X) class X : public Type { \

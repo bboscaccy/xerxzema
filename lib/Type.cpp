@@ -27,11 +27,6 @@ void Type::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm:
 
 }
 
-void ParameterizedType::instantiate(const std::vector<Type *> &params)
-{
-	type_params = params;
-}
-
 std::string Bool::name()
 {
 	return "bool";
@@ -109,6 +104,18 @@ void Token::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::V
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
 
+Array::Array() : cached_type(nullptr)
+{
+
+}
+
+
+std::unique_ptr<ParameterizedType> Array::instantiate(const std::vector<Type *> &params)
+{
+	auto v = std::make_unique<Array>();
+	v->type_params = params;
+	return std::move(v);
+}
 
 std::string Array::name()
 {
@@ -117,11 +124,15 @@ std::string Array::name()
 
 llvm::Type* Array::type(llvm::LLVMContext& context)
 {
+	if(cached_type)
+		return cached_type;
+
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(type_params[0]->type(context));
 	arg_types.push_back(llvm::Type::getInt64Ty(context));
 	arg_types.push_back(llvm::Type::getInt64Ty(context));
-	return llvm::StructType::create(context, arg_types, name());
+	cached_type = llvm::StructType::create(context, arg_types, name());
+	return cached_type;
 }
 
 void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *val)
