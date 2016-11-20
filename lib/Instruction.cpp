@@ -99,6 +99,71 @@ void Instruction::generate_state_initializer(llvm::LLVMContext &context,
 	builder.CreateMemSet(ptr, llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), 0), size, 0);
 }
 
+void Merge::generate_check(llvm::LLVMContext& context,
+								 llvm::IRBuilder<> &builder,
+								 Program* program,
+								 llvm::BasicBlock* check_block,
+								 llvm::BasicBlock* op_block,
+								 llvm::BasicBlock* next_block)
+{
+	builder.SetInsertPoint(check_block);
+	auto mask_value = builder.CreateLoad(_value);
+	auto comp_value = builder.CreateICmp(llvm::CmpInst::Predicate::ICMP_UGT,
+										 mask_value,
+										 llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
+	builder.CreateCondBr(comp_value, op_block, next_block);
+}
+
+void Merge::generate_operation(llvm::LLVMContext &context,
+							   llvm::IRBuilder<> &builder,
+							   xerxzema::Program *program)
+{
+
+}
+
+void Merge::generate_prolouge(llvm::LLVMContext &context,
+							  llvm::IRBuilder<> &builder,
+							  Program* program,
+							  llvm::BasicBlock *next_block)
+{
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+	auto p = builder.CreateLoad(program->activation_counter_value());
+	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+	builder.CreateStore(i, program->activation_counter_value());
+
+	auto arg1_block = llvm::BasicBlock::Create(context, "merge_arg1", program->function_value());
+	auto arg0_block = llvm::BasicBlock::Create(context, "merge_arg0", program->function_value());
+
+	auto mask_value = builder.CreateLoad(_value);
+	auto arg0 = builder.CreateAnd(mask_value, 1);
+	auto comp_value = builder.CreateICmpUGT(arg0,
+											 llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
+
+	builder.CreateCondBr(comp_value, arg0_block, arg1_block);
+
+	builder.SetInsertPoint(arg0_block);
+	_inputs[0]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+							 _inputs[0]->fetch_value_raw(context, builder));
+
+	for(auto& r:_outputs)
+	{
+		r->do_activations(context, builder);
+	}
+	builder.CreateBr(next_block);
+
+	builder.SetInsertPoint(arg1_block);
+	_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+							 _inputs[1]->fetch_value_raw(context, builder));
+
+	for(auto& r:_outputs)
+	{
+		r->do_activations(context, builder);
+	}
+	builder.CreateBr(next_block);
+
+}
+
+
 ValueReal::ValueReal(double v):value(v)	{}
 void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								   Program* program)
@@ -308,7 +373,7 @@ void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 							  Program *program, llvm::BasicBlock *next_block)
 {
 	auto true_block = llvm::BasicBlock::Create(context, "cond_true", program->function_value());
-	auto false_block = llvm::BasicBlock::Create(context, "when_false", program->function_value());
+	auto false_block = llvm::BasicBlock::Create(context, "cond_false", program->function_value());
 
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
 	auto test_val = _inputs[0]->fetch_value(context, builder);
