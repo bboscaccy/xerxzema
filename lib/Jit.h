@@ -38,11 +38,16 @@ public:
 	void compile_namespace(Namespace* ns);
 	void* get_jitted_function(const std::string& ns, const std::string& name);
 
+	inline void dump_after_codegen() { dump_pre_optimization = true; }
+	inline void dump_after_optimization() { dump_post_optimization = true; }
+
 private:
 	void create_module(Namespace* ns);
 	llvm::LLVMContext _context;
 	World* _world;
 	std::map<std::string, llvm::Module*> modules;
 	std::map<std::string, std::unique_ptr<llvm::ExecutionEngine>> engines;
+	bool dump_pre_optimization;
+	bool dump_post_optimization;
 };
 };

@@ -6,7 +6,7 @@
 namespace xerxzema
 {
 
-Jit::Jit(World* world) : _world(world)
+Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false)
 {
 	llvm::InitializeNativeTarget();
 	llvm::InitializeNativeTargetAsmParser();
@@ -36,6 +36,9 @@ void Jit::compile_namespace(Namespace* ns)
 	create_module(ns);
 	ns->codegen(modules[ns->full_name()], _context);
 
+	if(dump_pre_optimization)
+		modules[ns->full_name()]->dump();
+
 	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(modules[ns->full_name()]);
 
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
@@ -52,7 +55,10 @@ void Jit::compile_namespace(Namespace* ns)
 	{
 		fpm->run(f);
 	}
-	modules[ns->full_name()]->dump();
+
+	if(dump_post_optimization)
+		modules[ns->full_name()]->dump();
+
 	engines[ns->full_name()]->finalizeObject();
 }
 

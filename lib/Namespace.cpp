@@ -22,7 +22,6 @@ void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 	{
 		program.second->code_gen(module, context);
 	}
-	module->dump();
 }
 
 Namespace* Namespace::get_namespace(const std::string& name)
