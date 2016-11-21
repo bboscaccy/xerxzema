@@ -33,6 +33,13 @@ void Instruction::sample(xerxzema::Register *reg)
 	_deps.push_back(reg);
 }
 
+void Instruction::oneshot_dependent(xerxzema::Register *reg)
+{
+	reg->activation(this, 1 << _deps.size());
+	reset_mask |= (1 << _deps.size());
+	_deps.push_back(reg);
+}
+
 bool Instruction::is_ugen()
 {
 	return false;

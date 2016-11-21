@@ -23,6 +23,7 @@ public:
 	void input(Register* reg);
 	void dependent(Register* reg);
 	void sample(Register* reg);
+	void oneshot_dependent(Register* reg);
 	inline std::vector<Register*>& inputs()
 	{
 		return _inputs;
