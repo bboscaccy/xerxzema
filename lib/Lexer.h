@@ -12,7 +12,8 @@ enum class TokenType : char
 {
 	Invalid,
 	Eof,
-	Number,
+	Int,
+	Real,
 	Symbol,
 	Operator
 };
@@ -38,8 +39,10 @@ std::ostream& operator<<(std::ostream& stream, const TokenType& x)
 		stream << "invalid";
 	else if (x == TokenType::Eof)
 		stream << "eof";
-	else if (x == TokenType::Number)
-		stream << "number";
+	else if (x == TokenType::Int)
+		stream << "int";
+	else if (x == TokenType::Real)
+		stream << "real";
 	else if (x == TokenType::Symbol)
 		stream << "symbol";
 	else if (x == TokenType::Operator)

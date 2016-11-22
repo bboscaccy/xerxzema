@@ -29,16 +29,75 @@ bool Lexer::do_number()
 	if(!input)
 		return false;
 
-	if(!isdigit(input.peek()))
-	   return false;
-
 	size_t start = col;
+	bool is_negative = false;
+	bool starting_dot = false;
+	if(input.peek() == '-')
+	{
+		is_negative = true;
+		input.get();
+		col++;
+	}
+
+	if(input.peek() == '.')
+	{
+		starting_dot = true;
+		input.get();
+		col++;
+	}
+
+	if(!isdigit(input.peek()))
+	{
+		if(is_negative)
+		{
+			input.putback('-');
+			col--;
+		}
+		if(starting_dot)
+		{
+			input.putback('.');
+			col--;
+		}
+		return false;
+	}
+
+	if(is_negative)
+	{
+		buffer.push_back('-');
+	}
+	if(starting_dot)
+	{
+		buffer.push_back('0');
+		buffer.push_back('.');
+	}
+
 	while(isdigit(input.peek()))
 	{
 		buffer.push_back(input.get());
 		col++;
 	}
-	token = std::make_unique<Token>(TokenType::Number, line, start, std::move(buffer));
+	if(!starting_dot && input.peek() == '.')
+	{
+		buffer.push_back(input.get());
+		col++;
+		while(isdigit(input.peek()))
+		{
+			buffer.push_back(input.get());
+			col++;
+		}
+		token = std::make_unique<Token>(TokenType::Real, line, start, std::move(buffer));
+	}
+	else
+	{
+		if(starting_dot)
+		{
+			token = std::make_unique<Token>(TokenType::Real, line, start, std::move(buffer));
+		}
+		else
+		{
+			token = std::make_unique<Token>(TokenType::Int, line, start, std::move(buffer));
+		}
+	}
 	return true;
 }
 

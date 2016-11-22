@@ -3,22 +3,22 @@
 #include <iostream>
 #include "../lib/Lexer.h"
 
-TEST(TextLexer, TestInt)
+TEST(TestLexer, TestInt)
 {
 	std::stringstream ss;
 	ss << "  12  27\n13\n\t12";
 	xerxzema::Lexer lex(ss);
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Number);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
 	ASSERT_EQ(lex.peek()->column, 3);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Number);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
 	ASSERT_EQ(lex.peek()->column, 7);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Number);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
 	ASSERT_EQ(lex.peek()->column, 1);
 	ASSERT_EQ(lex.peek()->line, 2);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Number);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
 	ASSERT_EQ(lex.peek()->column, 5);
 	ASSERT_EQ(lex.peek()->line, 3);
 	lex.get();
@@ -27,7 +27,7 @@ TEST(TextLexer, TestInt)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
 }
 
-TEST(TextLexer, TestOperator)
+TEST(TestLexer, TestOperator)
 {
 	std::stringstream ss;
 	ss << "++ -- ^ ~`!@#$%^&*<>,.?\\/=+-";
@@ -41,4 +41,30 @@ TEST(TextLexer, TestOperator)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Operator);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestLexer, TestNumbers)
+{
+	std::stringstream ss;
+	ss << "1 -2 .20 0. 0.2 -1.2 -.2 - .";
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Real);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Real);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Real);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Real);;
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Real);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Operator);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Operator);
+	lex.get();
+
 }
