@@ -18,6 +18,7 @@ enum class TokenType : char
 	Add, // +
 	Bang, // +>
 	MergeStart, // +{
+	When, // +?
 	Sub, // -
 	Result, // ->
 	Operator
