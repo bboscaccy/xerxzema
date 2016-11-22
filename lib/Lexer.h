@@ -30,6 +30,8 @@ enum class TokenType : char
 	Cond, // ?
 	With, // :-
 	Delimit, // :
+	Size, // #
+	SeqBegin, // #{
 	SwitchBegin, // ?{
 	BlockBegin, // {
 	BlockEnd, // }
