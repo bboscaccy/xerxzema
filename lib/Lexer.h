@@ -15,6 +15,9 @@ enum class TokenType : char
 	Int,
 	Real,
 	Symbol,
+	Add, // +
+	Bang, // +>
+	MergeStart, // +{
 	Operator
 };
 
@@ -47,6 +50,12 @@ std::ostream& operator<<(std::ostream& stream, const TokenType& x)
 		stream << "symbol";
 	else if (x == TokenType::Operator)
 		stream << "operator";
+	else if (x == TokenType::Add)
+			stream << "add";
+	else if (x == TokenType::Bang)
+		stream << "bang";
+	else if (x == TokenType::MergeStart)
+		stream << "merge-start";
 	return stream;
 }
 

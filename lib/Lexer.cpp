@@ -128,6 +128,31 @@ bool Lexer::do_operator()
 	   return false;
 
 	size_t start = col;
+	if(input.peek() == '+')
+	{
+		input.get();
+		col++;
+		buffer.push_back('+');
+		if(input.peek() == '>')
+		{
+			input.get();
+			col++;
+			buffer.push_back('>');
+			token = std::make_unique<Token>(TokenType::Bang, line, start, std::move(buffer));
+			return true;
+		}
+		if(input.peek() == '{')
+		{
+			input.get();
+			col++;
+			buffer.push_back('{');
+			token = std::make_unique<Token>(TokenType::MergeStart, line, start, std::move(buffer));
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Add, line, start, std::move(buffer));
+		return true;
+	}
+
 	while(is_operator(input.peek()))
 	{
 		buffer.push_back(input.get());
