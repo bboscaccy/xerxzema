@@ -28,11 +28,15 @@ enum class TokenType : char
 	Const, // =
 	Eq, // ==
 	Cond, // ?
+	SwitchBegin, // ?{
 	With, // :-
 	Delimit, // :
 	Size, // #
 	SeqBegin, // #{
-	SwitchBegin, // ?{
+	Gt, // >
+	Ge, // >=
+	Lt, // <
+	Le, // <=
 	BlockBegin, // {
 	BlockEnd, // }
 	GroupBegin, // (

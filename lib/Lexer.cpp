@@ -338,6 +338,40 @@ bool Lexer::do_operator()
 		return true;
 	}
 
+	if(input.peek() == '>')
+	{
+		input.get();
+		col++;
+		buffer.push_back('>');
+		if(input.peek() == '=')
+		{
+			input.get();
+			col++;
+			buffer.push_back('=');
+			token = std::make_unique<Token>(TokenType::Ge, line, start, std::move(buffer));
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Gt, line, start, std::move(buffer));
+		return true;
+	}
+
+	if(input.peek() == '<')
+	{
+		input.get();
+		col++;
+		buffer.push_back('<');
+		if(input.peek() == '=')
+		{
+			input.get();
+			col++;
+			buffer.push_back('=');
+			token = std::make_unique<Token>(TokenType::Le, line, start, std::move(buffer));
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Lt, line, start, std::move(buffer));
+		return true;
+	}
+
 	while(is_operator(input.peek()))
 	{
 		buffer.push_back(input.get());
