@@ -28,6 +28,8 @@ enum class TokenType : char
 	Const, // =
 	Eq, // ==
 	Cond, // ?
+	With, // :-
+	Delimit, // :
 	SwitchBegin, // ?{
 	BlockBegin, // {
 	BlockEnd, // }
