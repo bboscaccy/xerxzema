@@ -25,6 +25,10 @@ enum class TokenType : char
 	Pow, // **
 	Not, // !
 	Ne, // !=
+	Const, // =
+	Eq, // ==
+	Cond, // ?
+	SwitchBegin, // ?{
 	Operator
 };
 

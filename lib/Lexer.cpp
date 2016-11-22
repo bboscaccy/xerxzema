@@ -212,6 +212,40 @@ bool Lexer::do_operator()
 		return true;
 	}
 
+	if(input.peek() == '=')
+	{
+		input.get();
+		col++;
+		buffer.push_back('=');
+		if(input.peek() == '=')
+		{
+			input.get();
+			col++;
+			buffer.push_back('=');
+			token = std::make_unique<Token>(TokenType::Eq, line, start, std::move(buffer));
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Const, line, start, std::move(buffer));
+		return true;
+	}
+
+	if(input.peek() == '?')
+	{
+		input.get();
+		col++;
+		buffer.push_back('?');
+		if(input.peek() == '{')
+		{
+			input.get();
+			col++;
+			buffer.push_back('{');
+			token = std::make_unique<Token>(TokenType::SwitchBegin, line, start, std::move(buffer));
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Cond, line, start, std::move(buffer));
+		return true;
+	}
+
 	while(is_operator(input.peek()))
 	{
 		buffer.push_back(input.get());

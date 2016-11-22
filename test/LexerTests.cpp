@@ -30,7 +30,7 @@ TEST(TestLexer, TestInt)
 TEST(TestLexer, TestOperator)
 {
 	std::stringstream ss;
-	ss << "+ +> +{ +? - -> * ** ! !=";
+	ss << "+ +> +{ +? - -> * ** ! != = == ? ?{";
 	xerxzema::Lexer lex(ss);
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Add);
 	lex.get();
@@ -51,6 +51,14 @@ TEST(TestLexer, TestOperator)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Not);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Ne);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Const);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eq);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Cond);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::SwitchBegin);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
 }
