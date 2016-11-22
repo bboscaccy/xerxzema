@@ -63,6 +63,28 @@ TEST(TestLexer, TestOperator)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
 }
 
+TEST(TestLexer, TestLexicalScope)
+{
+	std::stringstream ss;
+	ss << "(){}[]";
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::GroupBegin);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::GroupEnd);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BlockBegin);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BlockEnd);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BraceBegin);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BraceEnd);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
+}
+
+
+
 TEST(TestLexer, TestNumbers)
 {
 	std::stringstream ss;

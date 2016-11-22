@@ -29,6 +29,12 @@ enum class TokenType : char
 	Eq, // ==
 	Cond, // ?
 	SwitchBegin, // ?{
+	BlockBegin, // {
+	BlockEnd, // }
+	GroupBegin, // (
+	GroupEnd, // )
+	BraceBegin, // [
+	BraceEnd, // ]
 	Operator
 };
 
@@ -83,6 +89,7 @@ private:
 	bool do_number();
 	bool do_symbol();
 	bool do_operator();
+	bool do_lexical();
 	void read_next_token();
 	std::istream& input;
 	std::vector<Token> _tokens;

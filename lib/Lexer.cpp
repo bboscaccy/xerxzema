@@ -9,7 +9,7 @@ inline bool is_operator(int c)
 	return c == '~' || c == '`' || c == '!' || c == '@' || c == '#' || c == '$'
 		|| c == '%' || c == '^' || c == '&' || c == '*' || c == '-' || c == '+'
 		|| c == '=' || c == ',' || c == '.' || c == '?' || c == '/' || c == '\\'
-		|| c == '<' || c == '>' || c == '|' || c == ':' || c == ';';
+		|| c == '<' || c == '>' || c == '|' || c == ':';
 
 }
 
@@ -117,6 +117,64 @@ bool Lexer::do_symbol()
 	}
 	token = std::make_unique<Token>(TokenType::Symbol, line, start, std::move(buffer));
 	return true;
+}
+
+bool Lexer::do_lexical()
+{
+	if(!input)
+		return false;
+
+	size_t start = col;
+	if(input.peek() == '{')
+	{
+		input.get();
+		col++;
+		buffer.push_back('{');
+		token = std::make_unique<Token>(TokenType::BlockBegin, line, start, std::move(buffer));
+		return true;
+	}
+	else if(input.peek() == '}')
+	{
+		input.get();
+		col++;
+		buffer.push_back('}');
+		token = std::make_unique<Token>(TokenType::BlockEnd, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '(')
+	{
+		input.get();
+		col++;
+		buffer.push_back('(');
+		token = std::make_unique<Token>(TokenType::GroupBegin, line, start, std::move(buffer));
+		return true;
+	}
+	else if(input.peek() == ')')
+	{
+		input.get();
+		col++;
+		buffer.push_back(')');
+		token = std::make_unique<Token>(TokenType::GroupEnd, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '[')
+	{
+		input.get();
+		col++;
+		buffer.push_back('[');
+		token = std::make_unique<Token>(TokenType::BraceBegin, line, start, std::move(buffer));
+		return true;
+	}
+	else if(input.peek() == ']')
+	{
+		input.get();
+		col++;
+		buffer.push_back(']');
+		token = std::make_unique<Token>(TokenType::BraceEnd, line, start, std::move(buffer));
+		return true;
+	}
+
+	return false;
 }
 
 bool Lexer::do_operator()
@@ -280,6 +338,9 @@ void Lexer::read_next_token()
 		}
 	}
 	if(do_number())
+	{
+	}
+	else if(do_lexical())
 	{
 	}
 	else if(do_operator())
