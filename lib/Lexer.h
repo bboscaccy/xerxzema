@@ -37,6 +37,9 @@ enum class TokenType : char
 	Ge, // >=
 	Lt, // <
 	Le, // <=
+	Div, // /
+	Root, // //
+	Mod, // /%
 	BlockBegin, // {
 	BlockEnd, // }
 	GroupBegin, // (
