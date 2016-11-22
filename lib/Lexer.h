@@ -45,6 +45,7 @@ enum class TokenType : char
 	Xor, // ^
 	Sample, // `
 	Delay, // ~
+	Comment, // ; * \n
 	BlockBegin, // {
 	BlockEnd, // }
 	GroupBegin, // (
@@ -106,6 +107,7 @@ private:
 	bool do_symbol();
 	bool do_operator();
 	bool do_lexical();
+	bool do_comment();
 	void read_next_token();
 	std::istream& input;
 	std::vector<Token> _tokens;

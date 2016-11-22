@@ -115,6 +115,22 @@ TEST(TestLexer, TestLexicalScope)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
 }
 
+TEST(TestLexer, TestComments)
+{
+	std::stringstream ss;
+	ss << "( ;this is a bunch of garbage that is ignored...\n";
+	ss << "12";
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::GroupBegin);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Comment);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
+}
+
+
 
 
 TEST(TestLexer, TestNumbers)

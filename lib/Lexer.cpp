@@ -447,6 +447,24 @@ bool Lexer::do_operator()
 
 }
 
+bool Lexer::do_comment()
+{
+	if(input.peek() == ';')
+	{
+		input.get();
+		auto start = col;
+		col++;
+		while(input && input.peek() != '\n')
+		{
+			buffer.push_back(input.get());
+			col++;
+		}
+		token = std::make_unique<Token>(TokenType::Comment, line, start, std::move(buffer));
+		return true;
+	}
+	return false;
+}
+
 void Lexer::read_next_token()
 {
 	if(!input)
@@ -480,6 +498,9 @@ void Lexer::read_next_token()
 	{
 	}
 	else if(do_symbol())
+	{
+	}
+	else if(do_comment())
 	{
 	}
 	else
