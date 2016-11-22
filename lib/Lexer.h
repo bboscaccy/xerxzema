@@ -40,6 +40,11 @@ enum class TokenType : char
 	Div, // /
 	Root, // //
 	Mod, // /%
+	And, // &
+	Or, // |
+	Xor, // ^
+	Sample, // `
+	Delay, // ~
 	BlockBegin, // {
 	BlockEnd, // }
 	GroupBegin, // (

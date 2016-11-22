@@ -396,6 +396,46 @@ bool Lexer::do_operator()
 		token = std::make_unique<Token>(TokenType::Div, line, start, std::move(buffer));
 		return true;
 	}
+	if(input.peek() == '&')
+	{
+		input.get();
+		col++;
+		buffer.push_back('&');
+		token = std::make_unique<Token>(TokenType::And, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '|')
+	{
+		input.get();
+		col++;
+		buffer.push_back('|');
+		token = std::make_unique<Token>(TokenType::Or, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '^')
+	{
+		input.get();
+		col++;
+		buffer.push_back('^');
+		token = std::make_unique<Token>(TokenType::Xor, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '`')
+	{
+		input.get();
+		col++;
+		buffer.push_back('`');
+		token = std::make_unique<Token>(TokenType::Sample, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '~')
+	{
+		input.get();
+		col++;
+		buffer.push_back('~');
+		token = std::make_unique<Token>(TokenType::Delay, line, start, std::move(buffer));
+		return true;
+	}
 
 	while(is_operator(input.peek()))
 	{
