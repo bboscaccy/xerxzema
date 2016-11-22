@@ -21,6 +21,8 @@ enum class TokenType : char
 	When, // +?
 	Sub, // -
 	Result, // ->
+	Mul, // *
+	Pow, // **
 	Operator
 };
 
