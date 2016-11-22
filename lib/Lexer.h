@@ -23,6 +23,8 @@ enum class TokenType : char
 	Result, // ->
 	Mul, // *
 	Pow, // **
+	Not, // !
+	Ne, // !=
 	Operator
 };
 
