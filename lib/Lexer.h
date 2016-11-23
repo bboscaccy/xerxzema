@@ -61,7 +61,7 @@ class Token
 {
 public:
 	Token() = default;
-	inline Token(TokenType t, size_t l, size_t c, std::string&& d):
+	inline Token(TokenType t, size_t l, size_t c, const std::string& d):
 		type(t), line(l), column(c), data(d)
 	{
 	}
@@ -72,7 +72,7 @@ public:
 	std::string data;
 };
 
-std::ostream& operator<<(std::ostream& stream, const TokenType& x)
+inline std::ostream& operator<<(std::ostream& stream, const TokenType& x)
 {
 	if(x == TokenType::Invalid)
 		stream << "invalid";

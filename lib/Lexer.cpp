@@ -85,17 +85,17 @@ bool Lexer::do_number()
 			buffer.push_back(input.get());
 			col++;
 		}
-		token = std::make_unique<Token>(TokenType::Real, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Real, line, start, buffer);
 	}
 	else
 	{
 		if(starting_dot)
 		{
-			token = std::make_unique<Token>(TokenType::Real, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Real, line, start, buffer);
 		}
 		else
 		{
-			token = std::make_unique<Token>(TokenType::Int, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Int, line, start, buffer);
 		}
 	}
 	return true;
@@ -110,12 +110,12 @@ bool Lexer::do_symbol()
 	   return false;
 
 	size_t start = col;
-	while(isalnum(input.peek() || input.peek() == '_'))
+	while(isalnum(input.peek()) || input.peek() == '_')
 	{
 		buffer.push_back(input.get());
 		col++;
 	}
-	token = std::make_unique<Token>(TokenType::Symbol, line, start, std::move(buffer));
+	token = std::make_unique<Token>(TokenType::Symbol, line, start, buffer);
 	return true;
 }
 
@@ -130,7 +130,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back('{');
-		token = std::make_unique<Token>(TokenType::BlockBegin, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::BlockBegin, line, start, buffer);
 		return true;
 	}
 	else if(input.peek() == '}')
@@ -138,7 +138,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back('}');
-		token = std::make_unique<Token>(TokenType::BlockEnd, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::BlockEnd, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '(')
@@ -146,7 +146,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back('(');
-		token = std::make_unique<Token>(TokenType::GroupBegin, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::GroupBegin, line, start, buffer);
 		return true;
 	}
 	else if(input.peek() == ')')
@@ -154,7 +154,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back(')');
-		token = std::make_unique<Token>(TokenType::GroupEnd, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::GroupEnd, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '[')
@@ -162,7 +162,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back('[');
-		token = std::make_unique<Token>(TokenType::BraceBegin, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::BraceBegin, line, start, buffer);
 		return true;
 	}
 	else if(input.peek() == ']')
@@ -170,7 +170,7 @@ bool Lexer::do_lexical()
 		input.get();
 		col++;
 		buffer.push_back(']');
-		token = std::make_unique<Token>(TokenType::BraceEnd, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::BraceEnd, line, start, buffer);
 		return true;
 	}
 
@@ -196,7 +196,7 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('>');
-			token = std::make_unique<Token>(TokenType::Bang, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Bang, line, start, buffer);
 			return true;
 		}
 		if(input.peek() == '{')
@@ -204,7 +204,7 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('{');
-			token = std::make_unique<Token>(TokenType::MergeStart, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::MergeStart, line, start, buffer);
 			return true;
 		}
 		if(input.peek() == '?')
@@ -212,10 +212,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('?');
-			token = std::make_unique<Token>(TokenType::When, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::When, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Add, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Add, line, start, buffer);
 		return true;
 	}
 
@@ -229,10 +229,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('>');
-			token = std::make_unique<Token>(TokenType::Result, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Result, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Sub, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Sub, line, start, buffer);
 		return true;
 	}
 
@@ -246,10 +246,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('*');
-			token = std::make_unique<Token>(TokenType::Pow, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Pow, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Mul, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Mul, line, start, buffer);
 		return true;
 	}
 
@@ -263,10 +263,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('=');
-			token = std::make_unique<Token>(TokenType::Ne, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Ne, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Not, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Not, line, start, buffer);
 		return true;
 	}
 
@@ -280,10 +280,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('=');
-			token = std::make_unique<Token>(TokenType::Eq, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Eq, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Const, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Const, line, start, buffer);
 		return true;
 	}
 
@@ -297,10 +297,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('{');
-			token = std::make_unique<Token>(TokenType::SwitchBegin, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::SwitchBegin, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Cond, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Cond, line, start, buffer);
 		return true;
 	}
 
@@ -314,10 +314,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('-');
-			token = std::make_unique<Token>(TokenType::With, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::With, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Delimit, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Delimit, line, start, buffer);
 		return true;
 	}
 
@@ -331,10 +331,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('{');
-			token = std::make_unique<Token>(TokenType::SeqBegin, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::SeqBegin, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Size, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Size, line, start, buffer);
 		return true;
 	}
 
@@ -348,10 +348,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('=');
-			token = std::make_unique<Token>(TokenType::Ge, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Ge, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Gt, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Gt, line, start, buffer);
 		return true;
 	}
 
@@ -365,10 +365,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('=');
-			token = std::make_unique<Token>(TokenType::Le, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Le, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Lt, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Lt, line, start, buffer);
 		return true;
 	}
 
@@ -382,7 +382,7 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('/');
-			token = std::make_unique<Token>(TokenType::Root, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Root, line, start, buffer);
 			return true;
 		}
 		if(input.peek() == '%')
@@ -390,10 +390,10 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('%');
-			token = std::make_unique<Token>(TokenType::Mod, line, start, std::move(buffer));
+			token = std::make_unique<Token>(TokenType::Mod, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Div, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Div, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '&')
@@ -401,7 +401,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('&');
-		token = std::make_unique<Token>(TokenType::And, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::And, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '|')
@@ -409,7 +409,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('|');
-		token = std::make_unique<Token>(TokenType::Or, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Or, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '^')
@@ -417,7 +417,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('^');
-		token = std::make_unique<Token>(TokenType::Xor, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Xor, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '`')
@@ -425,7 +425,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('`');
-		token = std::make_unique<Token>(TokenType::Sample, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Sample, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '~')
@@ -433,7 +433,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('~');
-		token = std::make_unique<Token>(TokenType::Delay, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Delay, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == ',')
@@ -441,7 +441,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back(',');
-		token = std::make_unique<Token>(TokenType::Seperator, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Seperator, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '.')
@@ -449,7 +449,7 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('.');
-		token = std::make_unique<Token>(TokenType::Dot, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Dot, line, start, buffer);
 		return true;
 	}
 
@@ -458,7 +458,7 @@ bool Lexer::do_operator()
 		buffer.push_back(input.get());
 		col++;
 	}
-	token = std::make_unique<Token>(TokenType::Operator, line, start, std::move(buffer));
+	token = std::make_unique<Token>(TokenType::Operator, line, start, buffer);
 	return true;
 
 }
@@ -475,7 +475,7 @@ bool Lexer::do_comment()
 			buffer.push_back(input.get());
 			col++;
 		}
-		token = std::make_unique<Token>(TokenType::Comment, line, start, std::move(buffer));
+		token = std::make_unique<Token>(TokenType::Comment, line, start, buffer);
 		return true;
 	}
 	return false;
@@ -506,18 +506,23 @@ void Lexer::read_next_token()
 	}
 	if(do_number())
 	{
+		buffer.clear();
 	}
 	else if(do_lexical())
 	{
+		buffer.clear();
 	}
 	else if(do_operator())
 	{
+		buffer.clear();
 	}
 	else if(do_symbol())
 	{
+		buffer.clear();
 	}
 	else if(do_comment())
 	{
+		buffer.clear();
 	}
 	else
 	{
