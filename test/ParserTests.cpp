@@ -4,24 +4,38 @@
 #include "../lib/Lexer.h"
 #include "../lib/Parser.h"
 
-TEST(TestParser, TestAtom)
+TEST(TestParser, TestAddExpr)
 {
+
 	std::stringstream ss;
-	ss << "aa 3 12 2.0";
-	xerxzema::Lexer lex(ss);
+	ss << "a + b";
+	xerxzema::Lexer lexer(ss);
 
-	auto n = xerxzema::match_atom(lex);
-	ASSERT_NE(n.get(), nullptr);
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (symbol a) (symbol b))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
 
-	auto n1 = xerxzema::match_atom(lex);
-	ASSERT_NE(n1.get(), nullptr);
+TEST(TestParser, TestMulExpr)
+{
 
-	auto n2 = xerxzema::match_atom(lex);
-	ASSERT_NE(n2.get(), nullptr);
+	std::stringstream ss;
+	ss << "a * b";
+	xerxzema::Lexer lexer(ss);
 
-	auto n3 = xerxzema::match_atom(lex);
-	ASSERT_NE(n3.get(), nullptr);
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(mul (symbol a) (symbol b))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
 
-	auto n4 = xerxzema::match_atom(lex);
-	ASSERT_EQ(n4.get(), nullptr);
+TEST(TestParser, TestAddMulExpr)
+{
+
+	std::stringstream ss;
+	ss << "a + b * c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (symbol a) (mul (symbol b) (symbol c)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
