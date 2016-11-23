@@ -50,3 +50,14 @@ TEST(TestParser, TestMulAddExpr)
 	ASSERT_EQ(expr->show(), "(add (mul (symbol a) (symbol b)) (symbol c))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestArgListExpr)
+{
+	std::stringstream ss;
+	ss << "a, b + b0, c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(arg-list (arg-list (symbol a) (add (symbol b) (symbol b0))) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

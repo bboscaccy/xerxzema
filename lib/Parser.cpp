@@ -39,6 +39,17 @@ std::string AddExpression::show()
 	return "(add " + lhs->show() + " " + rhs->show() + ")";
 }
 
+ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+{
+}
+
+std::string ArgListExpression::show()
+{
+	return "(arg-list " + lhs->show() + " " + rhs->show() + ")";
+}
+
+
 std::string Expression::show()
 {
 	return "unimplemented";
@@ -64,6 +75,8 @@ int left_bind(Token* token)
 		return 10;
 	if(token->type == TokenType::Mul)
 		return 20;
+	if(token->type == TokenType::Seperator)
+		return 5;
 	return -1;
 }
 
@@ -81,6 +94,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<AddExpression>(std::move(expr), expression(lexer, 10));
 	if(token->type == TokenType::Mul)
 		return std::make_unique<MulExpression>(std::move(expr), expression(lexer, 20));
+	if(token->type == TokenType::Seperator)
+		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
 	return nullptr;
 }
 

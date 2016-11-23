@@ -47,6 +47,14 @@ public:
 	std::string show();
 };
 
+class ArgListExpression : public BinaryExpression
+{
+public:
+	ArgListExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
+
 std::unique_ptr<Expression> expression(Lexer& lexer, int right_bind = 0);
 std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>&& token);
 std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expression>&& expr,
