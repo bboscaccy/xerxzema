@@ -39,6 +39,17 @@ std::string AddExpression::show()
 	return "(add " + lhs->show() + " " + rhs->show() + ")";
 }
 
+SubExpression::SubExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+{
+}
+
+std::string SubExpression::show()
+{
+	return "(sub " + lhs->show() + " " + rhs->show() + ")";
+}
+
+
 ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {
@@ -56,6 +67,15 @@ GroupExpression::GroupExpression(std::unique_ptr<Expression>&& e) : expr(std::mo
 std::string GroupExpression::show()
 {
 	return "(group " + expr->show() + ")";
+}
+
+NegateExpression::NegateExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+{
+}
+
+std::string NegateExpression::show()
+{
+	return "(negate " + expr->show() + ")";
 }
 
 CallExpression::CallExpression(std::unique_ptr<Expression>&& t, std::unique_ptr<Expression>&& a ) :
@@ -91,6 +111,8 @@ int left_bind(Token* token)
 		return 0;
 	if(token->type == TokenType::Add)
 		return 10;
+	if(token->type == TokenType::Sub)
+		return 10;
 	if(token->type == TokenType::Mul)
 		return 20;
 	if(token->type == TokenType::Seperator)
@@ -104,9 +126,11 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 {
 	if(token->type == TokenType::Symbol)
 		return std::make_unique<SymbolExpression>(std::move(token));
+	if(token->type == TokenType::Sub)
+		return std::make_unique<NegateExpression>(expression(lexer, 1000));
 	if(token->type == TokenType::GroupBegin)
 	{
-		auto v = std::make_unique<GroupExpression>(expression(lexer));
+		auto v = std::make_unique<GroupExpression>(expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::GroupEnd)
 		{
 			lexer.get();
@@ -125,6 +149,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 {
 	if(token->type == TokenType::Add)
 		return std::make_unique<AddExpression>(std::move(expr), expression(lexer, 10));
+	if(token->type == TokenType::Sub)
+		return std::make_unique<SubExpression>(std::move(expr), expression(lexer, 10));
 	if(token->type == TokenType::Mul)
 		return std::make_unique<MulExpression>(std::move(expr), expression(lexer, 20));
 	if(token->type == TokenType::Seperator)

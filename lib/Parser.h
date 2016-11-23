@@ -37,7 +37,13 @@ class AddExpression : public BinaryExpression
 public:
 	AddExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
+};
 
+class SubExpression : public BinaryExpression
+{
+public:
+	SubExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
 };
 
 class MulExpression : public BinaryExpression
@@ -58,6 +64,14 @@ class GroupExpression : public Expression
 {
 public:
 	GroupExpression(std::unique_ptr<Expression>&& expr);
+	std::unique_ptr<Expression> expr;
+	std::string show();
+};
+
+class NegateExpression : public Expression
+{
+public:
+	NegateExpression(std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
 };

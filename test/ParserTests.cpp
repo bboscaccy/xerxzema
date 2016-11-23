@@ -142,3 +142,27 @@ TEST(TestParser, TestCallChain)
 			  "(call (symbol f) (arg-list (arg-list (symbol x) (symbol y)) (symbol z)))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestSubExpr)
+{
+
+	std::stringstream ss;
+	ss << "a - b";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(sub (symbol a) (symbol b))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestNegExpr)
+{
+
+	std::stringstream ss;
+	ss << "a + -b + c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (add (symbol a) (negate (symbol b))) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
