@@ -39,3 +39,14 @@ TEST(TestParser, TestAddMulExpr)
 	ASSERT_EQ(expr->show(), "(add (symbol a) (mul (symbol b) (symbol c)))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestMulAddExpr)
+{
+	std::stringstream ss;
+	ss << "a * b + c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (mul (symbol a) (symbol b)) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
