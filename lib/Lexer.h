@@ -45,6 +45,8 @@ enum class TokenType : char
 	Xor, // ^
 	Sample, // `
 	Delay, // ~
+	Seperator, // ,
+	Dot, // .
 	Comment, // ; * \n
 	BlockBegin, // {
 	BlockEnd, // }

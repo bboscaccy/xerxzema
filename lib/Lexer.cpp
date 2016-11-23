@@ -436,6 +436,22 @@ bool Lexer::do_operator()
 		token = std::make_unique<Token>(TokenType::Delay, line, start, std::move(buffer));
 		return true;
 	}
+	if(input.peek() == ',')
+	{
+		input.get();
+		col++;
+		buffer.push_back(',');
+		token = std::make_unique<Token>(TokenType::Seperator, line, start, std::move(buffer));
+		return true;
+	}
+	if(input.peek() == '.')
+	{
+		input.get();
+		col++;
+		buffer.push_back('.');
+		token = std::make_unique<Token>(TokenType::Dot, line, start, std::move(buffer));
+		return true;
+	}
 
 	while(is_operator(input.peek()))
 	{
