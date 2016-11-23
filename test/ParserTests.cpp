@@ -96,3 +96,28 @@ TEST(TestParser, TestCallExprCompound)
 			  "(arg-list (symbol f) (call (symbol x) (arg-list (symbol a) (symbol d))))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestGroupExprPrecLeft)
+{
+	std::stringstream ss;
+	ss << "a + (b * c)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (symbol a) (group (mul (symbol b) (symbol c))))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+
+
+TEST(TestParser, TestCallExprBin)
+{
+	std::stringstream ss;
+	ss << "f + x(a)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "(add (symbol f) (call (symbol x) (symbol a)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

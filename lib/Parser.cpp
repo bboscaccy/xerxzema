@@ -96,7 +96,7 @@ int left_bind(Token* token)
 	if(token->type == TokenType::Seperator)
 		return 5;
 	if(token->type == TokenType::GroupBegin)
-		return 6;
+		return 1000;
 	return -1;
 }
 
@@ -131,7 +131,7 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
 	if(token->type == TokenType::GroupBegin)
 	{
-		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 4));
+		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::GroupEnd)
 		{
 			lexer.get();
