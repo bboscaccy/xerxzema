@@ -140,7 +140,7 @@ TEST(TestLexer, TestComments)
 TEST(TestLexer, TestNumbers)
 {
 	std::stringstream ss;
-	ss << "1 -2 .20 0. 0.2 -1.2 -.2 - .";
+	ss << "1 2 .20 0. 0.2 1.2 .2 - .";
 	xerxzema::Lexer lex(ss);
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
 	lex.get();

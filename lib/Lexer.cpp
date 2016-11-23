@@ -30,15 +30,7 @@ bool Lexer::do_number()
 		return false;
 
 	size_t start = col;
-	bool is_negative = false;
 	bool starting_dot = false;
-	if(input.peek() == '-')
-	{
-		is_negative = true;
-		input.get();
-		col++;
-	}
-
 	if(input.peek() == '.')
 	{
 		starting_dot = true;
@@ -48,11 +40,6 @@ bool Lexer::do_number()
 
 	if(!isdigit(input.peek()))
 	{
-		if(is_negative)
-		{
-			input.putback('-');
-			col--;
-		}
 		if(starting_dot)
 		{
 			input.putback('.');
@@ -61,10 +48,6 @@ bool Lexer::do_number()
 		return false;
 	}
 
-	if(is_negative)
-	{
-		buffer.push_back('-');
-	}
 	if(starting_dot)
 	{
 		buffer.push_back('0');
