@@ -30,7 +30,7 @@ TEST(TestLexer, TestInt)
 TEST(TestLexer, TestOperator)
 {
 	std::stringstream ss;
-	ss << "+ +> +{ +? - -> * ** ! != = == ? ?{ : :- # #{ > >= < <= / // /% & | ^ ` ~ , .";
+	ss << "+ +> +{ +? - -> * ^ ! != = == ? ?{ : :- # #{ > >= < <= / // % & | ^| ` ~ , .";
 	xerxzema::Lexer lex(ss);
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Add);
 	lex.get();

@@ -22,7 +22,7 @@ enum class TokenType : char
 	Sub, // -
 	Result, // ->
 	Mul, // *
-	Pow, // **
+	Pow, // ^
 	Not, // !
 	Ne, // !=
 	Const, // =
@@ -39,10 +39,10 @@ enum class TokenType : char
 	Le, // <=
 	Div, // /
 	Root, // //
-	Mod, // /%
+	Mod, // %
 	And, // &
 	Or, // |
-	Xor, // ^
+	Xor, // ^|
 	Sample, // `
 	Delay, // ~
 	Seperator, // ,

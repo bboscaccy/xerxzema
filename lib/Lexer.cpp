@@ -385,15 +385,15 @@ bool Lexer::do_operator()
 			token = std::make_unique<Token>(TokenType::Root, line, start, buffer);
 			return true;
 		}
-		if(input.peek() == '%')
-		{
-			input.get();
-			col++;
-			buffer.push_back('%');
-			token = std::make_unique<Token>(TokenType::Mod, line, start, buffer);
-			return true;
-		}
 		token = std::make_unique<Token>(TokenType::Div, line, start, buffer);
+		return true;
+	}
+	if(input.peek() == '%')
+	{
+		input.get();
+		col++;
+		buffer.push_back('%');
+		token = std::make_unique<Token>(TokenType::Mod, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '&')
@@ -417,7 +417,15 @@ bool Lexer::do_operator()
 		input.get();
 		col++;
 		buffer.push_back('^');
-		token = std::make_unique<Token>(TokenType::Xor, line, start, buffer);
+		if(input.peek() == '|')
+		{
+			input.get();
+			col++;
+			buffer.push_back('|');
+			token = std::make_unique<Token>(TokenType::Xor, line, start, buffer);
+			return true;
+		}
+		token = std::make_unique<Token>(TokenType::Pow, line, start, buffer);
 		return true;
 	}
 	if(input.peek() == '`')
