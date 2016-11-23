@@ -58,6 +58,41 @@ TEST(TestParser, TestArgListExpr)
 	xerxzema::Lexer lexer(ss);
 
 	auto expr = xerxzema::expression(lexer);
-	ASSERT_EQ(expr->show(), "(arg-list (arg-list (symbol a) (add (symbol b) (symbol b0))) (symbol c))");
+	ASSERT_EQ(expr->show(),
+			  "(arg-list (arg-list (symbol a) (add (symbol b) (symbol b0))) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestGroupExpr)
+{
+	std::stringstream ss;
+	ss << "(a * b)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(group (mul (symbol a) (symbol b)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestGroupExprPrec)
+{
+	std::stringstream ss;
+	ss << "(a + b) * c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(mul (group (add (symbol a) (symbol b))) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestCallExprCompound)
+{
+	std::stringstream ss;
+	ss << "f, x(a, d)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "(arg-list (symbol f) (call (symbol x) (arg-list (symbol a) (symbol d))))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }

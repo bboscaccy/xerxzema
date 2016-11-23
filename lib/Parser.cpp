@@ -49,6 +49,24 @@ std::string ArgListExpression::show()
 	return "(arg-list " + lhs->show() + " " + rhs->show() + ")";
 }
 
+GroupExpression::GroupExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+{
+}
+
+std::string GroupExpression::show()
+{
+	return "(group " + expr->show() + ")";
+}
+
+CallExpression::CallExpression(std::unique_ptr<Expression>&& t, std::unique_ptr<Expression>&& a ) :
+	target(std::move(t)), args(std::move(a))
+{
+}
+
+std::string CallExpression::show()
+{
+	return "(call " + target->show() + " " + args->show() + ")";
+}
 
 std::string Expression::show()
 {
@@ -77,6 +95,8 @@ int left_bind(Token* token)
 		return 20;
 	if(token->type == TokenType::Seperator)
 		return 5;
+	if(token->type == TokenType::GroupBegin)
+		return 6;
 	return -1;
 }
 
@@ -84,6 +104,19 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 {
 	if(token->type == TokenType::Symbol)
 		return std::make_unique<SymbolExpression>(std::move(token));
+	if(token->type == TokenType::GroupBegin)
+	{
+		auto v = std::make_unique<GroupExpression>(expression(lexer));
+		if(lexer.peek()->type == TokenType::GroupEnd)
+		{
+			lexer.get();
+			return v;
+		}
+		else
+		{
+			//TODO error/invalid expression.
+		}
+	}
 	return nullptr;
 }
 
@@ -96,6 +129,19 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<MulExpression>(std::move(expr), expression(lexer, 20));
 	if(token->type == TokenType::Seperator)
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
+	if(token->type == TokenType::GroupBegin)
+	{
+		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 4));
+		if(lexer.peek()->type == TokenType::GroupEnd)
+		{
+			lexer.get();
+			return v;
+		}
+		else
+		{
+			//TODO error/invalid expression.
+		}
+	}
 	return nullptr;
 }
 

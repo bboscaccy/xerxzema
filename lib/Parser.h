@@ -54,6 +54,23 @@ public:
 	std::string show();
 };
 
+class GroupExpression : public Expression
+{
+public:
+	GroupExpression(std::unique_ptr<Expression>&& expr);
+	std::unique_ptr<Expression> expr;
+	std::string show();
+};
+
+class CallExpression : public Expression
+{
+public:
+	CallExpression(std::unique_ptr<Expression>&& target, std::unique_ptr<Expression>&& args);
+	std::unique_ptr<Expression> target;
+	std::unique_ptr<Expression> args;
+	std::string show();
+};
+
 
 std::unique_ptr<Expression> expression(Lexer& lexer, int right_bind = 0);
 std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>&& token);
