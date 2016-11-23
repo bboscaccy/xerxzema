@@ -108,8 +108,6 @@ TEST(TestParser, TestGroupExprPrecLeft)
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
 
-
-
 TEST(TestParser, TestCallExprBin)
 {
 	std::stringstream ss;
@@ -119,5 +117,28 @@ TEST(TestParser, TestCallExprBin)
 	auto expr = xerxzema::expression(lexer);
 	ASSERT_EQ(expr->show(),
 			  "(add (symbol f) (call (symbol x) (symbol a)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestCall)
+{
+	std::stringstream ss;
+	ss << "f(x)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(call (symbol f) (symbol x))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+TEST(TestParser, TestCallChain)
+{
+	std::stringstream ss;
+	ss << "f(x,y,z)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "(call (symbol f) (arg-list (arg-list (symbol x) (symbol y)) (symbol z)))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
