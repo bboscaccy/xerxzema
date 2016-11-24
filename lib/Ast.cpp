@@ -122,7 +122,7 @@ InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) : token
 
 std::string InvalidNullDetonation::show()
 {
-	return "(invalid-null " + token->data + ")";
+	return "(invalid-null (token '" + token->data + "'))";
 }
 
 InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
@@ -133,7 +133,7 @@ InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
 
 std::string InvalidLeftDetonation::show()
 {
-	return "(invalid-left " + expr->show() + " " +  token->data + ")";
+	return "(invalid-left " + expr->show() + " (token '" +  token->data + "'))";
 }
 
 

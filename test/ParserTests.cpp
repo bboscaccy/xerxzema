@@ -209,11 +209,9 @@ TEST(TestParser, TestBadOperator)
 {
 
 	std::stringstream ss;
-	ss << "x() * 22";
+	ss << "+ x";
 	xerxzema::Lexer lexer(ss);
 
 	auto expr = xerxzema::expression(lexer);
-	ASSERT_EQ(expr->show(),
-			  "(bind (call (symbol f) (symbol x)) (arg-list (symbol y) (symbol z)))");
-	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+	ASSERT_EQ(expr->show(), "(invalid-null (token '+'))");
 }
