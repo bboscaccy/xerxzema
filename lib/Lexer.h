@@ -20,7 +20,7 @@ enum class TokenType : char
 	MergeStart, // +{
 	When, // +?
 	Sub, // -
-	Result, // ->
+	Bind, // ->
 	Mul, // *
 	Pow, // ^
 	Not, // !

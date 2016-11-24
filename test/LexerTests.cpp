@@ -42,7 +42,7 @@ TEST(TestLexer, TestOperator)
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Sub);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Result);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Bind);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Mul);
 	lex.get();

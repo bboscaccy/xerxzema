@@ -30,6 +30,8 @@ int left_bind(Token* token)
 		return 5;
 	if(token->type == TokenType::Assign)
 		return 4;
+	if(token->type == TokenType::Bind)
+		return 1;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
 	return -1;
@@ -43,6 +45,11 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		return std::make_unique<NegateExpression>(expression(lexer, 1000));
 	if(token->type == TokenType::GroupBegin)
 	{
+		if(lexer.peek()->type == TokenType::GroupEnd)
+		{
+			//TODO unit expression
+		}
+
 		auto v = std::make_unique<GroupExpression>(expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::GroupEnd)
 		{
@@ -54,7 +61,7 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 			//TODO error/invalid expression.
 		}
 	}
-	return nullptr;
+	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 
 std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expression>&& expr,
@@ -70,6 +77,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
 	if(token->type == TokenType::Assign)
 		return std::make_unique<AssignExpression>(std::move(expr), expression(lexer, 4));
+	if(token->type == TokenType::Bind)
+		return std::make_unique<BindExpression>(std::move(expr), expression(lexer, 4));
 	if(token->type == TokenType::GroupBegin)
 	{
 		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 0));
@@ -80,10 +89,10 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		}
 		else
 		{
-			//TODO error/invalid expression.
+			return std::make_unique<InvalidLeftDetonation>(std::move(v), std::move(token));
 		}
 	}
-	return nullptr;
+	return std::make_unique<InvalidLeftDetonation>(std::move(expr), std::move(token));
 }
 
 

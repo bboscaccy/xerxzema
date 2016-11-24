@@ -212,7 +212,7 @@ bool Lexer::do_operator()
 			input.get();
 			col++;
 			buffer.push_back('>');
-			token = std::make_unique<Token>(TokenType::Result, line, start, buffer);
+			token = std::make_unique<Token>(TokenType::Bind, line, start, buffer);
 			return true;
 		}
 		token = std::make_unique<Token>(TokenType::Sub, line, start, buffer);

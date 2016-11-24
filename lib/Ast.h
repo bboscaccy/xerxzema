@@ -92,4 +92,31 @@ public:
 	std::string show();
 };
 
+class BindExpression : public BinaryExpression
+{
+public:
+	BindExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
+
+class InvalidNullDetonation : public Expression
+{
+public:
+	InvalidNullDetonation(std::unique_ptr<Token>&& token);
+	std::unique_ptr<Token> token;
+	std::string show();
+};
+
+class InvalidLeftDetonation : public Expression
+{
+public:
+	InvalidLeftDetonation(std::unique_ptr<Expression>&& expr, std::unique_ptr<Token>&& token);
+	std::unique_ptr<Expression> expr;
+	std::unique_ptr<Token> token;
+	std::string show();
+};
+
+
+
 };

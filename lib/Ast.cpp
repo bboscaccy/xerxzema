@@ -88,7 +88,10 @@ CallExpression::CallExpression(std::unique_ptr<Expression>&& t,
 
 std::string CallExpression::show()
 {
-	return "(call " + target->show() + " " + args->show() + ")";
+	if(args)
+		return "(call " + target->show() + " " + args->show() + ")";
+	else
+		return "(call " + target->show() + " (unit))";
 }
 
 AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l,
@@ -100,6 +103,37 @@ AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l,
 std::string AssignExpression::show()
 {
 	return "(assign " + lhs->show() + " " + rhs->show() + ")";
+}
+
+BindExpression::BindExpression(std::unique_ptr<Expression>&& l,
+							   std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+{
+}
+
+std::string BindExpression::show()
+{
+	return "(bind " + lhs->show() + " " + rhs->show() + ")";
+}
+
+InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) : token(std::move(t))
+{
+}
+
+std::string InvalidNullDetonation::show()
+{
+	return "(invalid-null " + token->data + ")";
+}
+
+InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
+											 std::unique_ptr<Token>&& t)
+	: token(std::move(t)), expr(std::move(e))
+{
+}
+
+std::string InvalidLeftDetonation::show()
+{
+	return "(invalid-left " + expr->show() + " " +  token->data + ")";
 }
 
 
