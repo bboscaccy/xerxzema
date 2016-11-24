@@ -8,6 +8,7 @@ add_library(xerxzema SHARED
   Jit.cpp
   Instruction.cpp
   Lexer.cpp
+  Ast.cpp
   Parser.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})
