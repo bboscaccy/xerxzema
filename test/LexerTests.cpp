@@ -52,7 +52,7 @@ TEST(TestLexer, TestOperator)
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Ne);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Const);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Assign);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eq);
 	lex.get();

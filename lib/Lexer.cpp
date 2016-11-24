@@ -266,7 +266,7 @@ bool Lexer::do_operator()
 			token = std::make_unique<Token>(TokenType::Eq, line, start, buffer);
 			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Const, line, start, buffer);
+		token = std::make_unique<Token>(TokenType::Assign, line, start, buffer);
 		return true;
 	}
 

@@ -85,6 +85,13 @@ public:
 	std::string show();
 };
 
+class AssignExpression : public BinaryExpression
+{
+public:
+	AssignExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
 
 std::unique_ptr<Expression> expression(Lexer& lexer, int right_bind = 0);
 std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>&& token);

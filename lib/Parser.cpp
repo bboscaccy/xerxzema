@@ -88,6 +88,17 @@ std::string CallExpression::show()
 	return "(call " + target->show() + " " + args->show() + ")";
 }
 
+AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+{
+}
+
+std::string AssignExpression::show()
+{
+	return "(assign " + lhs->show() + " " + rhs->show() + ")";
+}
+
+
 std::string Expression::show()
 {
 	return "unimplemented";
@@ -117,6 +128,8 @@ int left_bind(Token* token)
 		return 20;
 	if(token->type == TokenType::Seperator)
 		return 5;
+	if(token->type == TokenType::Assign)
+		return 4;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
 	return -1;
@@ -155,6 +168,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<MulExpression>(std::move(expr), expression(lexer, 20));
 	if(token->type == TokenType::Seperator)
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
+	if(token->type == TokenType::Assign)
+		return std::make_unique<AssignExpression>(std::move(expr), expression(lexer, 4));
 	if(token->type == TokenType::GroupBegin)
 	{
 		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 0));

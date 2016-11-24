@@ -166,3 +166,15 @@ TEST(TestParser, TestNegExpr)
 	ASSERT_EQ(expr->show(), "(add (add (symbol a) (negate (symbol b))) (symbol c))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestAssignExpr)
+{
+
+	std::stringstream ss;
+	ss << "a = -b + c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(assign (symbol a) (add (negate (symbol b)) (symbol c)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
