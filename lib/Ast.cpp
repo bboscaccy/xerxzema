@@ -12,7 +12,8 @@ std::string SymbolExpression::show()
 	return "(symbol " + token->data + ")";
 }
 
-BinaryExpression::BinaryExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+BinaryExpression::BinaryExpression(std::unique_ptr<Expression>&& l,
+								   std::unique_ptr<Expression>&& r) :
 	lhs(std::move(l)), rhs(std::move(r))
 
 {
@@ -50,7 +51,8 @@ std::string SubExpression::show()
 }
 
 
-ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l,
+									 std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {
 }
@@ -78,7 +80,8 @@ std::string NegateExpression::show()
 	return "(negate " + expr->show() + ")";
 }
 
-CallExpression::CallExpression(std::unique_ptr<Expression>&& t, std::unique_ptr<Expression>&& a ) :
+CallExpression::CallExpression(std::unique_ptr<Expression>&& t,
+							   std::unique_ptr<Expression>&& a ) :
 	target(std::move(t)), args(std::move(a))
 {
 }
@@ -88,7 +91,8 @@ std::string CallExpression::show()
 	return "(call " + target->show() + " " + args->show() + ")";
 }
 
-AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l,
+								   std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {
 }
