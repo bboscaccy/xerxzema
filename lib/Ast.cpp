@@ -30,6 +30,17 @@ std::string MulExpression::show()
 	return "(mul " + lhs->show() + " " + rhs->show() + ")";
 }
 
+DivExpression::DivExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+
+{
+}
+
+std::string DivExpression::show()
+{
+	return "(div " + lhs->show() + " " + rhs->show() + ")";
+}
+
 AddExpression::AddExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {

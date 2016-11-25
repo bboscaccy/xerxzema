@@ -26,6 +26,8 @@ int left_bind(Token* token)
 		return 10;
 	if(token->type == TokenType::Mul)
 		return 20;
+	if(token->type == TokenType::Div)
+		return 20;
 	if(token->type == TokenType::Seperator)
 		return 5;
 	if(token->type == TokenType::Assign)
@@ -73,6 +75,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<SubExpression>(std::move(expr), expression(lexer, 10));
 	if(token->type == TokenType::Mul)
 		return std::make_unique<MulExpression>(std::move(expr), expression(lexer, 20));
+	if(token->type == TokenType::Div)
+		return std::make_unique<DivExpression>(std::move(expr), expression(lexer, 20));
 	if(token->type == TokenType::Seperator)
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
 	if(token->type == TokenType::Assign)

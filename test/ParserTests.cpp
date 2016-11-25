@@ -215,3 +215,15 @@ TEST(TestParser, TestBadOperator)
 	auto expr = xerxzema::expression(lexer);
 	ASSERT_EQ(expr->show(), "(invalid-null (token '+'))");
 }
+
+TEST(TestParser, TestDivExpr)
+{
+
+	std::stringstream ss;
+	ss << "a / b / c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(div (div (symbol a) (symbol b)) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

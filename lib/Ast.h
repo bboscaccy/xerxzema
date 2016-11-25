@@ -53,6 +53,13 @@ public:
 	std::string show();
 };
 
+class DivExpression : public BinaryExpression
+{
+public:
+	DivExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
 class ArgListExpression : public BinaryExpression
 {
 public:
