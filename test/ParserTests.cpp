@@ -263,3 +263,16 @@ TEST(TestParser, TestStatementBlock)
 	ASSERT_EQ(expr->show(),
 		  "{[(bind (symbol x) (symbol y))][(bind (mul (symbol y) (symbol y)) (symbol z))]}");
 }
+
+TEST(TestParser, TestWith)
+{
+
+	std::stringstream ss;
+	ss << ":- a,b f(x);";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "[with (arg-list (symbol a) (symbol b)) [(call (symbol f) (symbol x))]]");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

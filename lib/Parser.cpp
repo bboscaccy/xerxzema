@@ -87,6 +87,12 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		}
 		//TODO missing block end...
 	}
+	if(token->type == TokenType::With)
+	{
+		auto clause = expression(lexer, 0);
+		auto instructions = expression(lexer, 0);
+		return std::make_unique<WithStatement>(std::move(clause), std::move(instructions));
+	}
 	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 

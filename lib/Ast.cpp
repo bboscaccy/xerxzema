@@ -194,6 +194,18 @@ std::string Statement::show()
 	return "[" + expr->show() + "]";
 }
 
+WithStatement::WithStatement(std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	with_clause(std::move(l)), statements(std::move(r))
+{
+}
+
+std::string WithStatement::show()
+{
+	return "[with " + with_clause->show() + " " + statements->show() + "]";
+}
+
+
 std::string Expression::show()
 {
 	return "unimplemented";

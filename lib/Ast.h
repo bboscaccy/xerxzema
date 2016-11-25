@@ -30,7 +30,16 @@ public:
 	Statement(std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
+};
 
+class WithStatement : public Expression
+{
+public:
+	WithStatement(std::unique_ptr<Expression>&& with_clause,
+				  std::unique_ptr<Expression>&& statements);
+	std::unique_ptr<Expression> with_clause;
+	std::unique_ptr<Expression> statements;
+	std::string show();
 };
 
 class SymbolExpression : public Expression
