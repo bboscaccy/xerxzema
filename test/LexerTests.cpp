@@ -30,7 +30,7 @@ TEST(TestLexer, TestInt)
 TEST(TestLexer, TestOperator)
 {
 	std::stringstream ss;
-	ss << "+ +> +{ +? - -> * ^ ! != = == ? ?{ : :- # #{ > >= < <= / // % & | ^| ` ~ , .";
+	ss << "+ +> +{ +? - -> * ^ ! != = == ? ?{ : :- # #{ > >= < <= / % & | ^| ` ~ , . ;";
 	xerxzema::Lexer lex(ss);
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Add);
 	lex.get();
@@ -78,8 +78,6 @@ TEST(TestLexer, TestOperator)
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Div);
 	lex.get();
-	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Root);
-	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Mod);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::And);
@@ -95,6 +93,8 @@ TEST(TestLexer, TestOperator)
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Seperator);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Dot);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Term);
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Eof);
 }
@@ -122,7 +122,7 @@ TEST(TestLexer, TestLexicalScope)
 TEST(TestLexer, TestComments)
 {
 	std::stringstream ss;
-	ss << "( ;this is a bunch of garbage that is ignored...\n";
+	ss << "( // this is a bunch of garbage that is ignored...\n";
 	ss << "12";
 	xerxzema::Lexer lex(ss);
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::GroupBegin);

@@ -9,7 +9,7 @@ inline bool is_operator(int c)
 	return c == '~' || c == '`' || c == '!' || c == '@' || c == '#' || c == '$'
 		|| c == '%' || c == '^' || c == '&' || c == '*' || c == '-' || c == '+'
 		|| c == '=' || c == ',' || c == '.' || c == '?' || c == '/' || c == '\\'
-		|| c == '<' || c == '>' || c == '|' || c == ':';
+		|| c == '<' || c == '>' || c == '|' || c == ':' || c == ';';
 
 }
 
@@ -443,6 +443,14 @@ bool Lexer::do_operator()
 		token = std::make_unique<Token>(TokenType::Dot, line, start, buffer);
 		return true;
 	}
+	if(input.peek() == ';')
+	{
+		input.get();
+		col++;
+		buffer.push_back(';');
+		token = std::make_unique<Token>(TokenType::Term, line, start, buffer);
+		return true;
+	}
 
 	while(is_operator(input.peek()))
 	{
@@ -456,18 +464,27 @@ bool Lexer::do_operator()
 
 bool Lexer::do_comment()
 {
-	if(input.peek() == ';')
+	if(input.peek() == '/')
 	{
 		input.get();
 		auto start = col;
 		col++;
-		while(input && input.peek() != '\n')
+		if(input.peek() == '/')
 		{
-			buffer.push_back(input.get());
 			col++;
+			input.get();
+			while(input && input.peek() != '\n')
+			{
+				buffer.push_back(input.get());
+				col++;
+			}
+			token = std::make_unique<Token>(TokenType::Comment, line, start, buffer);
+			return true;
 		}
-		token = std::make_unique<Token>(TokenType::Comment, line, start, buffer);
-		return true;
+		else
+		{
+			input.putback('/');
+		}
 	}
 	return false;
 }
@@ -503,7 +520,7 @@ void Lexer::read_next_token()
 	{
 		buffer.clear();
 	}
-	else if(do_operator())
+	else if(do_comment())
 	{
 		buffer.clear();
 	}
@@ -511,7 +528,7 @@ void Lexer::read_next_token()
 	{
 		buffer.clear();
 	}
-	else if(do_comment())
+	else if(do_operator())
 	{
 		buffer.clear();
 	}

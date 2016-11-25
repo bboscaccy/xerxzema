@@ -47,6 +47,7 @@ enum class TokenType : char
 	Delay, // ~
 	Seperator, // ,
 	Dot, // .
+	Term, // ;
 	Comment, // ; * \n
 	BlockBegin, // {
 	BlockEnd, // }
