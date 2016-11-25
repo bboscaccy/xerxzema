@@ -123,6 +123,14 @@ public:
 	std::string show();
 };
 
+class SampleExpression : public Expression
+{
+public:
+	SampleExpression(std::unique_ptr<Expression>&& expr);
+	std::unique_ptr<Expression> expr;
+	std::string show();
+};
+
 class CallExpression : public Expression
 {
 public:

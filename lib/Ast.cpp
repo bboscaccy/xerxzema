@@ -119,6 +119,15 @@ CallExpression::CallExpression(std::unique_ptr<Expression>&& t,
 {
 }
 
+SampleExpression::SampleExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+{
+}
+
+std::string SampleExpression::show()
+{
+	return "(sample " + expr->show() + ")";
+}
+
 std::string CallExpression::show()
 {
 	if(args)
