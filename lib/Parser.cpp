@@ -40,6 +40,8 @@ int left_bind(Token* token)
 		return 1;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
+	if(token->type == TokenType::Term)
+		return 1;
 	return -1;
 }
 
@@ -67,6 +69,26 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 			//TODO error/invalid expression.
 		}
 	}
+	if(token->type == TokenType::BlockBegin)
+	{
+		auto b = std::make_unique<ExpressionBlock>();
+
+		while(true)
+		{
+			if(lexer.peek()->type == TokenType::BlockEnd ||
+			   lexer.peek()->type == TokenType::Eof)
+				break;
+			auto expr = expression(lexer, 0);
+			b->add(std::move(expr));
+		}
+
+		if(lexer.peek()->type == TokenType::BlockEnd)
+		{
+			lexer.get();
+			return b;
+		}
+		//TODO missing block end...
+	}
 	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 
@@ -91,6 +113,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<AssignExpression>(std::move(expr), expression(lexer, 4));
 	if(token->type == TokenType::Bind)
 		return std::make_unique<BindExpression>(std::move(expr), expression(lexer, 1));
+	if(token->type == TokenType::Term)
+		return std::make_unique<Statement>(std::move(expr));
 	if(token->type == TokenType::GroupBegin)
 	{
 		if(lexer.peek()->type == TokenType::GroupEnd)

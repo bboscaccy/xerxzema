@@ -169,6 +169,30 @@ std::string InvalidLeftDetonation::show()
 	return "(invalid-left " + expr->show() + " (token '" +  token->data + "'))";
 }
 
+std::string	ExpressionBlock::show()
+{
+	std::string res = "{";
+	for(auto& e:expressions)
+	{
+		res += e->show();
+	}
+	res += "}";
+	return res;
+}
+
+void ExpressionBlock::add(std::unique_ptr<Expression>&& expr)
+{
+	expressions.push_back(std::move(expr));
+}
+
+Statement::Statement(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+{
+}
+
+std::string Statement::show()
+{
+	return "[" + expr->show() + "]";
+}
 
 std::string Expression::show()
 {

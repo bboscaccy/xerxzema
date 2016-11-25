@@ -16,6 +16,23 @@ public:
 	virtual std::string show();
 };
 
+class ExpressionBlock : public Expression
+{
+public:
+	std::string show();
+	void add(std::unique_ptr<Expression>&& expr);
+	std::vector<std::unique_ptr<Expression>> expressions;
+};
+
+class Statement : public Expression
+{
+public:
+	Statement(std::unique_ptr<Expression>&& expr);
+	std::unique_ptr<Expression> expr;
+	std::string show();
+
+};
+
 class SymbolExpression : public Expression
 {
 public:
