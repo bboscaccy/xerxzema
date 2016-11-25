@@ -41,6 +41,17 @@ std::string DivExpression::show()
 	return "(div " + lhs->show() + " " + rhs->show() + ")";
 }
 
+PowExpression::PowExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+
+{
+}
+
+std::string PowExpression::show()
+{
+	return "(pow " + lhs->show() + " " + rhs->show() + ")";
+}
+
 AddExpression::AddExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {

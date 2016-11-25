@@ -227,3 +227,15 @@ TEST(TestParser, TestDivExpr)
 	ASSERT_EQ(expr->show(), "(div (div (symbol a) (symbol b)) (symbol c))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestPowExpr)
+{
+
+	std::stringstream ss;
+	ss << "a*b^c^d";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(mul (symbol a) (pow (symbol b) (pow (symbol c) (symbol d))))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
