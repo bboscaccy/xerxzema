@@ -16,7 +16,7 @@ public:
 	virtual std::string show();
 };
 
-class ExpressionBlock : public Expression
+class StatementBlock : public Expression
 {
 public:
 	std::string show();

@@ -71,15 +71,13 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 	}
 	if(token->type == TokenType::BlockBegin)
 	{
-		auto b = std::make_unique<ExpressionBlock>();
-
+		auto b = std::make_unique<StatementBlock>();
 		while(true)
 		{
 			if(lexer.peek()->type == TokenType::BlockEnd ||
 			   lexer.peek()->type == TokenType::Eof)
 				break;
-			auto expr = expression(lexer, 0);
-			b->add(std::move(expr));
+			b->add(expression(lexer, 0));
 		}
 
 		if(lexer.peek()->type == TokenType::BlockEnd)
