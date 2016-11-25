@@ -228,6 +228,18 @@ TEST(TestParser, TestDivExpr)
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
 
+TEST(TestParser, TestModExpr)
+{
+
+	std::stringstream ss;
+	ss << "a+b%c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(add (symbol a) (mod (symbol b) (symbol c)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
 TEST(TestParser, TestPowExpr)
 {
 

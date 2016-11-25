@@ -60,6 +60,13 @@ public:
 	std::string show();
 };
 
+class ModExpression : public BinaryExpression
+{
+public:
+	ModExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
 class PowExpression : public BinaryExpression
 {
 public:
