@@ -72,30 +72,6 @@ public:
 	std::string data;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const TokenType& x)
-{
-	if(x == TokenType::Invalid)
-		stream << "invalid";
-	else if (x == TokenType::Eof)
-		stream << "eof";
-	else if (x == TokenType::Int)
-		stream << "int";
-	else if (x == TokenType::Real)
-		stream << "real";
-	else if (x == TokenType::Symbol)
-		stream << "symbol";
-	else if (x == TokenType::Operator)
-		stream << "operator";
-	else if (x == TokenType::Add)
-			stream << "add";
-	else if (x == TokenType::Bang)
-		stream << "bang";
-	else if (x == TokenType::MergeStart)
-		stream << "merge-start";
-	return stream;
-}
-
-
 class Lexer
 {
 public:

@@ -78,9 +78,13 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 	if(token->type == TokenType::Assign)
 		return std::make_unique<AssignExpression>(std::move(expr), expression(lexer, 4));
 	if(token->type == TokenType::Bind)
-		return std::make_unique<BindExpression>(std::move(expr), expression(lexer, 4));
+		return std::make_unique<BindExpression>(std::move(expr), expression(lexer, 1));
 	if(token->type == TokenType::GroupBegin)
 	{
+		if(lexer.peek()->type == TokenType::GroupEnd)
+		{
+			//TODO unit expression.
+		}
 		auto v = std::make_unique<CallExpression>(std::move(expr), expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::GroupEnd)
 		{
