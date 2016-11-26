@@ -98,7 +98,14 @@ bool Lexer::do_symbol()
 		buffer.push_back(input.get());
 		col++;
 	}
-	token = std::make_unique<Token>(TokenType::Symbol, line, start, buffer);
+	if(buffer == "prog")
+		token = std::make_unique<Token>(TokenType::ProgKeyword, line, start, buffer);
+	else if(buffer == "func")
+		token = std::make_unique<Token>(TokenType::FuncKeyword, line, start, buffer);
+	else if(buffer == "ugen")
+		token = std::make_unique<Token>(TokenType::UgenKeyword, line, start, buffer);
+	else
+		token = std::make_unique<Token>(TokenType::Symbol, line, start, buffer);
 	return true;
 }
 

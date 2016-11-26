@@ -55,7 +55,10 @@ enum class TokenType : char
 	GroupEnd, // )
 	BraceBegin, // [
 	BraceEnd, // ]
-	Operator
+	Operator,
+	ProgKeyword, // prog
+	FuncKeyword, // func
+	UgenKeyword, // ugen
 };
 
 class Token

@@ -162,3 +162,19 @@ TEST(TestLexer, TestNumbers)
 	lex.get();
 
 }
+
+TEST(TestLexer, TestSymbols)
+{
+	std::stringstream ss;
+	ss << "hi prog func ugen i_dont_know";
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Symbol);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::ProgKeyword);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::FuncKeyword);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::UgenKeyword);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Symbol);
+}
