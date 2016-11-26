@@ -48,7 +48,7 @@ bool is_a(B* b)
 template<class V, class B, class T>
 T* as_a(B* b)
 {
-	is_a_impl<V, B, T> impl;
+	as_a_impl<V, B, T> impl;
 	b->accept(impl);
 	return impl.value;
 }
