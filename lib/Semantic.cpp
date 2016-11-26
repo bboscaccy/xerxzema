@@ -80,8 +80,9 @@ void HandleCodeDefinitionSignature::visit(xerxzema::ArgListExpression *e)
 {
 	if(state == ProcessState::InputArgs)
 	{
-		//eat the group and move on
-		//e->expr->accept(*this);
+		e->lhs->accept(*this);
+		state = ProcessState::InputArgs;
+		e->rhs->accept(*this);
 	}
 }
 

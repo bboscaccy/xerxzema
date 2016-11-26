@@ -60,3 +60,25 @@ TEST(TestSemantic, TestProgramSingleInput)
 	ASSERT_EQ(inputs.size(), 1);
 	ASSERT_EQ(inputs[0]->name(), "x");
 }
+
+TEST(TestSemantic, TestProgramMultipleInput)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real, z:real, m:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	auto inputs = sig.program()->input_registers();
+	ASSERT_EQ(inputs.size(), 3);
+	ASSERT_EQ(inputs[0]->name(), "x");
+	ASSERT_EQ(inputs[1]->name(), "z");
+	ASSERT_EQ(inputs[2]->name(), "m");
+}
