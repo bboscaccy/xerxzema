@@ -18,4 +18,37 @@ private:
 	Namespace* ns;
 	bool valid;
 };
+
+
+class HandleCodeDefinitionSignature : public AstVisitor
+{
+	enum class ProcessState
+	{
+		Entry,
+		Lhs,
+		Name,
+		InputArgs,
+		Rhs,
+		OutputArgs
+	};
+
+public:
+	HandleCodeDefinitionSignature(Namespace* ns, CodeDefinition* def);
+	void process();
+	void visit(BindExpression* e);
+	void visit(CallExpression* e);
+	void visit(SymbolExpression* e);
+	void handle_default(Expression* e);
+
+	inline Program* program() { return prog; }
+
+private:
+	Namespace* ns;
+	bool valid;
+	CodeDefinition* def;
+	ProcessState state;
+	std::string name;
+	Program* prog;
+};
+
 };

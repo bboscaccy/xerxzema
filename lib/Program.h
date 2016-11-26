@@ -38,6 +38,8 @@ public:
 	inline llvm::Function* function_value() { return function; }
 	inline llvm::Module* current_module() { return _current_module; }
 
+	inline std::string program_name() { return _name; }
+	
 private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<std::string>& inputs,

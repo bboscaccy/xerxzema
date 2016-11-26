@@ -22,3 +22,21 @@ TEST(TestSemantic, TestValidateTop)
 	expr->accept(top_level);
 	ASSERT_TRUE(top_level.is_valid());
 }
+
+TEST(TestSemantic, TestFindProgamName)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	ASSERT_EQ(sig.program()->program_name(), "foo");
+
+}
