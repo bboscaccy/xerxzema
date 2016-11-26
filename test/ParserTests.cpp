@@ -301,3 +301,17 @@ TEST(TestParser, TestAnnotation)
  "(group (arg-list (annotation (symbol int) (symbol x)) (annotation (symbol int) (symbol y))))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestBasicDecl)
+{
+
+	std::stringstream ss;
+	ss << "(int:x, int:y) -> int:z";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "(bind (group (arg-list (annotation (symbol int) (symbol x))" \
+" (annotation (symbol int) (symbol y)))) (annotation (symbol int) (symbol z)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
