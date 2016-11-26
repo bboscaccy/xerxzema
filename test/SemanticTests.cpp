@@ -40,3 +40,23 @@ TEST(TestSemantic, TestFindProgamName)
 	ASSERT_EQ(sig.program()->program_name(), "foo");
 
 }
+
+TEST(TestSemantic, TestProgramSingleInput)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	auto inputs = sig.program()->input_registers();
+	ASSERT_EQ(inputs.size(), 1);
+	ASSERT_EQ(inputs[0]->name(), "x");
+}

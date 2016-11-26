@@ -39,7 +39,8 @@ public:
 	inline llvm::Module* current_module() { return _current_module; }
 
 	inline std::string program_name() { return _name; }
-	
+	inline std::vector<Register*> input_registers() { return inputs; }
+
 private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<std::string>& inputs,

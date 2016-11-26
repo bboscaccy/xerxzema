@@ -28,6 +28,8 @@ class HandleCodeDefinitionSignature : public AstVisitor
 		Lhs,
 		Name,
 		InputArgs,
+		GetArgName,
+		GetArgType,
 		Rhs,
 		OutputArgs
 	};
@@ -38,6 +40,8 @@ public:
 	void visit(BindExpression* e);
 	void visit(CallExpression* e);
 	void visit(SymbolExpression* e);
+	void visit(ArgListExpression* e);
+	void visit(AnnotationExpression* e);
 	void handle_default(Expression* e);
 
 	inline Program* program() { return prog; }
@@ -49,6 +53,8 @@ private:
 	ProcessState state;
 	std::string name;
 	Program* prog;
+	std::string current_arg_name;
+	std::string current_arg_type;
 };
 
 };
