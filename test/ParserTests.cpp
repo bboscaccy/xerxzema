@@ -288,3 +288,16 @@ TEST(TestParser, TestSampleExpr)
 	ASSERT_EQ(expr->show(), "(bind (add (sample (symbol a)) (symbol b)) (symbol c))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestAnnotation)
+{
+
+	std::stringstream ss;
+	ss << "(int:x, int:y)";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+ "(group (arg-list (annotation (symbol int) (symbol x)) (annotation (symbol int) (symbol y))))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

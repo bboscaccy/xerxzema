@@ -19,6 +19,18 @@ BinaryExpression::BinaryExpression(std::unique_ptr<Expression>&& l,
 {
 }
 
+AnnotationExpression::AnnotationExpression(std::unique_ptr<Expression>&& l,
+										   std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(l), std::move(r))
+
+{
+}
+
+std::string AnnotationExpression::show()
+{
+	return "(annotation " + lhs->show() + " " + rhs->show() + ")";
+}
+
 MulExpression::MulExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 

@@ -38,6 +38,8 @@ int left_bind(Token* token)
 		return 4;
 	if(token->type == TokenType::Bind)
 		return 1;
+	if(token->type == TokenType::Delimit)
+		return 100;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
 	if(token->type == TokenType::Term)
@@ -113,6 +115,8 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		return std::make_unique<ModExpression>(std::move(expr), expression(lexer, 20));
 	if(token->type == TokenType::Pow)
 		return std::make_unique<PowExpression>(std::move(expr), expression(lexer, 29));
+	if(token->type == TokenType::Delimit)
+		return std::make_unique<AnnotationExpression>(std::move(expr), expression(lexer, 100));
 	if(token->type == TokenType::Seperator)
 		return std::make_unique<ArgListExpression>(std::move(expr), expression(lexer, 5));
 	if(token->type == TokenType::Assign)

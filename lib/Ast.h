@@ -58,6 +58,13 @@ public:
 	std::unique_ptr<Expression> rhs;
 };
 
+class AnnotationExpression : public BinaryExpression
+{
+public:
+	AnnotationExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+};
+
 class AddExpression : public BinaryExpression
 {
 public:
