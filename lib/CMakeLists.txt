@@ -10,5 +10,6 @@ add_library(xerxzema SHARED
   Lexer.cpp
   Ast.cpp
   Parser.cpp
+  Semantic.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})

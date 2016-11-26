@@ -4,6 +4,7 @@ add_executable(unittest
   ProgramTests.cpp
   LexerTests.cpp
   ParserTests.cpp
+  SemanticTests.cpp
   )
 
 include_directories(../lib)

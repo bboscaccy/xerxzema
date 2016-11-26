@@ -53,6 +53,6 @@ DECL_TYPE(Bool)
 DECL_TYPE(Unit)
 DECL_TYPE(Real)
 DECL_TYPE(Int)
-DECL_TYPE(Token)
+DECL_TYPE(Opaque)
 
 };

@@ -42,7 +42,7 @@ void World::create_core_namespace()
 	core->add_type("int", std::make_unique<Int>());
 	core->add_type("real", std::make_unique<Real>());
 	core->add_type("unit", std::make_unique<Unit>());
-	core->add_type("token", std::make_unique<Token>());
+	core->add_type("opaque", std::make_unique<Opaque>());
 	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
 	core->add_instruction(create_def<AddReal>("add", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<SubReal>("sub", {"real", "real"}, {"real"}));

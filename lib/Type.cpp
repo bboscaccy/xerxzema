@@ -89,17 +89,17 @@ void Int::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Val
 }
 
 
-llvm::Type* Token::type(llvm::LLVMContext &context)
+llvm::Type* Opaque::type(llvm::LLVMContext &context)
 {
 	return llvm::Type::getVoidTy(context)->getPointerTo();
 }
 
-std::string Token::name()
+std::string Opaque::name()
 {
-	return "token";
+	return "opaque";
 }
 
-void Token::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Opaque::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
