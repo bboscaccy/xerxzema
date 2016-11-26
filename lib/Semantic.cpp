@@ -42,7 +42,7 @@ void HandleCodeDefinitionSignature::visit(BindExpression *e)
 		auto rhs = e->rhs.get();
 		state = ProcessState::Lhs;
 		lhs->accept(*this);
-		state = ProcessState::Rhs;
+		state = ProcessState::OutputArgs;
 		rhs->accept(*this);
 	}
 }
@@ -84,14 +84,21 @@ void HandleCodeDefinitionSignature::visit(xerxzema::ArgListExpression *e)
 		state = ProcessState::InputArgs;
 		e->rhs->accept(*this);
 	}
+	else if(state == ProcessState::OutputArgs)
+	{
+		e->lhs->accept(*this);
+		state = ProcessState::OutputArgs;
+		e->rhs->accept(*this);
+	}
 }
 
 void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 {
-	if(state == ProcessState::InputArgs)
+	if(state == ProcessState::InputArgs || state == ProcessState::OutputArgs)
 	{
 		current_arg_name = "";
 		current_arg_type = "";
+		auto last_state = state;
 		state = ProcessState::GetArgName;
 		e->lhs->accept(*this);
 		state = ProcessState::GetArgType;
@@ -99,7 +106,10 @@ void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 
 		if(ns->is_type(current_arg_type))
 		{
-			prog->add_input(current_arg_name, ns->type(current_arg_type));
+			if(last_state == ProcessState::InputArgs)
+				prog->add_input(current_arg_name, ns->type(current_arg_type));
+			if(last_state == ProcessState::OutputArgs)
+				prog->add_output(current_arg_name, ns->type(current_arg_type));
 		}
 	}
 }

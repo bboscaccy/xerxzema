@@ -30,7 +30,6 @@ class HandleCodeDefinitionSignature : public AstVisitor
 		InputArgs,
 		GetArgName,
 		GetArgType,
-		Rhs,
 		OutputArgs
 	};
 

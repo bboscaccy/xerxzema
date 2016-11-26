@@ -82,3 +82,44 @@ TEST(TestSemantic, TestProgramMultipleInput)
 	ASSERT_EQ(inputs[1]->name(), "z");
 	ASSERT_EQ(inputs[2]->name(), "m");
 }
+
+TEST(TestSemantic, TestProgramSingleOutput)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	auto outputs = sig.program()->output_registers();
+	ASSERT_EQ(outputs.size(), 1);
+	ASSERT_EQ(outputs[0]->name(), "y");
+}
+
+TEST(TestSemantic, TestProgramMultipleOutput)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real, z:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	auto outputs = sig.program()->output_registers();
+	ASSERT_EQ(outputs.size(), 2);
+	ASSERT_EQ(outputs[0]->name(), "y");
+	ASSERT_EQ(outputs[1]->name(), "z");
+}

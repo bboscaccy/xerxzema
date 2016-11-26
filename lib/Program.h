@@ -40,6 +40,7 @@ public:
 
 	inline std::string program_name() { return _name; }
 	inline std::vector<Register*> input_registers() { return inputs; }
+	inline std::vector<Register*> output_registers() { return outputs; }
 
 private:
 	bool check_instruction(const std::string& name,
