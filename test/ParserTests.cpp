@@ -315,3 +315,19 @@ TEST(TestParser, TestBasicDecl)
 " (annotation (symbol int) (symbol y)))) (annotation (symbol int) (symbol z)))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestSimpleProg)
+{
+	std::stringstream ss;
+	ss << "prog foo(int:x, int:y) -> int:z\n"	\
+		  "  x + y -> z;";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(),
+			  "[prog (bind (call (symbol foo) (arg-list (annotation (symbol int) (symbol x)) "\
+			  "(annotation (symbol int) (symbol y)))) (annotation (symbol int) (symbol z))) "\
+			  "[(bind (add (symbol x) (symbol y)) (symbol z))]]");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+
+}

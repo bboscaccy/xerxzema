@@ -42,6 +42,18 @@ public:
 	std::string show();
 };
 
+class CodeDefinition : public Expression
+{
+public:
+	CodeDefinition(std::unique_ptr<Token>&& defintion_type,
+				   std::unique_ptr<Expression>&& signature,
+				   std::unique_ptr<Expression>&& body);
+	std::unique_ptr<Expression> signature;
+	std::unique_ptr<Expression> body;
+	std::unique_ptr<Token> definition_type;
+	std::string show();
+};
+
 class SymbolExpression : public Expression
 {
 public:

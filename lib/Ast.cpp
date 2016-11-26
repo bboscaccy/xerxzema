@@ -226,6 +226,18 @@ std::string WithStatement::show()
 	return "[with " + with_clause->show() + " " + statements->show() + "]";
 }
 
+CodeDefinition::CodeDefinition(std::unique_ptr<Token>&& d,
+							   std::unique_ptr<Expression>&& l,
+							   std::unique_ptr<Expression>&& r) :
+	definition_type(std::move(d)), signature(std::move(l)), body(std::move(r))
+{
+}
+
+std::string CodeDefinition::show()
+{
+	return "[" + definition_type->data + " " + signature->show() + " "
+		+ body->show() + "]";
+}
 
 std::string Expression::show()
 {

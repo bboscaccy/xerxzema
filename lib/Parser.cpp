@@ -97,6 +97,15 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		auto instructions = expression(lexer, 0);
 		return std::make_unique<WithStatement>(std::move(clause), std::move(instructions));
 	}
+	if(token->type == TokenType::ProgKeyword ||
+	   token->type == TokenType::UgenKeyword ||
+	   token->type == TokenType::FuncKeyword)
+	{
+		auto sig = expression(lexer, 0);
+		auto body = expression(lexer, 0);
+		return std::make_unique<CodeDefinition>(std::move(token), std::move(sig),
+												std::move(body));
+	}
 	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 
