@@ -12,6 +12,11 @@ std::string SymbolExpression::show()
 	return "(symbol " + token->data + ")";
 }
 
+void SymbolExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 BinaryExpression::BinaryExpression(std::unique_ptr<Expression>&& l,
 								   std::unique_ptr<Expression>&& r) :
 	lhs(std::move(l)), rhs(std::move(r))
@@ -31,10 +36,20 @@ std::string AnnotationExpression::show()
 	return "(annotation " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void AnnotationExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 MulExpression::MulExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 
 {
+}
+
+void MulExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string MulExpression::show()
@@ -48,6 +63,11 @@ DivExpression::DivExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Ex
 {
 }
 
+void DivExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 std::string DivExpression::show()
 {
 	return "(div " + lhs->show() + " " + rhs->show() + ")";
@@ -57,6 +77,11 @@ ModExpression::ModExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Ex
 	BinaryExpression(std::move(l), std::move(r))
 
 {
+}
+
+void ModExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string ModExpression::show()
@@ -75,9 +100,19 @@ std::string PowExpression::show()
 	return "(pow " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void PowExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 AddExpression::AddExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
 {
+}
+
+void AddExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string AddExpression::show()
@@ -95,6 +130,10 @@ std::string SubExpression::show()
 	return "(sub " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void SubExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
 
 ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l,
 									 std::unique_ptr<Expression>&& r) :
@@ -107,6 +146,11 @@ std::string ArgListExpression::show()
 	return "(arg-list " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void ArgListExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 GroupExpression::GroupExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
 {
 }
@@ -116,8 +160,18 @@ std::string GroupExpression::show()
 	return "(group " + expr->show() + ")";
 }
 
+void GroupExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 NegateExpression::NegateExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
 {
+}
+
+void NegateExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string NegateExpression::show()
@@ -140,12 +194,22 @@ std::string SampleExpression::show()
 	return "(sample " + expr->show() + ")";
 }
 
+void SampleExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 std::string CallExpression::show()
 {
 	if(args)
 		return "(call " + target->show() + " " + args->show() + ")";
 	else
 		return "(call " + target->show() + " (unit))";
+}
+
+void CallExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l,
@@ -159,6 +223,11 @@ std::string AssignExpression::show()
 	return "(assign " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void AssignExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 BindExpression::BindExpression(std::unique_ptr<Expression>&& l,
 							   std::unique_ptr<Expression>&& r) :
 	BinaryExpression(std::move(l), std::move(r))
@@ -170,6 +239,11 @@ std::string BindExpression::show()
 	return "(bind " + lhs->show() + " " + rhs->show() + ")";
 }
 
+void BindExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) : token(std::move(t))
 {
 }
@@ -177,6 +251,11 @@ InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) : token
 std::string InvalidNullDetonation::show()
 {
 	return "(invalid-null (token '" + token->data + "'))";
+}
+
+void InvalidNullDetonation::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
@@ -188,6 +267,11 @@ InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
 std::string InvalidLeftDetonation::show()
 {
 	return "(invalid-left " + expr->show() + " (token '" +  token->data + "'))";
+}
+
+void InvalidLeftDetonation::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string	StatementBlock::show()
@@ -206,6 +290,11 @@ void StatementBlock::add(std::unique_ptr<Expression>&& expr)
 	expressions.push_back(std::move(expr));
 }
 
+void StatementBlock::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 Statement::Statement(std::unique_ptr<Expression>&& e) : expr(std::move(e))
 {
 }
@@ -213,6 +302,11 @@ Statement::Statement(std::unique_ptr<Expression>&& e) : expr(std::move(e))
 std::string Statement::show()
 {
 	return "[" + expr->show() + "]";
+}
+
+void Statement::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 WithStatement::WithStatement(std::unique_ptr<Expression>&& l,
@@ -226,6 +320,11 @@ std::string WithStatement::show()
 	return "[with " + with_clause->show() + " " + statements->show() + "]";
 }
 
+void WithStatement::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 CodeDefinition::CodeDefinition(std::unique_ptr<Token>&& d,
 							   std::unique_ptr<Expression>&& l,
 							   std::unique_ptr<Expression>&& r) :
@@ -237,6 +336,11 @@ std::string CodeDefinition::show()
 {
 	return "[" + definition_type->data + " " + signature->show() + " "
 		+ body->show() + "]";
+}
+
+void CodeDefinition::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
 }
 
 std::string Expression::show()
@@ -309,6 +413,14 @@ void AstVisitor::visit(CallExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(BindExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(AssignExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(NegateExpression *e)
 {
 	handle_default(e);
 }

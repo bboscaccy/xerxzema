@@ -329,5 +329,5 @@ TEST(TestParser, TestSimpleProg)
 			  "(annotation (symbol int) (symbol y)))) (annotation (symbol int) (symbol z))) "\
 			  "[(bind (add (symbol x) (symbol y)) (symbol z))]]");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
-
+	ASSERT_TRUE(expr->is_a<xerxzema::CodeDefinition>());
 }
