@@ -191,6 +191,29 @@ public:
 	std::string show();
 };
 
-
-
+class AstVisitor
+{
+public:
+	virtual ~AstVisitor() = default;
+	virtual void visit(StatementBlock* e);
+	virtual void visit(Statement* e);
+	virtual void visit(WithStatement* e);
+	virtual void visit(CodeDefinition* e);
+	virtual void visit(SymbolExpression* e);
+	virtual void visit(AnnotationExpression* e);
+	virtual void visit(AddExpression* e);
+	virtual void visit(SubExpression* e);
+	virtual void visit(MulExpression* e);
+	virtual void visit(DivExpression* e);
+	virtual void visit(ModExpression* e);
+	virtual void visit(PowExpression* e);
+	virtual void visit(ArgListExpression* e);
+	virtual void visit(GroupExpression* e);
+	virtual void visit(SampleExpression* e);
+	virtual void visit(CallExpression* e);
+	virtual void visit(BindExpression* e);
+	virtual void visit(InvalidLeftDetonation* e);
+	virtual void visit(InvalidNullDetonation* e);
+	virtual void handle_default(Expression* ) = 0;
+};
 };

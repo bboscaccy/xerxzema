@@ -243,4 +243,81 @@ std::string Expression::show()
 {
 	return "unimplemented";
 }
+
+void AstVisitor::visit(StatementBlock *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(Statement *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(WithStatement *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(CodeDefinition *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(SymbolExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(AnnotationExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(AddExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(SubExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(MulExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(DivExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(ModExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(PowExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(ArgListExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(GroupExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(SampleExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(CallExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(BindExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(InvalidLeftDetonation *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(InvalidNullDetonation *e)
+{
+	handle_default(e);
+}
 };
