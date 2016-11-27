@@ -71,7 +71,8 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		}
 		else
 		{
-			//TODO error/invalid expression.
+			emit_error(token.get(), "Missing closing parenthesis.");
+			return std::make_unique<InvalidNullDetonation>(std::move(token));
 		}
 	}
 	if(token->type == TokenType::BlockBegin)
@@ -90,7 +91,8 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 			lexer.get();
 			return b;
 		}
-		//TODO missing block end...
+		emit_error(token.get(), "Missing closing brace.");
+		return std::make_unique<InvalidNullDetonation>(std::move(token));
 	}
 	if(token->type == TokenType::With)
 	{
@@ -107,7 +109,7 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		return std::make_unique<CodeDefinition>(std::move(token), std::move(sig),
 												std::move(body));
 	}
-	emit_error(token.get(), "Invalid null denotation.");
+	emit_error(token.get(), "Expecting something that can form an expression");
 	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 

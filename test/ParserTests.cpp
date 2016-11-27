@@ -331,3 +331,14 @@ TEST(TestParser, TestSimpleProg)
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 	ASSERT_TRUE(expr->is_a<xerxzema::CodeDefinition>());
 }
+
+TEST(TestParser, TestMissingParen)
+{
+
+	std::stringstream ss;
+	ss << "(x + a) * (y + b";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
