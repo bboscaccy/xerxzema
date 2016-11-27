@@ -48,6 +48,26 @@ void Program::instruction(const std::string &name,
 						  const std::vector<std::string> &inputs,
 						  const std::vector<std::string> &outputs)
 {
+	std::vector<RegisterData> in_regs;
+	std::vector<RegisterData> out_regs;
+
+	for(auto& n:inputs)
+	{
+		in_regs.push_back(reg_data(n));
+	}
+
+	for(auto& n:outputs)
+	{
+		out_regs.push_back(reg_data(n));
+	}
+	instruction(name, in_regs, out_regs);
+}
+
+void Program::instruction(const std::string &name,
+						  const std::vector<RegisterData> &inputs,
+						  const std::vector<RegisterData> &outputs)
+{
+
 	if(!check_instruction(name, inputs, outputs))
 	{
 		auto def = std::make_unique<DeferredInstruction>();
@@ -58,30 +78,29 @@ void Program::instruction(const std::string &name,
 
 		for(auto& r: inputs)
 		{
-			reg(r)->deffered.push_back(def.get());
+			r.reg->deffered.push_back(def.get());
 		}
 
 		deferred.push_back(std::move(def));
 	}
-
 }
 
 bool Program::check_instruction(const std::string &name,
-								const std::vector<std::string> &inputs,
-								const std::vector<std::string> &outputs)
+								const std::vector<RegisterData> &inputs,
+								const std::vector<RegisterData> &outputs)
 {
 	bool resolved = true;
 	std::vector<Type*> input_types;
-	for(auto reg_name: inputs)
+	for(auto& reg_data: inputs)
 	{
-		if(!reg(reg_name)->type())
+		if(!reg_data.reg->type())
 		{
 			resolved = false;
 			break;
 		}
 		else
 		{
-			input_types.push_back(reg(reg_name)->type());
+			input_types.push_back(reg_data.reg->type());
 		}
 	}
 	if(resolved)
@@ -95,7 +114,7 @@ bool Program::check_instruction(const std::string &name,
 				auto it = outputs.begin();
 				for(auto& type: output_types)
 				{
-					auto out_reg = reg(*it);
+					auto out_reg = it->reg;
 					if(out_reg->type())
 					{
 						if(out_reg->type() != type)
@@ -122,11 +141,11 @@ bool Program::check_instruction(const std::string &name,
 				auto inst = def->create();
 				for(auto& n:inputs)
 				{
-					inst->input(reg(n));
+					inst->input(n.reg);
 				}
 				for(auto& n:outputs)
 				{
-					inst->output(reg(n));
+					inst->output(n.reg);
 				}
 				instruction(std::move(inst));
 				return true;

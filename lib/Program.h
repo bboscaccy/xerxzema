@@ -12,11 +12,17 @@ namespace xerxzema
 {
 class Namespace;
 
+struct RegisterData
+{
+	Register* reg;
+	bool sample;
+};
+
 struct DeferredInstruction
 {
 	std::string name;
-	std::vector<std::string> inputs;
-	std::vector<std::string> outputs;
+	std::vector<RegisterData> inputs;
+	std::vector<RegisterData> outputs;
 	bool solved;
 };
 
@@ -30,7 +36,14 @@ public:
 	void instruction(const std::string& name,
 					 const std::vector<std::string>& inputs,
 					 const std::vector<std::string>& outputs);
+	void instruction(const std::string& name,
+					 const std::vector<RegisterData>& inputs,
+					 const std::vector<RegisterData>& outputs);
 	Register* reg(const std::string& name);
+	inline RegisterData reg_data(const std::string& name, bool sample=false)
+	{
+		return RegisterData({reg(name), sample});
+	}
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
@@ -44,8 +57,8 @@ public:
 
 private:
 	bool check_instruction(const std::string& name,
-						   const std::vector<std::string>& inputs,
-						   const std::vector<std::string>& outputs);
+						   const std::vector<RegisterData>& inputs,
+						   const std::vector<RegisterData>& outputs);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
