@@ -74,6 +74,7 @@ public:
 	size_t line;
 	size_t column;
 	std::string data;
+	std::shared_ptr<std::string> line_data;
 };
 
 class Lexer
@@ -98,6 +99,7 @@ private:
 	size_t tab_width;
 	std::string buffer;
 	std::unique_ptr<Token> token;
+	std::shared_ptr<std::string> current_line;
 };
 
 

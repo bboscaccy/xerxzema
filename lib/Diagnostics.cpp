@@ -35,4 +35,26 @@ void emit_debug(const std::string& msg)
 	std::cout << AnsiReset;
 }
 
+void emit_error(Token* token, const std::string& msg)
+{
+	std::cout << AnsiRed << AnsiBright;
+	std::cout << "Error: ";
+	std::cout << AnsiReset;
+	std::cout << '<' << token->line << ',' << token->column << "> ";
+	std::cout << AnsiWhite << AnsiBright << msg << '\n';
+	if(token->line_data)
+	{
+		std::cout << AnsiReset;
+		std::cout << "    " << *token->line_data << '\n';
+		std::cout << "    ";
+		std::cout << AnsiDim << AnsiGreen;
+		for(size_t i = 1; i < token->column; i++)
+		{
+			std::cout << '~';
+		}
+		std::cout << AnsiBright << AnsiRed << "^\n";
+	}
+	std::cout << AnsiReset;
+}
+
 };

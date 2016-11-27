@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "Diagnostics.h"
 
 namespace xerxzema
 {
@@ -106,6 +107,7 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		return std::make_unique<CodeDefinition>(std::move(token), std::move(sig),
 												std::move(body));
 	}
+	emit_error(token.get(), "Invalid null denotation.");
 	return std::make_unique<InvalidNullDetonation>(std::move(token));
 }
 
@@ -148,9 +150,11 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 		}
 		else
 		{
+			emit_error(token.get(), "Missing closing parenthesis.");
 			return std::make_unique<InvalidLeftDetonation>(std::move(v), std::move(token));
 		}
 	}
+	emit_error(token.get(), "Invalid left denotation.");
 	return std::make_unique<InvalidLeftDetonation>(std::move(expr), std::move(token));
 }
 

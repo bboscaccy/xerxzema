@@ -28,4 +28,6 @@ void emit_warn(const std::string& msg);
 void emit_info(const std::string& msg);
 void emit_debug(const std::string& msg);
 
+void emit_error(Token* token, const std::string& msg);
+
 };

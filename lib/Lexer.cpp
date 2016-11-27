@@ -22,6 +22,7 @@ Lexer::Lexer(std::istream& input_stream) : input(input_stream), line(1), col(1),
 										   tab_width(4)
 
 {
+	current_line = std::make_shared<std::string>();
 }
 
 bool Lexer::do_number()
@@ -506,37 +507,50 @@ void Lexer::read_next_token()
 		{
 			input.get();
 			col++;
+			*current_line += ' ';
 		}
 		else if (input.peek() == '\t')
 		{
 			input.get();
 			col += tab_width;
+			*current_line += "    ";
 		}
 		else if(input.peek() == '\n')
 		{
 			input.get();
 			line++;
 			col = 1;
+			current_line = std::make_shared<std::string>();
 		}
 	}
 	if(do_number())
 	{
+		*current_line += buffer;
+		token->line_data = current_line;
 		buffer.clear();
 	}
 	else if(do_lexical())
 	{
+		*current_line += buffer;
+		token->line_data = current_line;
 		buffer.clear();
 	}
 	else if(do_comment())
 	{
+		*current_line += buffer;
+		token->line_data = current_line;
 		buffer.clear();
 	}
 	else if(do_symbol())
 	{
+		*current_line += buffer;
+		token->line_data = current_line;
 		buffer.clear();
 	}
 	else if(do_operator())
 	{
+		*current_line += buffer;
+		token->line_data = current_line;
 		buffer.clear();
 	}
 	else
@@ -545,11 +559,15 @@ void Lexer::read_next_token()
 		{
 			buffer.push_back(input.get());
 			token = std::make_unique<Token>(TokenType::Invalid, line, col, "");
+			*current_line += buffer;
+			token->line_data = current_line;
+
 		}
 		else
 		{
 			buffer.push_back(input.get());
 			token = std::make_unique<Token>(TokenType::Eof, line, col, "");
+			token->line_data = current_line;
 		}
 	}
 }
