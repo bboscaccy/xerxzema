@@ -187,6 +187,12 @@ void HandleExpression::visit(xerxzema::SymbolExpression *e)
 	result.push_back(program->reg_data(e->token->data));
 }
 
+void HandleExpression::visit(xerxzema::SampleExpression *e)
+{
+	HandleExpression child(program, e->expr.get());
+	result.push_back(RegisterData({child.result[0].reg, true}));
+}
+
 void HandleExpression::visit(xerxzema::AddExpression *e)
 {
 	HandleExpression lhs(program, e->lhs.get());
@@ -194,9 +200,7 @@ void HandleExpression::visit(xerxzema::AddExpression *e)
 	HandleExpression rhs(program, e->rhs.get());
 	rhs.process();
 	if(result.size() == 0)
-	{
 		result.push_back(program->temp_reg());
-	}
 	program->instruction("add", {lhs.result[0], rhs.result[0]}, result);
 }
 

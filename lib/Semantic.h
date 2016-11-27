@@ -70,7 +70,7 @@ public:
 
 	inline bool is_valid() { return valid; }
 	inline bool count() { return counter; }
-	
+
 private:
 	Program* program;
 	Expression* expr;
@@ -85,6 +85,7 @@ public:
 					 const std::vector<RegisterData>& result = {});
 	void process();
 	void visit(SymbolExpression* e);
+	void visit(SampleExpression* e);
 	void visit(AddExpression* e);
 	void visit(BindExpression* e);
 	void handle_default(Expression* e);
