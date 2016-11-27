@@ -5,6 +5,7 @@
 #include "../lib/Parser.h"
 #include "../lib/Semantic.h"
 #include "../lib/World.h"
+#include "../lib/Diagnostics.h"
 
 TEST(TestSemantic, TestValidateTop)
 {
