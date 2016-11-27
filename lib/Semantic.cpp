@@ -135,4 +135,38 @@ void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 	}
 }
 
+HandleStatement::HandleStatement(Program* p, Expression* e) : program(p), expr(e), valid(true)
+{
+}
+
+void HandleStatement::process()
+{
+	state = ProcessState::Entry;
+	expr->accept(*this);
+}
+
+void HandleStatement::visit(Statement *e)
+{
+	//is valid top expression next?
+	//bind, call, bang, merge, etc..
+}
+
+void HandleStatement::visit(StatementBlock *e)
+{
+	for(auto& s: e->expressions)
+	{
+		e->accept(*this);
+	}
+}
+
+void HandleStatement::visit(xerxzema::WithStatement *e)
+{
+
+}
+
+void HandleStatement::handle_default(xerxzema::Expression *e)
+{
+
+}
+
 };
