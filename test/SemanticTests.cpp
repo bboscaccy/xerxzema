@@ -167,3 +167,26 @@ TEST(TestSemantic, TestHandleStamentSingle)
 	stmt.process();
 	ASSERT_EQ(stmt.count(), 1);
 }
+
+TEST(TestSemantic, TestAddExpr)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	xerxzema::HandleStatement stmt(sig.program(),
+								   expr->as_a<xerxzema::CodeDefinition>()->body.get());
+
+	stmt.process();
+	ASSERT_EQ(stmt.count(), 1);
+	ASSERT_EQ(sig.program()->instruction_listing().size(), 1);
+}

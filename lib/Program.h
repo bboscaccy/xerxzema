@@ -44,6 +44,12 @@ public:
 	{
 		return RegisterData({reg(name), sample});
 	}
+
+	inline RegisterData temp_reg()
+	{
+		return reg_data("temp@" + std::to_string(locals.size() + 1));
+	}
+
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
@@ -54,6 +60,11 @@ public:
 	inline std::string program_name() { return _name; }
 	inline std::vector<Register*> input_registers() { return inputs; }
 	inline std::vector<Register*> output_registers() { return outputs; }
+
+	inline const std::vector<std::unique_ptr<Instruction>>& instruction_listing()
+	{
+		return instructions;
+	}
 
 private:
 	bool check_instruction(const std::string& name,

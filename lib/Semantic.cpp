@@ -195,11 +195,10 @@ void HandleExpression::visit(xerxzema::AddExpression *e)
 	rhs.process();
 	if(result.size() == 0)
 	{
-		//create temp register to assign the result
+		result.push_back(program->temp_reg());
 	}
-	//create the add instruction with lhs, rhs, and any other
-	//extra sample regs or dependency registers
-};
+	program->instruction("add", {lhs.result[0], rhs.result[0]}, result);
+}
 
 void HandleExpression::visit(xerxzema::BindExpression *e)
 {
