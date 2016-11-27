@@ -145,3 +145,25 @@ TEST(TestSemantic, TestMalformed)
 	sig.process();
 	ASSERT_FALSE(sig.is_valid());
 }
+
+TEST(TestSemantic, TestHandleStamentSingle)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) -> y:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+
+	xerxzema::HandleStatement stmt(sig.program(),
+								   expr->as_a<xerxzema::CodeDefinition>()->body.get());
+
+	stmt.process();
+	ASSERT_EQ(stmt.count(), 1);
+}

@@ -135,20 +135,22 @@ void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 	}
 }
 
-HandleStatement::HandleStatement(Program* p, Expression* e) : program(p), expr(e), valid(true)
+HandleStatement::HandleStatement(Program* p, Expression* e) : program(p), expr(e), valid(true),
+															  counter(0)
+
 {
 }
 
 void HandleStatement::process()
 {
-	state = ProcessState::Entry;
 	expr->accept(*this);
 }
 
 void HandleStatement::visit(Statement *e)
 {
-	//is valid top expression next?
-	//bind, call, bang, merge, etc..
+	HandleExpression handler(program, e->expr.get());
+	handler.process();
+	counter++;
 }
 
 void HandleStatement::visit(StatementBlock *e)
@@ -166,7 +168,52 @@ void HandleStatement::visit(xerxzema::WithStatement *e)
 
 void HandleStatement::handle_default(xerxzema::Expression *e)
 {
-
+	valid = false;
 }
+
+
+HandleExpression::HandleExpression(Program* p, Expression* e, const std::vector<Register*>& r) :
+	program(p), expr(e), valid(true), result(r)
+{
+}
+
+void HandleExpression::process()
+{
+	expr->accept(*this);
+}
+
+void HandleExpression::visit(xerxzema::SymbolExpression *e)
+{
+	result.push_back(program->reg(e->token->data));
+}
+
+void HandleExpression::visit(xerxzema::AddExpression *e)
+{
+	HandleExpression lhs(program, e->lhs.get());
+	lhs.process();
+	HandleExpression rhs(program, e->rhs.get());
+	rhs.process();
+	if(result.size() == 0)
+	{
+		//create temp register to assign the result
+	}
+	//create the add instruction with lhs, rhs, and any other
+	//extra sample regs or dependency registers
+};
+
+void HandleExpression::visit(xerxzema::BindExpression *e)
+{
+	HandleExpression rhs(program, e->rhs.get());
+	rhs.process();
+	result = rhs.result;
+	HandleExpression lhs(program, e->lhs.get(), result);
+	lhs.process();
+}
+
+void HandleExpression::handle_default(xerxzema::Expression *e)
+{
+	//???
+}
+
 
 };

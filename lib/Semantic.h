@@ -59,12 +59,6 @@ private:
 
 class HandleStatement : public AstVisitor
 {
-	enum class ProcessState
-	{
-		Entry,
-		Expression
-	};
-
 public:
 	HandleStatement(Program* program, Expression* expr);
 	void process();
@@ -74,11 +68,33 @@ public:
 
 	void handle_default(Expression* e);
 
+	inline bool is_valid() { return valid; }
+	inline bool count() { return counter; }
+	
 private:
 	Program* program;
 	Expression* expr;
 	bool valid;
-	ProcessState state;
+	size_t counter;
+};
+
+class HandleExpression : public AstVisitor
+{
+public:
+	HandleExpression(Program* program, Expression* expr,
+					 const std::vector<Register*>& result = {});
+	void process();
+	void visit(SymbolExpression* e);
+	void visit(AddExpression* e);
+	void visit(BindExpression* e);
+	void handle_default(Expression* e);
+
+	inline std::vector<Register*> results() { return result; }
+private:
+	Program* program;
+	Expression* expr;
+	bool valid;
+	std::vector<Register*> result;
 };
 
 };
