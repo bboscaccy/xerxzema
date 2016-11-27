@@ -128,3 +128,20 @@ TEST(TestSemantic, TestProgramMultipleOutput)
 	ASSERT_EQ(outputs[1]->name(), "z");
 	ASSERT_TRUE(sig.is_valid());
 }
+
+TEST(TestSemantic, TestMalformed)
+{
+	std::stringstream ss;
+	ss << "prog foo(x:real) + y:real, z:real\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+	ASSERT_FALSE(sig.is_valid());
+}
