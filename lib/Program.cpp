@@ -141,7 +141,10 @@ bool Program::check_instruction(const std::string &name,
 				auto inst = def->create();
 				for(auto& n:inputs)
 				{
-					inst->input(n.reg);
+					if(n.sample)
+						inst->sample(n.reg);
+					else
+						inst->input(n.reg);
 				}
 				for(auto& n:outputs)
 				{
