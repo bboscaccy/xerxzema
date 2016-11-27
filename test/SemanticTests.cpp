@@ -38,6 +38,7 @@ TEST(TestSemantic, TestFindProgamName)
 	sig.process();
 
 	ASSERT_EQ(sig.program()->program_name(), "foo");
+	ASSERT_TRUE(sig.is_valid());
 
 }
 
@@ -59,6 +60,7 @@ TEST(TestSemantic, TestProgramSingleInput)
 	auto inputs = sig.program()->input_registers();
 	ASSERT_EQ(inputs.size(), 1);
 	ASSERT_EQ(inputs[0]->name(), "x");
+	ASSERT_TRUE(sig.is_valid());
 }
 
 TEST(TestSemantic, TestProgramMultipleInput)
@@ -81,6 +83,7 @@ TEST(TestSemantic, TestProgramMultipleInput)
 	ASSERT_EQ(inputs[0]->name(), "x");
 	ASSERT_EQ(inputs[1]->name(), "z");
 	ASSERT_EQ(inputs[2]->name(), "m");
+	ASSERT_TRUE(sig.is_valid());
 }
 
 TEST(TestSemantic, TestProgramSingleOutput)
@@ -101,6 +104,7 @@ TEST(TestSemantic, TestProgramSingleOutput)
 	auto outputs = sig.program()->output_registers();
 	ASSERT_EQ(outputs.size(), 1);
 	ASSERT_EQ(outputs[0]->name(), "y");
+	ASSERT_TRUE(sig.is_valid());
 }
 
 TEST(TestSemantic, TestProgramMultipleOutput)
@@ -122,4 +126,5 @@ TEST(TestSemantic, TestProgramMultipleOutput)
 	ASSERT_EQ(outputs.size(), 2);
 	ASSERT_EQ(outputs[0]->name(), "y");
 	ASSERT_EQ(outputs[1]->name(), "z");
+	ASSERT_TRUE(sig.is_valid());
 }

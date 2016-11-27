@@ -19,13 +19,14 @@ void HandleTopLevelExpression::visit(xerxzema::CodeDefinition *e)
 }
 
 HandleCodeDefinitionSignature::HandleCodeDefinitionSignature(Namespace* n, CodeDefinition* d) :
-	ns(n), def(d), prog(nullptr)
+	ns(n), def(d), prog(nullptr), valid(true)
 {
 }
 
 void HandleCodeDefinitionSignature::handle_default(xerxzema::Expression *e)
 {
 	//TODO error.
+	valid = false;
 }
 
 void HandleCodeDefinitionSignature::process()
@@ -45,6 +46,10 @@ void HandleCodeDefinitionSignature::visit(BindExpression *e)
 		state = ProcessState::OutputArgs;
 		rhs->accept(*this);
 	}
+	else
+	{
+		valid = false;
+	}
 }
 
 void HandleCodeDefinitionSignature::visit(CallExpression* e)
@@ -57,6 +62,10 @@ void HandleCodeDefinitionSignature::visit(CallExpression* e)
 		target->accept(*this);
 		state = ProcessState::InputArgs;
 		args->accept(*this);
+	}
+	else
+	{
+		valid = false;
 	}
 }
 
@@ -74,6 +83,10 @@ void HandleCodeDefinitionSignature::visit(SymbolExpression* e)
 	{
 		current_arg_type = e->token->data;
 	}
+	else
+	{
+		valid = false;
+	}
 }
 
 void HandleCodeDefinitionSignature::visit(xerxzema::ArgListExpression *e)
@@ -89,6 +102,10 @@ void HandleCodeDefinitionSignature::visit(xerxzema::ArgListExpression *e)
 		e->lhs->accept(*this);
 		state = ProcessState::OutputArgs;
 		e->rhs->accept(*this);
+	}
+	else
+	{
+		valid = false;
 	}
 }
 
@@ -110,6 +127,10 @@ void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 				prog->add_input(current_arg_name, ns->type(current_arg_type));
 			if(last_state == ProcessState::OutputArgs)
 				prog->add_output(current_arg_name, ns->type(current_arg_type));
+		}
+		else
+		{
+			valid = false;
 		}
 	}
 }

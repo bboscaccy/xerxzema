@@ -44,6 +44,7 @@ public:
 	void handle_default(Expression* e);
 
 	inline Program* program() { return prog; }
+	inline bool is_valid() { return valid; }
 
 private:
 	Namespace* ns;
