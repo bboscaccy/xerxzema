@@ -82,19 +82,19 @@ class HandleExpression : public AstVisitor
 {
 public:
 	HandleExpression(Program* program, Expression* expr,
-					 const std::vector<Register*>& result = {});
+					 const std::vector<RegisterData>& result = {});
 	void process();
 	void visit(SymbolExpression* e);
 	void visit(AddExpression* e);
 	void visit(BindExpression* e);
 	void handle_default(Expression* e);
 
-	inline std::vector<Register*> results() { return result; }
+	inline std::vector<RegisterData> results() { return result; }
 private:
 	Program* program;
 	Expression* expr;
 	bool valid;
-	std::vector<Register*> result;
+	std::vector<RegisterData> result;
 };
 
 };

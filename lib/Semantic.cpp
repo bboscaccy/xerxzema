@@ -172,7 +172,7 @@ void HandleStatement::handle_default(xerxzema::Expression *e)
 }
 
 
-HandleExpression::HandleExpression(Program* p, Expression* e, const std::vector<Register*>& r) :
+HandleExpression::HandleExpression(Program* p, Expression* e, const std::vector<RegisterData>& r) :
 	program(p), expr(e), valid(true), result(r)
 {
 }
@@ -184,7 +184,7 @@ void HandleExpression::process()
 
 void HandleExpression::visit(xerxzema::SymbolExpression *e)
 {
-	result.push_back(program->reg(e->token->data));
+	result.push_back(program->reg_data(e->token->data));
 }
 
 void HandleExpression::visit(xerxzema::AddExpression *e)
