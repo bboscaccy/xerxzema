@@ -215,7 +215,7 @@ void HandleExpression::visit(xerxzema::BindExpression *e)
 
 void HandleExpression::handle_default(xerxzema::Expression *e)
 {
-	//???
+	valid = false;
 }
 
 
