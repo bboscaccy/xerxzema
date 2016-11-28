@@ -28,8 +28,14 @@ void HandleCodeDefinitionSignature::handle_default(xerxzema::Expression *e)
 {
 	//TODO error.
 	valid = false;
-	emit_error(e->token.get(), "malformed definition");
-
+	if(state == ProcessState::Entry)
+	{
+		emit_error(e->token.get(), "I was expecting a '->' operator somewhere but instead");
+	}
+	else
+	{
+		emit_error(e->token.get(), "malformed definition");
+	}
 }
 
 void HandleCodeDefinitionSignature::process()

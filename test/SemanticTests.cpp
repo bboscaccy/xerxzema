@@ -164,6 +164,23 @@ TEST(TestSemantic, TestBadType)
 	ASSERT_FALSE(sig.is_valid());
 }
 
+TEST(TestSemantic, TestBadTop)
+{
+	std::stringstream ss;
+	ss << "prog 2*3 = yeah\n" \
+		" x + x -> y; ";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleCodeDefinitionSignature sig(ns, expr->as_a<xerxzema::CodeDefinition>());
+	sig.process();
+	ASSERT_FALSE(sig.is_valid());
+}
+
 TEST(TestSemantic, TestHandleStamentSingle)
 {
 	std::stringstream ss;
