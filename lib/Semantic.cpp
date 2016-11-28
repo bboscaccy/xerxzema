@@ -1,4 +1,5 @@
 #include "Semantic.h"
+#include "Diagnostics.h"
 
 namespace xerxzema
 {
@@ -27,6 +28,8 @@ void HandleCodeDefinitionSignature::handle_default(xerxzema::Expression *e)
 {
 	//TODO error.
 	valid = false;
+	emit_error(e->token.get(), "malformed definition");
+
 }
 
 void HandleCodeDefinitionSignature::process()
@@ -48,6 +51,7 @@ void HandleCodeDefinitionSignature::visit(BindExpression *e)
 	}
 	else
 	{
+		emit_error(e->token.get(), "malformed definition");
 		valid = false;
 	}
 }
@@ -65,6 +69,7 @@ void HandleCodeDefinitionSignature::visit(CallExpression* e)
 	}
 	else
 	{
+		emit_error(e->token.get(), "malformed definition");
 		valid = false;
 	}
 }
@@ -85,6 +90,7 @@ void HandleCodeDefinitionSignature::visit(SymbolExpression* e)
 	}
 	else
 	{
+		emit_error(e->token.get(), "malformed definition");
 		valid = false;
 	}
 }
@@ -105,6 +111,7 @@ void HandleCodeDefinitionSignature::visit(xerxzema::ArgListExpression *e)
 	}
 	else
 	{
+		emit_error(e->token.get(), "malformed definition");
 		valid = false;
 	}
 }
@@ -131,7 +138,13 @@ void HandleCodeDefinitionSignature::visit(xerxzema::AnnotationExpression *e)
 		else
 		{
 			valid = false;
+			emit_error(e->token.get(), current_arg_type + " is not a valid type");
 		}
+	}
+	else
+	{
+		valid = false;
+		emit_error(e->token.get(), "malformed definition");
 	}
 }
 
