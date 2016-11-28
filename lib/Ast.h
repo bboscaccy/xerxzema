@@ -16,6 +16,8 @@ class AstVisitor;
 class Expression
 {
 public:
+	Expression(std::unique_ptr<Token>&& token);
+	virtual ~Expression() = default;
 	virtual std::string show();
 	virtual void accept(AstVisitor& v) = 0;
 
@@ -30,11 +32,13 @@ public:
 	{
 		return util::as_a<AstVisitor, Expression, T>(this);
 	}
+	std::unique_ptr<Token> token;
 };
 
 class StatementBlock : public Expression
 {
 public:
+	StatementBlock(std::unique_ptr<Token>&& token);
 	std::string show();
 	void add(std::unique_ptr<Expression>&& expr);
 	std::vector<std::unique_ptr<Expression>> expressions;
@@ -44,7 +48,7 @@ public:
 class Statement : public Expression
 {
 public:
-	Statement(std::unique_ptr<Expression>&& expr);
+	Statement(std::unique_ptr<Token>&& token, std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
 	void accept(AstVisitor& v);
@@ -53,7 +57,8 @@ public:
 class WithStatement : public Expression
 {
 public:
-	WithStatement(std::unique_ptr<Expression>&& with_clause,
+	WithStatement(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& with_clause,
 				  std::unique_ptr<Expression>&& statements);
 	std::unique_ptr<Expression> with_clause;
 	std::unique_ptr<Expression> statements;
@@ -64,12 +69,11 @@ public:
 class CodeDefinition : public Expression
 {
 public:
-	CodeDefinition(std::unique_ptr<Token>&& defintion_type,
+	CodeDefinition(std::unique_ptr<Token>&& token,
 				   std::unique_ptr<Expression>&& signature,
 				   std::unique_ptr<Expression>&& body);
 	std::unique_ptr<Expression> signature;
 	std::unique_ptr<Expression> body;
-	std::unique_ptr<Token> definition_type;
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -78,7 +82,6 @@ class SymbolExpression : public Expression
 {
 public:
 	SymbolExpression(std::unique_ptr<Token>&& token);
-	std::unique_ptr<Token> token;
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -86,7 +89,9 @@ public:
 class BinaryExpression : public Expression
 {
 public:
-	BinaryExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	virtual ~BinaryExpression() = default;
+	BinaryExpression(std::unique_ptr<Token>&& token,
+					 std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::unique_ptr<Expression> lhs;
 	std::unique_ptr<Expression> rhs;
 };
@@ -94,7 +99,8 @@ public:
 class AnnotationExpression : public BinaryExpression
 {
 public:
-	AnnotationExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	AnnotationExpression(std::unique_ptr<Token>&& token,
+						 std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -102,7 +108,8 @@ public:
 class AddExpression : public BinaryExpression
 {
 public:
-	AddExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	AddExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -110,7 +117,8 @@ public:
 class SubExpression : public BinaryExpression
 {
 public:
-	SubExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	SubExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -118,7 +126,8 @@ public:
 class MulExpression : public BinaryExpression
 {
 public:
-	MulExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	MulExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -126,7 +135,8 @@ public:
 class DivExpression : public BinaryExpression
 {
 public:
-	DivExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	DivExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -134,7 +144,8 @@ public:
 class ModExpression : public BinaryExpression
 {
 public:
-	ModExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	ModExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -142,7 +153,8 @@ public:
 class PowExpression : public BinaryExpression
 {
 public:
-	PowExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	PowExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -150,7 +162,8 @@ public:
 class ArgListExpression : public BinaryExpression
 {
 public:
-	ArgListExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	ArgListExpression(std::unique_ptr<Token>&& token,
+					  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -158,7 +171,8 @@ public:
 class GroupExpression : public Expression
 {
 public:
-	GroupExpression(std::unique_ptr<Expression>&& expr);
+	GroupExpression(std::unique_ptr<Token>&& token,
+					std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
 	void accept(AstVisitor& v);
@@ -167,7 +181,8 @@ public:
 class NegateExpression : public Expression
 {
 public:
-	NegateExpression(std::unique_ptr<Expression>&& expr);
+	NegateExpression(std::unique_ptr<Token>&& token,
+					 std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
 	void accept(AstVisitor& v);
@@ -176,7 +191,8 @@ public:
 class SampleExpression : public Expression
 {
 public:
-	SampleExpression(std::unique_ptr<Expression>&& expr);
+	SampleExpression(std::unique_ptr<Token>&& token,
+					 std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
 	std::string show();
 	void accept(AstVisitor& v);
@@ -185,7 +201,8 @@ public:
 class CallExpression : public Expression
 {
 public:
-	CallExpression(std::unique_ptr<Expression>&& target, std::unique_ptr<Expression>&& args);
+	CallExpression(std::unique_ptr<Token>&& token,
+				   std::unique_ptr<Expression>&& target, std::unique_ptr<Expression>&& args);
 	std::unique_ptr<Expression> target;
 	std::unique_ptr<Expression> args;
 	std::string show();
@@ -195,7 +212,8 @@ public:
 class AssignExpression : public BinaryExpression
 {
 public:
-	AssignExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	AssignExpression(std::unique_ptr<Token>&& token,
+					 std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -203,7 +221,8 @@ public:
 class BindExpression : public BinaryExpression
 {
 public:
-	BindExpression(std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	BindExpression(std::unique_ptr<Token>&& token,
+				   std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -213,7 +232,6 @@ class InvalidNullDetonation : public Expression
 {
 public:
 	InvalidNullDetonation(std::unique_ptr<Token>&& token);
-	std::unique_ptr<Token> token;
 	std::string show();
 	void accept(AstVisitor& v);
 };
@@ -221,9 +239,8 @@ public:
 class InvalidLeftDetonation : public Expression
 {
 public:
-	InvalidLeftDetonation(std::unique_ptr<Expression>&& expr, std::unique_ptr<Token>&& token);
+	InvalidLeftDetonation(std::unique_ptr<Token>&& token, std::unique_ptr<Expression>&& expr);
 	std::unique_ptr<Expression> expr;
-	std::unique_ptr<Token> token;
 	std::string show();
 	void accept(AstVisitor& v);
 };

@@ -3,7 +3,11 @@
 namespace xerxzema
 {
 
-SymbolExpression::SymbolExpression(std::unique_ptr<Token>&& t) : token(std::move(t))
+Expression::Expression(std::unique_ptr<Token>&& t) : token(std::move(t))
+{
+}
+
+SymbolExpression::SymbolExpression(std::unique_ptr<Token>&& t) : Expression(std::move(t))
 {
 }
 
@@ -17,16 +21,18 @@ void SymbolExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-BinaryExpression::BinaryExpression(std::unique_ptr<Expression>&& l,
+BinaryExpression::BinaryExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& l,
 								   std::unique_ptr<Expression>&& r) :
-	lhs(std::move(l)), rhs(std::move(r))
+	lhs(std::move(l)), rhs(std::move(r)), Expression(std::move(t))
 
 {
 }
 
-AnnotationExpression::AnnotationExpression(std::unique_ptr<Expression>&& l,
+AnnotationExpression::AnnotationExpression(std::unique_ptr<Token>&& t,
+										   std::unique_ptr<Expression>&& l,
 										   std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 
 {
 }
@@ -41,8 +47,10 @@ void AnnotationExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-MulExpression::MulExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+MulExpression::MulExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 
 {
 }
@@ -57,8 +65,10 @@ std::string MulExpression::show()
 	return "(mul " + lhs->show() + " " + rhs->show() + ")";
 }
 
-DivExpression::DivExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+DivExpression::DivExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 
 {
 }
@@ -73,8 +83,10 @@ std::string DivExpression::show()
 	return "(div " + lhs->show() + " " + rhs->show() + ")";
 }
 
-ModExpression::ModExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+ModExpression::ModExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 
 {
 }
@@ -89,8 +101,10 @@ std::string ModExpression::show()
 	return "(mod " + lhs->show() + " " + rhs->show() + ")";
 }
 
-PowExpression::PowExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+PowExpression::PowExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 
 {
 }
@@ -105,8 +119,10 @@ void PowExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-AddExpression::AddExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+AddExpression::AddExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 {
 }
 
@@ -120,8 +136,10 @@ std::string AddExpression::show()
 	return "(add " + lhs->show() + " " + rhs->show() + ")";
 }
 
-SubExpression::SubExpression(std::unique_ptr<Expression>&& l, std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+SubExpression::SubExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 {
 }
 
@@ -135,9 +153,10 @@ void SubExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-ArgListExpression::ArgListExpression(std::unique_ptr<Expression>&& l,
+ArgListExpression::ArgListExpression(std::unique_ptr<Token>&& t,
+									 std::unique_ptr<Expression>&& l,
 									 std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 {
 }
 
@@ -151,7 +170,9 @@ void ArgListExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-GroupExpression::GroupExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+GroupExpression::GroupExpression(std::unique_ptr<Token>&& t,
+								 std::unique_ptr<Expression>&& e) :
+	expr(std::move(e)), Expression(std::move(t))
 {
 }
 
@@ -165,7 +186,9 @@ void GroupExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-NegateExpression::NegateExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+NegateExpression::NegateExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& e) :
+	expr(std::move(e)), Expression(std::move(t))
 {
 }
 
@@ -179,13 +202,16 @@ std::string NegateExpression::show()
 	return "(negate " + expr->show() + ")";
 }
 
-CallExpression::CallExpression(std::unique_ptr<Expression>&& t,
+CallExpression::CallExpression(std::unique_ptr<Token>&& tk,
+							   std::unique_ptr<Expression>&& t,
 							   std::unique_ptr<Expression>&& a ) :
-	target(std::move(t)), args(std::move(a))
+	target(std::move(t)), args(std::move(a)), Expression(std::move(tk))
 {
 }
 
-SampleExpression::SampleExpression(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+SampleExpression::SampleExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& e) :
+	expr(std::move(e)), Expression(std::move(t))
 {
 }
 
@@ -212,9 +238,10 @@ void CallExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-AssignExpression::AssignExpression(std::unique_ptr<Expression>&& l,
+AssignExpression::AssignExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& l,
 								   std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 {
 }
 
@@ -228,9 +255,10 @@ void AssignExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-BindExpression::BindExpression(std::unique_ptr<Expression>&& l,
+BindExpression::BindExpression(std::unique_ptr<Token>&& t,
+							   std::unique_ptr<Expression>&& l,
 							   std::unique_ptr<Expression>&& r) :
-	BinaryExpression(std::move(l), std::move(r))
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
 {
 }
 
@@ -244,7 +272,8 @@ void BindExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) : token(std::move(t))
+InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) :
+	Expression(std::move(t))
 {
 }
 
@@ -258,9 +287,9 @@ void InvalidNullDetonation::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Expression>&& e,
-											 std::unique_ptr<Token>&& t)
-	: token(std::move(t)), expr(std::move(e))
+InvalidLeftDetonation::InvalidLeftDetonation(std::unique_ptr<Token>&& t,
+											 std::unique_ptr<Expression>&& e)
+	: Expression(std::move(t)), expr(std::move(e))
 {
 }
 
@@ -272,6 +301,9 @@ std::string InvalidLeftDetonation::show()
 void InvalidLeftDetonation::accept(xerxzema::AstVisitor &v)
 {
 	v.visit(this);
+}
+StatementBlock::StatementBlock(std::unique_ptr<Token>&& t) : Expression(std::move(t))
+{
 }
 
 std::string	StatementBlock::show()
@@ -295,7 +327,9 @@ void StatementBlock::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-Statement::Statement(std::unique_ptr<Expression>&& e) : expr(std::move(e))
+Statement::Statement(std::unique_ptr<Token>&& t,
+					 std::unique_ptr<Expression>&& e) :
+	Expression(std::move(t)), expr(std::move(e))
 {
 }
 
@@ -309,9 +343,10 @@ void Statement::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
-WithStatement::WithStatement(std::unique_ptr<Expression>&& l,
+WithStatement::WithStatement(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
 							 std::unique_ptr<Expression>&& r) :
-	with_clause(std::move(l)), statements(std::move(r))
+	Expression(std::move(t)), with_clause(std::move(l)), statements(std::move(r))
 {
 }
 
@@ -328,13 +363,13 @@ void WithStatement::accept(xerxzema::AstVisitor &v)
 CodeDefinition::CodeDefinition(std::unique_ptr<Token>&& d,
 							   std::unique_ptr<Expression>&& l,
 							   std::unique_ptr<Expression>&& r) :
-	definition_type(std::move(d)), signature(std::move(l)), body(std::move(r))
+	Expression(std::move(d)), signature(std::move(l)), body(std::move(r))
 {
 }
 
 std::string CodeDefinition::show()
 {
-	return "[" + definition_type->data + " " + signature->show() + " "
+	return "[" + token->data + " " + signature->show() + " "
 		+ body->show() + "]";
 }
 
