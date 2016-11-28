@@ -1,5 +1,6 @@
 #include "Semantic.h"
 #include "Diagnostics.h"
+#include "StlUtils.h"
 
 namespace xerxzema
 {
@@ -218,9 +219,10 @@ void HandleExpression::visit(xerxzema::AddExpression *e)
 	lhs.process();
 	HandleExpression rhs(program, e->rhs.get());
 	rhs.process();
+	valid = rhs.valid && lhs.valid;
 	if(result.size() == 0)
 		result.push_back(program->temp_reg());
-	program->instruction("add", {lhs.result[0], rhs.result[0]}, result);
+	program->instruction("add", combine_vectors(lhs.result, rhs.result), result);
 }
 
 void HandleExpression::visit(xerxzema::BindExpression *e)

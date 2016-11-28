@@ -109,9 +109,23 @@ bool Program::check_instruction(const std::string &name,
 		if(def)
 		{
 			auto output_types = def->output_types(parent);
-			if(output_types.size() == outputs.size())
+			//we can create extra outputs here if needed?
+			//probably issue a warning or something
+			std::vector<RegisterData> target_outputs(outputs);
+			if(output_types.size() > target_outputs.size())
 			{
-				auto it = outputs.begin();
+				//create extra temporary registers to pad the outputs
+				auto it = output_types.begin();
+				it+= target_outputs.size();
+				while(it != output_types.end())
+				{
+					target_outputs.push_back(temp_reg());
+					it++;
+				}
+			}
+			if(output_types.size() == target_outputs.size())
+			{
+				auto it = target_outputs.begin();
 				for(auto& type: output_types)
 				{
 					auto out_reg = it->reg;
@@ -146,7 +160,7 @@ bool Program::check_instruction(const std::string &name,
 					else
 						inst->input(n.reg);
 				}
-				for(auto& n:outputs)
+				for(auto& n:target_outputs)
 				{
 					inst->output(n.reg);
 				}
