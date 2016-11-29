@@ -86,6 +86,14 @@ public:
 	void accept(AstVisitor& v);
 };
 
+class RealExpression : public Expression
+{
+public:
+	RealExpression(std::unique_ptr<Token>&& token);
+	std::string show();
+	void accept(AstVisitor& v);
+};
+
 class BinaryExpression : public Expression
 {
 public:
@@ -254,6 +262,7 @@ public:
 	virtual void visit(WithStatement* e);
 	virtual void visit(CodeDefinition* e);
 	virtual void visit(SymbolExpression* e);
+	virtual void visit(RealExpression* e);
 	virtual void visit(AnnotationExpression* e);
 	virtual void visit(AddExpression* e);
 	virtual void visit(SubExpression* e);

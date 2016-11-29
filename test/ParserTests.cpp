@@ -342,3 +342,15 @@ TEST(TestParser, TestMissingParen)
 	auto expr = xerxzema::expression(lexer);
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestRealExpr)
+{
+
+	std::stringstream ss;
+	ss << "12.0 + b -> c";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(bind (add (real 12.0) (symbol b)) (symbol c))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

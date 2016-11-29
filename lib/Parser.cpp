@@ -21,6 +21,8 @@ int left_bind(Token* token)
 {
 	if(token->type == TokenType::Symbol)
 		return 0;
+	if(token->type == TokenType::Real)
+		return 0;
 	if(token->type == TokenType::Add)
 		return 10;
 	if(token->type == TokenType::Sub)
@@ -54,6 +56,8 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 
 	if(token->type == TokenType::Symbol)
 		return std::make_unique<SymbolExpression>(std::move(token));
+	if(token->type == TokenType::Real)
+		return std::make_unique<RealExpression>(std::move(token));
 	if(token->type == TokenType::Sub)
 		return std::make_unique<NegateExpression>(std::move(token), expression(lexer, 1000));
 	if(token->type == TokenType::Sample)
