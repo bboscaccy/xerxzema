@@ -222,7 +222,7 @@ void HandleExpression::visit(xerxzema::AddExpression *e)
 	valid = rhs.valid && lhs.valid;
 	if(result.size() == 0)
 		result.push_back(program->temp_reg());
-	program->instruction("add", combine_vectors(lhs.result, rhs.result), result);
+	program->instruction("add", combine_vectors(lhs.result, rhs.result), result, e);
 }
 
 void HandleExpression::visit(xerxzema::BindExpression *e)

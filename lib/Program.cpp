@@ -65,16 +65,18 @@ void Program::instruction(const std::string &name,
 
 void Program::instruction(const std::string &name,
 						  const std::vector<RegisterData> &inputs,
-						  const std::vector<RegisterData> &outputs)
+						  const std::vector<RegisterData> &outputs,
+						  Expression* source)
 {
 
-	if(!check_instruction(name, inputs, outputs))
+	if(!check_instruction(name, inputs, outputs, source))
 	{
 		auto def = std::make_unique<DeferredInstruction>();
 		def->name = name;
 		def->inputs = inputs;
 		def->outputs = outputs;
 		def->solved = false;
+		def->source = source;
 
 		for(auto& r: inputs)
 		{
@@ -87,7 +89,8 @@ void Program::instruction(const std::string &name,
 
 bool Program::check_instruction(const std::string &name,
 								const std::vector<RegisterData> &inputs,
-								const std::vector<RegisterData> &outputs)
+								const std::vector<RegisterData> &outputs,
+								Expression* source)
 {
 	bool resolved = true;
 	std::vector<Type*> input_types;
@@ -143,7 +146,8 @@ bool Program::check_instruction(const std::string &name,
 						{
 							if(!retry->solved)
 							{
-								if(check_instruction(retry->name, retry->inputs, retry->outputs))
+								if(check_instruction(retry->name, retry->inputs, retry->outputs,
+													 retry->source))
 								{
 									retry->solved = true;
 								}

@@ -77,7 +77,7 @@ private:
 	bool valid;
 	size_t counter;
 };
-
+//TODO: propogate extra instruction dependencies
 class HandleExpression : public AstVisitor
 {
 public:

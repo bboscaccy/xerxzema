@@ -11,6 +11,7 @@
 namespace xerxzema
 {
 class Namespace;
+class Expression;
 
 struct RegisterData
 {
@@ -24,6 +25,7 @@ struct DeferredInstruction
 	std::vector<RegisterData> inputs;
 	std::vector<RegisterData> outputs;
 	bool solved;
+	Expression* source;
 };
 
 class Program
@@ -38,7 +40,8 @@ public:
 					 const std::vector<std::string>& outputs);
 	void instruction(const std::string& name,
 					 const std::vector<RegisterData>& inputs,
-					 const std::vector<RegisterData>& outputs);
+					 const std::vector<RegisterData>& outputs,
+					 Expression* source = nullptr);
 	Register* reg(const std::string& name);
 	inline RegisterData reg_data(const std::string& name, bool sample=false)
 	{
@@ -69,7 +72,8 @@ public:
 private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<RegisterData>& inputs,
-						   const std::vector<RegisterData>& outputs);
+						   const std::vector<RegisterData>& outputs,
+						   Expression* source);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
