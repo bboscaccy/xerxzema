@@ -24,6 +24,7 @@ struct DeferredInstruction
 	std::string name;
 	std::vector<RegisterData> inputs;
 	std::vector<RegisterData> outputs;
+	std::vector<RegisterData> dependencies;
 	bool solved;
 	Expression* source;
 };
@@ -41,6 +42,7 @@ public:
 	void instruction(const std::string& name,
 					 const std::vector<RegisterData>& inputs,
 					 const std::vector<RegisterData>& outputs,
+					 const std::vector<RegisterData>& dependencies,
 					 Expression* source = nullptr);
 	Register* reg(const std::string& name);
 	inline RegisterData reg_data(const std::string& name, bool sample=false)
@@ -73,6 +75,7 @@ private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<RegisterData>& inputs,
 						   const std::vector<RegisterData>& outputs,
+						   const std::vector<RegisterData>& dependencies,
 						   Expression* source);
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);

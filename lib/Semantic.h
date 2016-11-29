@@ -77,12 +77,13 @@ private:
 	bool valid;
 	size_t counter;
 };
-//TODO: propogate extra instruction dependencies
+
 class HandleExpression : public AstVisitor
 {
 public:
 	HandleExpression(Program* program, Expression* expr,
-					 const std::vector<RegisterData>& result = {});
+					 const std::vector<RegisterData>& result = {},
+					 const std::vector<RegisterData>& dependencies = {});
 	void process();
 	void visit(SymbolExpression* e);
 	void visit(SampleExpression* e);
@@ -96,6 +97,7 @@ private:
 	Expression* expr;
 	bool valid;
 	std::vector<RegisterData> result;
+	std::vector<RegisterData> dependencies;
 };
 
 };

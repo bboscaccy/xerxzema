@@ -192,8 +192,9 @@ void HandleStatement::handle_default(xerxzema::Expression *e)
 }
 
 
-HandleExpression::HandleExpression(Program* p, Expression* e, const std::vector<RegisterData>& r) :
-	program(p), expr(e), valid(true), result(r)
+HandleExpression::HandleExpression(Program* p, Expression* e, const std::vector<RegisterData>& r,
+								   const std::vector<RegisterData>& deps) :
+	program(p), expr(e), valid(true), result(r), dependencies(deps)
 {
 }
 
@@ -209,28 +210,28 @@ void HandleExpression::visit(xerxzema::SymbolExpression *e)
 
 void HandleExpression::visit(xerxzema::SampleExpression *e)
 {
-	HandleExpression child(program, e->expr.get());
+	HandleExpression child(program, e->expr.get(), {}, dependencies);
 	result.push_back(RegisterData({child.result[0].reg, true}));
 }
 
 void HandleExpression::visit(xerxzema::AddExpression *e)
 {
-	HandleExpression lhs(program, e->lhs.get());
+	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
 	lhs.process();
-	HandleExpression rhs(program, e->rhs.get());
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
 	rhs.process();
 	valid = rhs.valid && lhs.valid;
 	if(result.size() == 0)
 		result.push_back(program->temp_reg());
-	program->instruction("add", combine_vectors(lhs.result, rhs.result), result, e);
+	program->instruction("add", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
 }
 
 void HandleExpression::visit(xerxzema::BindExpression *e)
 {
-	HandleExpression rhs(program, e->rhs.get());
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
 	rhs.process();
 	result = rhs.result;
-	HandleExpression lhs(program, e->lhs.get(), result);
+	HandleExpression lhs(program, e->lhs.get(), result, dependencies);
 	lhs.process();
 }
 

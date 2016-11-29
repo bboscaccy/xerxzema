@@ -60,21 +60,23 @@ void Program::instruction(const std::string &name,
 	{
 		out_regs.push_back(reg_data(n));
 	}
-	instruction(name, in_regs, out_regs);
+	instruction(name, in_regs, out_regs, {});
 }
 
 void Program::instruction(const std::string &name,
 						  const std::vector<RegisterData> &inputs,
 						  const std::vector<RegisterData> &outputs,
+						  const std::vector<RegisterData> &dependencies,
 						  Expression* source)
 {
 
-	if(!check_instruction(name, inputs, outputs, source))
+	if(!check_instruction(name, inputs, outputs, dependencies, source))
 	{
 		auto def = std::make_unique<DeferredInstruction>();
 		def->name = name;
 		def->inputs = inputs;
 		def->outputs = outputs;
+		def->dependencies = dependencies;
 		def->solved = false;
 		def->source = source;
 
@@ -90,6 +92,7 @@ void Program::instruction(const std::string &name,
 bool Program::check_instruction(const std::string &name,
 								const std::vector<RegisterData> &inputs,
 								const std::vector<RegisterData> &outputs,
+								const std::vector<RegisterData> &dependencies,
 								Expression* source)
 {
 	bool resolved = true;
@@ -147,7 +150,7 @@ bool Program::check_instruction(const std::string &name,
 							if(!retry->solved)
 							{
 								if(check_instruction(retry->name, retry->inputs, retry->outputs,
-													 retry->source))
+													 retry->dependencies, retry->source))
 								{
 									retry->solved = true;
 								}
@@ -167,6 +170,10 @@ bool Program::check_instruction(const std::string &name,
 				for(auto& n:target_outputs)
 				{
 					inst->output(n.reg);
+				}
+				for(auto& n:dependencies)
+				{
+					inst->dependent(n.reg);
 				}
 				instruction(std::move(inst));
 				return true;
