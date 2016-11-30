@@ -87,6 +87,7 @@ public:
 	void process();
 	void visit(SymbolExpression* e);
 	void visit(SampleExpression* e);
+	void visit(RealExpression* e);
 	void visit(AddExpression* e);
 	void visit(BindExpression* e);
 	void handle_default(Expression* e);

@@ -208,6 +208,12 @@ void HandleExpression::visit(xerxzema::SymbolExpression *e)
 	result.push_back(program->reg_data(e->token->data));
 }
 
+void HandleExpression::visit(xerxzema::RealExpression *e)
+{
+	auto value = atof(e->token->data.c_str());
+	result.push_back(program->constant(value));
+}
+
 void HandleExpression::visit(xerxzema::SampleExpression *e)
 {
 	HandleExpression child(program, e->expr.get(), {}, dependencies);
@@ -238,6 +244,7 @@ void HandleExpression::visit(xerxzema::BindExpression *e)
 void HandleExpression::handle_default(xerxzema::Expression *e)
 {
 	valid = false;
+	emit_error(e->token.get(), "Handler Unimplemented");
 }
 
 

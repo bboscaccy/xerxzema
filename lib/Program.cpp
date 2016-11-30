@@ -373,7 +373,6 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	}
 	builder.CreateBr(first_block);
 	return first_block;
-
 }
 
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
