@@ -248,50 +248,37 @@ void HandleExpression::visit(xerxzema::SampleExpression *e)
 
 void HandleExpression::visit(xerxzema::AddExpression *e)
 {
-	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
-	lhs.process();
-	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
-	rhs.process();
-	valid = rhs.valid && lhs.valid;
-	if(result.size() == 0)
-		result.push_back(program->temp_reg());
-	program->instruction("add", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "add");
 }
 
 void HandleExpression::visit(xerxzema::SubExpression *e)
 {
-	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
-	lhs.process();
-	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
-	rhs.process();
-	valid = rhs.valid && lhs.valid;
-	if(result.size() == 0)
-		result.push_back(program->temp_reg());
-	program->instruction("sub", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "sub");
 }
 
 void HandleExpression::visit(xerxzema::MulExpression *e)
 {
-	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
-	lhs.process();
-	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
-	rhs.process();
-	valid = rhs.valid && lhs.valid;
-	if(result.size() == 0)
-		result.push_back(program->temp_reg());
-	program->instruction("mul", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "mul");
 }
 
 void HandleExpression::visit(xerxzema::DivExpression *e)
 {
-	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
+	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "div");
+}
+
+void HandleExpression::do_binary_instruction(Expression* parent, Expression* l,
+											 Expression* r, const std::string& op)
+{
+	HandleExpression lhs(program, l, {}, dependencies);
 	lhs.process();
-	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
+	HandleExpression rhs(program, r, {}, dependencies);
 	rhs.process();
 	valid = rhs.valid && lhs.valid;
 	if(result.size() == 0)
 		result.push_back(program->temp_reg());
-	program->instruction("div", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+	program->instruction(op, combine_vectors(lhs.result, rhs.result), result, dependencies,
+						 parent);
+
 }
 
 void HandleExpression::visit(xerxzema::BindExpression *e)
@@ -315,6 +302,4 @@ void HandleExpression::handle_default(xerxzema::Expression *e)
 	valid = false;
 	emit_error(e->token.get(), "Handler Unimplemented");
 }
-
-
 };

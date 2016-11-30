@@ -100,6 +100,8 @@ public:
 
 	inline std::vector<RegisterData> results() { return result; }
 private:
+	void do_binary_instruction(Expression* parent, Expression* lhs,
+							   Expression* rhs, const std::string& op);
 	Program* program;
 	Expression* expr;
 	bool valid;
