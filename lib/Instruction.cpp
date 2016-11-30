@@ -29,6 +29,7 @@ void Instruction::sample(xerxzema::Register *reg)
 {
 	_inputs.push_back(reg);
 	reg->activation(this, 1 << _deps.size());
+	mask |= (1 << _deps.size());
 	reset_mask |= (1 << _deps.size());
 	_deps.push_back(reg);
 }
