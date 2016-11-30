@@ -216,7 +216,13 @@ void HandleExpression::visit(xerxzema::RealExpression *e)
 
 void HandleExpression::visit(xerxzema::SampleExpression *e)
 {
+	if(!e->expr->is_a<SymbolExpression>())
+	{
+		valid = false;
+		emit_error(e->expr->token.get(), "I can only sample variable");
+	}
 	HandleExpression child(program, e->expr.get(), {}, dependencies);
+	child.process();
 	result.push_back(RegisterData({child.result[0].reg, true}));
 }
 
