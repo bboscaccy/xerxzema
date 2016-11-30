@@ -42,8 +42,9 @@ public:
 	void instruction(const std::string& name,
 					 const std::vector<RegisterData>& inputs,
 					 const std::vector<RegisterData>& outputs,
-					 const std::vector<RegisterData>& dependencies,
+					 const std::vector<RegisterData>& dependencies = {},
 					 Expression* source = nullptr);
+	RegisterData constant(double literal);
 	Register* reg(const std::string& name);
 	inline RegisterData reg_data(const std::string& name, bool sample=false)
 	{

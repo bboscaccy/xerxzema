@@ -89,6 +89,18 @@ void Program::instruction(const std::string &name,
 	}
 }
 
+RegisterData Program::constant(double literal)
+{
+	auto inst = std::make_unique<ValueReal>(literal);
+	inst->dependent(reg("head"));
+	auto temp = temp_reg();
+	temp.reg->type(parent->world()->get_namespace("core")->type("real"));
+	inst->output(temp.reg);
+	instruction(std::move(inst));
+	temp.sample = true;
+	return temp;
+}
+
 bool Program::check_instruction(const std::string &name,
 								const std::vector<RegisterData> &inputs,
 								const std::vector<RegisterData> &outputs,

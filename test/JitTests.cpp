@@ -78,17 +78,9 @@ TEST(TestJit, TestAddChainConst)
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_input("bye", world.get_namespace("core")->type("real"));
 
-	auto baz = p->reg("baz");
-	baz->type(world.get_namespace("core")->type("real"));
-	auto val = std::make_unique<xerxzema::ValueReal>(42.0);
-	val->output(baz);
-	val->dependent(p->reg("head"));
-	p->instruction(std::move(val));
-
-
-	p->instruction("add", {"hi", "baz"}, {"bar"});
-	p->instruction("add", {"bar", "baz"}, {"bye"});
-
+	auto temp = p->constant(42.0);
+	p->instruction("add", {p->reg_data("hi"), temp}, {p->reg_data("bar")});
+	p->instruction("add", {p->reg_data("bar"), temp}, {p->reg_data("bye")});
 
 	jit->compile_namespace(world.get_namespace("core"));
 
