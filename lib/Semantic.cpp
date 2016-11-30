@@ -199,6 +199,7 @@ void HandleStatement::visit(xerxzema::WithStatement *e)
 void HandleStatement::handle_default(xerxzema::Expression *e)
 {
 	valid = false;
+	emit_error(e->token.get(), "this isn't a valid statement.");
 }
 
 
