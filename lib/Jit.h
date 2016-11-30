@@ -40,6 +40,7 @@ public:
 
 	inline void dump_after_codegen() { dump_pre_optimization = true; }
 	inline void dump_after_optimization() { dump_post_optimization = true; }
+	size_t get_state_size(const std::string& ns, const std::string& name);
 
 private:
 	void create_module(Namespace* ns);

@@ -62,9 +62,19 @@ void Jit::compile_namespace(Namespace* ns)
 	engines[ns->full_name()]->finalizeObject();
 }
 
+size_t Jit::get_state_size(const std::string& ns, const std::string &name)
+{
+	auto fn = modules[ns]->getFunction(name);
+	auto state_ptr_type = (*fn->getArgumentList().begin()).getType();
+	auto state_type = state_ptr_type->getPointerElementType();
+	return modules[ns]->getDataLayout().getTypeAllocSize(state_type);
+}
+
 void* Jit::get_jitted_function(const std::string& ns, const std::string &name)
 {
 	auto fn = modules[ns]->getFunction(name);
+	auto state_type = (*fn->getArgumentList().begin()).getType();
+	modules[ns]->getDataLayout().getTypeAllocSize(state_type);
 	return engines[ns]->getPointerToFunction(fn);
 }
 

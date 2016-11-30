@@ -62,6 +62,7 @@ public:
 	inline llvm::Value* activation_counter_value() { return activation_counter; }
 	inline llvm::Function* function_value() { return function; }
 	inline llvm::Module* current_module() { return _current_module; }
+	inline llvm::Type* state_type_value() { return state_type; }
 
 	inline std::string program_name() { return _name; }
 	inline std::vector<Register*> input_registers() { return inputs; }
