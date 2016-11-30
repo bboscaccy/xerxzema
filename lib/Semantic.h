@@ -91,6 +91,9 @@ public:
 	void visit(RealExpression* e);
 	void visit(ArgListExpression* e);
 	void visit(AddExpression* e);
+	void visit(SubExpression* e);
+	void visit(MulExpression* e);
+	void visit(DivExpression* e);
 	void visit(GroupExpression* e);
 	void visit(BindExpression* e);
 	void handle_default(Expression* e);

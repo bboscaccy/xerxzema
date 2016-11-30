@@ -258,6 +258,42 @@ void HandleExpression::visit(xerxzema::AddExpression *e)
 	program->instruction("add", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
 }
 
+void HandleExpression::visit(xerxzema::SubExpression *e)
+{
+	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
+	lhs.process();
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
+	rhs.process();
+	valid = rhs.valid && lhs.valid;
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("sub", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+}
+
+void HandleExpression::visit(xerxzema::MulExpression *e)
+{
+	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
+	lhs.process();
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
+	rhs.process();
+	valid = rhs.valid && lhs.valid;
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("mul", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+}
+
+void HandleExpression::visit(xerxzema::DivExpression *e)
+{
+	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
+	lhs.process();
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
+	rhs.process();
+	valid = rhs.valid && lhs.valid;
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("div", combine_vectors(lhs.result, rhs.result), result, dependencies, e);
+}
+
 void HandleExpression::visit(xerxzema::BindExpression *e)
 {
 	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
