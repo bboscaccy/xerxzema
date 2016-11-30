@@ -76,6 +76,7 @@ private:
 	Expression* expr;
 	bool valid;
 	size_t counter;
+	std::vector<RegisterData> extra_dependencies;
 };
 
 class HandleExpression : public AstVisitor
@@ -88,6 +89,7 @@ public:
 	void visit(SymbolExpression* e);
 	void visit(SampleExpression* e);
 	void visit(RealExpression* e);
+	void visit(ArgListExpression* e);
 	void visit(AddExpression* e);
 	void visit(BindExpression* e);
 	void handle_default(Expression* e);

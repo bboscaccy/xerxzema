@@ -168,7 +168,7 @@ void HandleStatement::process()
 
 void HandleStatement::visit(Statement *e)
 {
-	HandleExpression handler(program, e->expr.get());
+	HandleExpression handler(program, e->expr.get(), extra_dependencies);
 	handler.process();
 	counter++;
 }
@@ -183,7 +183,17 @@ void HandleStatement::visit(StatementBlock *e)
 
 void HandleStatement::visit(xerxzema::WithStatement *e)
 {
-
+	HandleExpression deps(program, e->with_clause.get());
+	deps.process();
+	for(auto& d: deps.results())
+	{
+		extra_dependencies.push_back(d);
+	}
+	e->statements->accept(*this);
+	for(auto& d: deps.results())
+	{
+		extra_dependencies.pop_back();
+	}
 }
 
 void HandleStatement::handle_default(xerxzema::Expression *e)
@@ -214,12 +224,21 @@ void HandleExpression::visit(xerxzema::RealExpression *e)
 	result.push_back(program->constant(value));
 }
 
+void HandleExpression::visit(xerxzema::ArgListExpression *e)
+{
+	HandleExpression lhs(program, e->lhs.get(), {}, dependencies);
+	lhs.process();
+	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
+	rhs.process();
+	result = combine_vectors(lhs.result, rhs.result);
+}
+
 void HandleExpression::visit(xerxzema::SampleExpression *e)
 {
 	if(!e->expr->is_a<SymbolExpression>())
 	{
 		valid = false;
-		emit_error(e->expr->token.get(), "I can only sample variable");
+		emit_error(e->expr->token.get(), "This probably isn't sane.");
 	}
 	HandleExpression child(program, e->expr.get(), {}, dependencies);
 	child.process();
