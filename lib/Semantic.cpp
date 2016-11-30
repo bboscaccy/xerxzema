@@ -267,6 +267,13 @@ void HandleExpression::visit(xerxzema::BindExpression *e)
 	lhs.process();
 }
 
+void HandleExpression::visit(xerxzema::GroupExpression *e)
+{
+	HandleExpression child(program, e->expr.get(), {}, dependencies);
+	child.process();
+	result = child.result;
+}
+
 void HandleExpression::handle_default(xerxzema::Expression *e)
 {
 	valid = false;
