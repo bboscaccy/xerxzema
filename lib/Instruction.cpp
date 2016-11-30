@@ -217,6 +217,17 @@ void DivReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &
 	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
 }
 
+void PowReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								 xerxzema::Program *program)
+{
+	auto lhs = _inputs[0]->fetch_value(context, builder);
+	auto rhs = _inputs[1]->fetch_value(context, builder);
+	auto call = llvm::Intrinsic::getDeclaration(program->current_module(), llvm::Intrinsic::pow,
+												{llvm::Type::getDoubleTy(context),
+														llvm::Type::getDoubleTy(context)});
+	auto p = builder.CreateCall(call, {rhs, lhs});
+	builder.CreateStore(p, _outputs[0]->fetch_value_raw(context, builder));
+}
 
 void EqReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								 xerxzema::Program *program)

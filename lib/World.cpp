@@ -48,6 +48,7 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<SubReal>("sub", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<MulReal>("mul", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<DivReal>("div", {"real", "real"}, {"real"}));
+	core->add_instruction(create_def<PowReal>("pow", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<EqReal>("eq", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<NeReal>("ne", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<LtReal>("lt", {"real", "real"}, {"bool"}));

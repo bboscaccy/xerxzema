@@ -278,7 +278,6 @@ void HandleExpression::do_binary_instruction(Expression* parent, Expression* l,
 		result.push_back(program->temp_reg());
 	program->instruction(op, combine_vectors(lhs.result, rhs.result), result, dependencies,
 						 parent);
-
 }
 
 void HandleExpression::visit(xerxzema::BindExpression *e)

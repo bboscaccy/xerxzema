@@ -224,3 +224,26 @@ TEST(TestJit, TestWhen)
 
 
 }
+
+TEST(TestJit, TestPow)
+{
+	xerxzema::World world;
+	auto jit = world.create_jit();
+	auto p = world.get_namespace("core")->get_program("test");
+	p->add_input("hi", world.get_namespace("core")->type("real"));
+	p->add_input("bye", world.get_namespace("core")->type("real"));
+
+	auto temp = p->constant(2.0);
+	p->instruction("pow", {p->reg_data("hi"), temp}, {p->reg_data("bye")});
+
+	jit->compile_namespace(world.get_namespace("core"));
+
+	void (*testpointer)(void*, double*, double*);
+	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
+	double in = 2.0;
+	double out = 3.0;
+	char state[128] = {0};
+	memset(state, 0, 128);
+	(*testpointer)(state, &in, &out);
+	ASSERT_EQ(out, 4.0);
+}
