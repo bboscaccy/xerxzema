@@ -58,6 +58,7 @@ private:
 class InstructionDefinition
 {
 public:
+	virtual ~InstructionDefinition() = default;
 	virtual std::unique_ptr<Instruction> create() = 0;
 	virtual std::vector<Type*> input_types(Namespace* parent) = 0;
 	virtual std::vector<Type*> output_types(Namespace* parent) = 0;

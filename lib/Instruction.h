@@ -20,6 +20,7 @@ class Instruction
 {
 public:
 	Instruction();
+	virtual ~Instruction() = default;
 	void input(Register* reg);
 	void dependent(Register* reg);
 	void sample(Register* reg);
