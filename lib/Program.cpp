@@ -451,7 +451,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 	for(auto& r: registers)
 	{
-		if(r.second->type()->name() != "unit" && r.second->offset() != 0)
+		if(r.second->offset() != 0)
 			create_closure(r.second.get(), context, module);
 	}
 }
@@ -462,7 +462,8 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
 
-	arg_types.push_back(reg->type()->type(context)->getPointerTo());
+	if(reg->type()->name() != "unit")
+		arg_types.push_back(reg->type()->type(context)->getPointerTo());
 
 	auto closure_type = llvm::FunctionType::get(llvm::Type::getInt64Ty(context),
 												arg_types, false);
@@ -470,21 +471,27 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 	auto fn = llvm::Function::Create(closure_type,
 									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									  _name + "_closure" + reg->name(), module);
+	llvm::Value* arg_ptr = nullptr;
 	auto it = fn->arg_begin();
 
 	auto state = &*it;
 	it++;
-	auto arg_ptr = &*it;
+	if(reg->type()->name() != "unit")
+	{
+		arg_ptr = &*it;
+		it++;
+	}
 
 
 	llvm::IRBuilder<> builder(context);
 	auto block = llvm::BasicBlock::Create(context, "entry", fn);
 	builder.SetInsertPoint(block);
 
-
-	auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
-	reg->type()->copy(context, builder, dest_ptr, arg_ptr);
-
+	if(reg->type()->name() != "unit")
+	{
+		auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
+		reg->type()->copy(context, builder, dest_ptr, arg_ptr);
+	}
 
 	//update activation masks
 	for(auto& activate: reg->activations)
