@@ -83,6 +83,8 @@ private:
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 	llvm::BasicBlock* generate_entry_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
+
+	void create_closure(Register* reg, llvm::LLVMContext& context, llvm::Module* module);
 	std::map<std::string, std::unique_ptr<Register>> registers;
 	std::vector<Register*> inputs;
 	std::vector<Register*> outputs;

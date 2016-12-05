@@ -30,7 +30,6 @@ TEST(TestJit, TestAdd)
 
 	p->instruction("add", {"hi", "hi"}, {"bye"});
 
-
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*);

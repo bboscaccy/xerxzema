@@ -339,6 +339,12 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	}
 	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(1, 1)), ptr);
+
+	//TODO after HEAD runs we need to clone our main instruction_state for each
+	//i/o thread state and place it "somewhere" not an alloca's block since
+	//this function will exit usually
+	//so next up, create i/o ports and hook up the scheduler..
+
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(resume_block);
@@ -442,6 +448,54 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	builder.SetInsertPoint(exit_block);
 	generate_exit_block(context, builder);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+
+	for(auto& r: registers)
+	{
+		if(r.second->type()->name() != "unit" && r.second->offset() != 0)
+			create_closure(r.second.get(), context, module);
+	}
 }
 
+void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context,
+							 llvm::Module* module)
+{
+	std::vector<llvm::Type*> arg_types;
+	arg_types.push_back(state_type->getPointerTo());
+
+	arg_types.push_back(reg->type()->type(context)->getPointerTo());
+
+	auto closure_type = llvm::FunctionType::get(llvm::Type::getInt64Ty(context),
+												arg_types, false);
+
+	auto fn = llvm::Function::Create(closure_type,
+									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+									  _name + "_closure" + reg->name(), module);
+	auto it = fn->arg_begin();
+
+	auto state = &*it;
+	it++;
+	auto arg_ptr = &*it;
+
+
+	llvm::IRBuilder<> builder(context);
+	auto block = llvm::BasicBlock::Create(context, "entry", fn);
+	builder.SetInsertPoint(block);
+
+
+	auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
+	reg->type()->copy(context, builder, dest_ptr, arg_ptr);
+
+
+	//update activation masks
+	for(auto& activate: reg->activations)
+	{
+		//todo refactor this eh?
+		auto ptr = builder.CreateStructGEP(state_type, state,
+										   activate.instruction->offset());
+		auto mask = builder.CreateLoad(ptr);
+		auto update = builder.CreateOr(mask, llvm::APInt(16, activate.value));
+		builder.CreateStore(update, ptr);
+	}
+	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+}
 };

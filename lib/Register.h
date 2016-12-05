@@ -43,11 +43,11 @@ public:
 
 
 	std::vector<DeferredInstruction*> deffered;
+	std::vector<ActivationMask> activations;
 private:
 	llvm::Value* _value;
 	std::string _name;
 	Type* _type;
-	std::vector<ActivationMask> activations;
 	uint32_t state_offset;
 };
 

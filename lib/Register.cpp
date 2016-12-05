@@ -4,7 +4,7 @@
 namespace xerxzema
 {
 
-Register::Register(const std::string& name) : _name(name), _type(nullptr)
+Register::Register(const std::string& name) : _name(name), _type(nullptr), state_offset(0)
 {
 
 }
