@@ -1,0 +1,170 @@
+Callbacks (the >> and the ~+ operator)
+
+i/o callbacks (the >> operator)
+are in the form of
+provder:port >> register;
+or
+provider:port ~> $register (statement | statement block)
+
+the former will produce a callback function
+with a signature of
+int32 (void* state, $input_type* data)
+this will copy the input data to a captured register,
+update it's activations, and then call the main program back.
+
+the other form will do the same as above with the execption of calling the main
+program back. Instead it will just execute possible activations out of it's
+captured instructions contained in a singular statement or a statement block.
+
+
+Program interal data model
+each program is modeled internally with a struct containing all of it's local registers,
+state information for each instruction, any associated state with each instruction,
+and captures of it's local input and output registers.
+
+each program has a function associated with it that takes a pointer to it's program state
+structure, and all of it's input args and output args which are passed by reference.
+it returns an i32 with a mask of all the output registers it actually updated
+
+so for a program that takes 2 reals and returns a real
+i32 foo(foo_state* state, double* in0, double* in1, double* out0);
+
+the i32 ret-code is currently a todo item.
+
+struct state
+{
+    bool reentry,
+    reg,
+    reg,
+    inst,
+    inst....
+}
+
+Concurrency (modified RCU algo?)
+the trick is that the main function entry is considered a lower priority
+and stuff that is thread/io bound is delimeted by {...} after a high priority read operation.
+
+on entry we need to read all of the state variables in our struct and capture the input
+arguments and store them in function local registers.
+
+so assumptions.
+#1 writing a pointer or a scalar value is an atomic operation on any hardware we care about.
+#2 we can update masks and other inplace values atomically with a lock statment
+(llvm atomicrmw deally)
+#3 values are written in only one place in code
+#4 values outside of a thread specific callback are sampled.
+#6 all callbacks to main are scheduled via the rt-scheduler (with a run_now command)
+
+with spin-locks (and decent snapshot concurrency)
+so in psuedocode
+entry: (read and copy)
+    if(!cas state-use-counter 0, 1) check the counter
+    {
+	reschedule-in-context(scheduler, 0) //so in whenever it will try again.?
+	return
+    }
+
+    while(!cas state-lock-counter, 0, 1) spin wait around a local r/w state lock
+    for each instruction in state:
+	local-instruction-state = state-instruction-state
+    for each item in state:
+	local-value = state-value
+    atomic dec state-lock-counter
+
+body:
+    normal processing loop here using all local stack values...
+
+
+tail:
+    if there are not activations procede to exit
+
+exit: (update)
+    while(!cas state-lock-counter, 0, 1) spin wait around a local r/w state lock
+    for each modified value
+	state-value = local-value
+    for each instruction mask
+	//since masks can modified from a thread isolated callback, we need to update as
+	//oposed to replacing this
+	atomic or local-mask, state-mask
+    atomic dec state-lock-counter
+    return
+
+and then in update callbacks
+entry:
+    while(!cas state-lock-counter, 0, 1) spin wait around a local r/w state lock
+    copy new value (if its not a unit value)
+    for each activation
+	atomic or mask-value, state-mask
+    atomic dec state-lock-counter
+    optionally call back to main depending on context...
+    return
+
+********************************
+*we are going with this version*
+********************************
+now the wait-free version...
+update-callbacks
+entry:
+    atomic inc update-counter-beta
+    copy new value (if its not a unit value)
+    for each activation
+	atomic or mask-value, state-mask
+    atomic inc update-counter-alpha
+    optionally(schedule main-function 0)
+    return
+
+main-function
+entry: (read and copy)
+    there is no overlap because main is only ever invoked from the main scheduler thread
+    allocate locals
+    br read-state:
+
+read-state:
+    get state-update-counter-alpha
+    for each instruction in state:
+	local-instruction-state = state-instruction-state
+    for each item in state:
+	local-value = state-value
+    get state-update-counter-beta
+    if alpha==beta we are consistent, goto body
+       else goto read-state
+
+body:
+    normal processing loop here using all local stack values...
+
+
+tail:
+    if there are not activations procede to exit
+
+exit: (update)
+    for each modified value
+	state-value = local-value
+    for each instruction mask
+	//since masks can modified from a thread isolated callback, we need to update as
+	//oposed to replacing this
+	atomic or local-mask, state-mask
+    return
+
+
+ok so now... if a program calls another program that may outlive it's own run
+(it does i/o or uses the timer)
+it's state and input args need to be heap allocated and ref counted
+otherwise, a stack allocation is fine.
+that's trivial to detect because if the program doesn't do any i/o or use
+the scheduler it's stack allocated. otherwise use heap allocated
+now if it's heap allocated and actually has return values,
+we need some place to shove them. which will actually be it's own internal state
+so if it returns normally at least once the caller can read it, but subsequent executions
+that where invoked by itself just disappear.
+
+
+main	    updater0	     updater1
+a=0
+	    b++
+b=1         a++
+a=1			     b++
+b=2
+invalid			     a++
+a=2
+b=2
+consistent
