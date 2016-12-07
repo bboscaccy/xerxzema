@@ -1,6 +1,7 @@
 #include "Program.h"
 #include "Namespace.h"
 #include "World.h"
+#include "LLVMUtils.h"
 #include "llvm/IR/IRBuilder.h"
 
 namespace xerxzema
@@ -219,15 +220,13 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		if(r->type()->name() != "unit")
 		{
 			data_types.push_back(r->type()->type(context));
-			r->offset(i);
-			i++;
+			r->offset(i++);
 		}
 	}
 	for(auto& r: instructions)
 	{
 		data_types.push_back(llvm::Type::getInt16Ty(context));
-		r->offset(i);
-		i++;
+		r->offset(i++);
 		if(r->state_type(context))
 		{
 			data_types.push_back(r->state_type(context));
@@ -260,18 +259,16 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 								 llvm::Function* fn)
 {
-	auto it = fn->arg_begin();
-	it++;
+	auto args = fn->arg_begin();
+	args++;
 	for(auto r: inputs)
 	{
-		r->value(&*it);
-		it++;
+		r->value(&*args++);
 	}
 
 	for(auto r: outputs)
 	{
-		r->value(&*it);
-		it++;
+		r->value(&*args++);
 	}
 
 	for(auto r: locals)
@@ -283,7 +280,7 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	for(auto& i: instructions)
 	{
 		i->value(builder.CreateAlloca(llvm::Type::getInt16Ty(context)));
-		builder.CreateStore(llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), 0), i->value());
+		builder.CreateStore(const_int16(context, 0), i->value());
 		auto instruction_state_type = i->state_type(context);
 		if(instruction_state_type != nullptr)
 		{
@@ -353,11 +350,12 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 		r->do_activations(context, builder);
 	}
 	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
-	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(1, 1)), ptr);
+	builder.CreateStore(const_int1(context, 1), ptr);
 
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(resume_block);
+	//TODO add is_trivial check here...
 	auto beta_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), beta_offset);
 	auto beta_val = builder.CreateLoad(beta_ptr);
 	for(auto r: locals)
@@ -492,14 +490,12 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									  _name + "_closure" + reg->name(), module);
 	llvm::Value* arg_ptr = nullptr;
-	auto it = fn->arg_begin();
+	auto args = fn->arg_begin();
 
-	auto state = &*it;
-	it++;
+	auto state = &*args++;
 	if(reg->type()->name() != "unit")
 	{
-		arg_ptr = &*it;
-		it++;
+		arg_ptr = &*args++;
 	}
 
 
