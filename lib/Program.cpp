@@ -358,6 +358,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	//TODO add is_trivial check here...
 	auto beta_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), beta_offset);
 	auto beta_val = builder.CreateLoad(beta_ptr);
+	builder.CreateFence(llvm::AtomicOrdering::Acquire);
 	for(auto r: locals)
 	{
 		if(r->type()->name() != "unit")
@@ -383,6 +384,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
 		}
 	}
+	builder.CreateFence(llvm::AtomicOrdering::Release);
 	auto alpha_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), alpha_offset);
 	auto alpha_val = builder.CreateLoad(alpha_ptr);
 
@@ -508,6 +510,7 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
 							llvm::AtomicOrdering::AcquireRelease);
 
+	builder.CreateFence(llvm::AtomicOrdering::Acquire);
 	if(reg->type()->name() != "unit")
 	{
 		auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
@@ -524,6 +527,7 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 								llvm::AtomicOrdering::AcquireRelease);
 
 	}
+	builder.CreateFence(llvm::AtomicOrdering::Acquire);
 	auto beta_ptr = builder.CreateStructGEP(state_type, state, beta_offset);
 	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
