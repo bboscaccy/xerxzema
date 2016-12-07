@@ -99,6 +99,7 @@ private:
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
 	int alpha_offset;
 	int beta_offset;
+	bool is_trivial;
 };
 
 

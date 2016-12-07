@@ -5,7 +5,8 @@
 
 namespace xerxzema
 {
-Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name)
+Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name),
+														  is_trivial(false)
 {
 	reg("head");
 	reg("head")->type(p->world()->get_namespace("core")->type("unit"));
@@ -307,7 +308,15 @@ void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>&
 	{
 		auto val = builder.CreateLoad(r->value());
 		auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-		builder.CreateStore(val, ptr);
+		if(is_trivial)
+		{
+			builder.CreateStore(val, ptr);
+		}
+		else
+		{
+			builder.CreateAtomicRMW(llvm::AtomicRMWInst::Or, ptr, val,
+									llvm::AtomicOrdering::AcquireRelease);
+		}
 
 		auto instruction_state_type = r->state_type(context);
 		if(instruction_state_type != nullptr)
