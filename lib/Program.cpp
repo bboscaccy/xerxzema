@@ -496,12 +496,12 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 	//update activation masks
 	for(auto& activate: reg->activations)
 	{
-		//todo refactor this eh?
 		auto ptr = builder.CreateStructGEP(state_type, state,
 										   activate.instruction->offset());
-		auto mask = builder.CreateLoad(ptr);
-		auto update = builder.CreateOr(mask, llvm::APInt(16, activate.value));
-		builder.CreateStore(update, ptr);
+		auto mask = llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), activate.value);
+		builder.CreateAtomicRMW(llvm::AtomicRMWInst::Or, ptr, mask,
+								llvm::AtomicOrdering::AcquireRelease);
+
 	}
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
