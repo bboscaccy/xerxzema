@@ -234,6 +234,11 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		}
 	}
 
+	data_types.push_back(llvm::Type::getInt32Ty(context));
+	alpha_offset = i++;
+	data_types.push_back(llvm::Type::getInt32Ty(context));
+	beta_offset = i++;
+
 	state_type = llvm::StructType::create(context, data_types, _name + "_data");
 
 	std::vector<llvm::Type*> arg_types;
@@ -487,6 +492,11 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 	auto block = llvm::BasicBlock::Create(context, "entry", fn);
 	builder.SetInsertPoint(block);
 
+	auto alpha_ptr = builder.CreateStructGEP(state_type, state, alpha_offset);
+	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
+							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
+							llvm::AtomicOrdering::AcquireRelease);
+
 	if(reg->type()->name() != "unit")
 	{
 		auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
@@ -503,6 +513,10 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 								llvm::AtomicOrdering::AcquireRelease);
 
 	}
+	auto beta_ptr = builder.CreateStructGEP(state_type, state, beta_offset);
+	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
+							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
+							llvm::AtomicOrdering::AcquireRelease);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 }
 };

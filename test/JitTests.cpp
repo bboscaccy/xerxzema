@@ -257,6 +257,8 @@ struct test_state_struct
 	double bar;
 	uint16_t s0;
 	uint16_t s1;
+	uint32_t alpha;
+	uint32_t beta;
 };
 
 TEST(TestJit, TestStateSize)

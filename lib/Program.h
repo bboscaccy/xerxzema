@@ -97,6 +97,8 @@ private:
 	llvm::Function* function;
 	llvm::Module* _current_module;
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
+	int alpha_offset;
+	int beta_offset;
 };
 
 
