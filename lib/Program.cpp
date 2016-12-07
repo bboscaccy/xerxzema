@@ -338,6 +338,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	auto head_block = llvm::BasicBlock::Create(context, "head", function);
 	auto resume_block = llvm::BasicBlock::Create(context, "resume", function);
 	auto first_block = llvm::BasicBlock::Create(context, "first", function);
+	auto input_activation_block = llvm::BasicBlock::Create(context, "input_activation", function);
 
 	builder.SetInsertPoint(entry_block);
 	allocate_registers(context, builder, function);
@@ -354,14 +355,11 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(1, 1)), ptr);
 
-	//TODO after HEAD runs we need to clone our main instruction_state for each
-	//i/o thread state and place it "somewhere" not an alloca's block since
-	//this function will exit usually
-	//so next up, create i/o ports and hook up the scheduler..
-
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(resume_block);
+	auto beta_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), beta_offset);
+	auto beta_val = builder.CreateLoad(beta_ptr);
 	for(auto r: locals)
 	{
 		if(r->type()->name() != "unit")
@@ -387,6 +385,14 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
 		}
 	}
+	auto alpha_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), alpha_offset);
+	auto alpha_val = builder.CreateLoad(alpha_ptr);
+
+	auto check_frame = builder.CreateICmpEQ(alpha_val, beta_val);
+	builder.CreateCondBr(check_frame, input_activation_block, resume_block);
+
+
+	builder.SetInsertPoint(input_activation_block);
 	for(auto r: inputs)
 	{
 		r->do_activations(context, builder);
