@@ -13,5 +13,6 @@ add_library(xerxzema SHARED
   Semantic.cpp
   Diagnostics.cpp
   Scheduler.cpp
+  RT.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})

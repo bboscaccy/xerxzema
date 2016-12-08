@@ -527,7 +527,7 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 								llvm::AtomicOrdering::AcquireRelease);
 
 	}
-	builder.CreateFence(llvm::AtomicOrdering::Acquire);
+	builder.CreateFence(llvm::AtomicOrdering::Release);
 	auto beta_ptr = builder.CreateStructGEP(state_type, state, beta_offset);
 	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),

@@ -124,7 +124,6 @@ TEST(TestJit, TestAddChainConstDelay)
 	p->instruction("add", {"hi", "baz"}, {"bar"});
 	p->instruction("add", {"bar", "baz"}, {"bye"});
 
-	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*);
@@ -199,6 +198,7 @@ TEST(TestJit, TestWhen)
 	p->instruction("trace", {"bye"}, {});
 	p->instruction("trace", {"x"}, {});
 
+	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*, double*);

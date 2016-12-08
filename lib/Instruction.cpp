@@ -433,7 +433,7 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 	auto format_str = builder.CreateGlobalString(input_str);
 
 
-	auto fn = program->current_module()->getFunction("printf");
+	auto fn = program->current_module()->getFunction("xerxzema_print");
 	if(!fn)
 	{
 		std::vector<llvm::Type*> printf_arg_types;
@@ -443,7 +443,7 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 			llvm::FunctionType::get(llvm::Type::getInt32Ty(context), printf_arg_types, true);
 
 		fn = llvm::Function::Create(printf_type, llvm::Function::ExternalLinkage,
-									"printf", program->current_module());
+									"xerxzema_print", program->current_module());
 
 		fn->setCallingConv(llvm::CallingConv::C);
 	}
