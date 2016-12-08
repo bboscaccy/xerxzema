@@ -129,6 +129,7 @@ bool Program::check_instruction(const std::string &name,
 		if(def)
 		{
 			auto output_types = def->output_types(parent);
+			//more comments?
 			//we can create extra outputs here if needed?
 			//probably issue a warning or something
 			std::vector<RegisterData> target_outputs(outputs);
