@@ -25,6 +25,20 @@ void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 											  false,
 											  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 											  nullptr, "xerxzema_scheduler");
+	auto callback_type = llvm::FunctionType::get
+		(llvm::Type::getVoidTy(context), {llvm::Type::getVoidTy(context)->getPointerTo()},
+		 false);
+
+	auto scheduler_run_type = llvm::FunctionType::get
+		(llvm::Type::getVoidTy(context),
+		 { llvm::Type::getVoidTy(context)->getPointerTo(),
+				 callback_type->getPointerTo(),
+				 llvm::Type::getVoidTy(context)->getPointerTo(),
+				 llvm::Type::getInt64Ty(context)}, false);
+
+	auto schedule_fn = llvm::Function::Create(scheduler_run_type,
+											  llvm::Function::ExternalLinkage,
+											  "xerxzema_schedule", module);
 
 	for(auto& program: programs)
 	{
