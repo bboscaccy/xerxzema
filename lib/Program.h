@@ -75,7 +75,8 @@ public:
 		return instructions;
 	}
 
-	llvm::Value* create_closure(Register* reg, llvm::LLVMContext& context, llvm::Module* module);
+	llvm::Value* create_closure(Register* reg, bool reinvoke,
+								llvm::LLVMContext& context, llvm::Module* module);
 private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<RegisterData>& inputs,

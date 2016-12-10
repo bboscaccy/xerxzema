@@ -251,6 +251,16 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	data_types.push_back(llvm::Type::getInt32Ty(context));
 	beta_offset = i++;
 
+	for(auto& r:inputs)
+	{
+		data_types.push_back(r->type()->type(context)->getPointerTo());
+		i++;
+	}
+	for(auto& r:outputs)
+	{
+		data_types.push_back(r->type()->type(context)->getPointerTo());
+		i++;
+	}
 	state_type = llvm::StructType::create(context, data_types, _name + "_data");
 
 	std::vector<llvm::Type*> arg_types;
@@ -483,8 +493,8 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 }
 
-llvm::Value* Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context,
-							 llvm::Module* module)
+llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
+									 llvm::LLVMContext& context, llvm::Module* module)
 {
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
@@ -539,7 +549,15 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext&
 	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
 							llvm::AtomicOrdering::AcquireRelease);
-	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+
+	if(reinvoke)
+	{
+		builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+	}
+	else
+	{
+		builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+	}
 
 	return fn;
 }
