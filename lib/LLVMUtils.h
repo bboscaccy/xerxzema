@@ -19,22 +19,22 @@ inline llvm::Value* const_int1(llvm::LLVMContext& context, uint64_t v)
 	return llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), v);
 }
 
-llvm::Value* const_int8(llvm::LLVMContext& context, uint64_t v)
+inline llvm::Value* const_int8(llvm::LLVMContext& context, uint64_t v)
 {
 	return llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), v);
 }
 
-llvm::Value* const_int16(llvm::LLVMContext& context, uint64_t v)
+inline llvm::Value* const_int16(llvm::LLVMContext& context, uint64_t v)
 {
 	return llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), v);
 }
 
-llvm::Value* const_int32(llvm::LLVMContext& context, uint64_t v)
+inline llvm::Value* const_int32(llvm::LLVMContext& context, uint64_t v)
 {
 	return llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), v);
 }
 
-llvm::Value* const_int64(llvm::LLVMContext& context, uint64_t v)
+inline llvm::Value* const_int64(llvm::LLVMContext& context, uint64_t v)
 {
 	return llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), v);
 }

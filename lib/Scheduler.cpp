@@ -44,6 +44,11 @@ uint64_t now()
 	return stamp;
 }
 
+void Scheduler::schedule(scheduler_callback callback, void* state, uint64_t when)
+{
+
+}
+
 void Scheduler::run()
 {
 	struct timespec begin;

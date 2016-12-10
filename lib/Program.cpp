@@ -103,6 +103,17 @@ RegisterData Program::constant(double literal)
 	return temp;
 }
 
+RegisterData Program::constant_int(int64_t literal)
+{
+	auto inst = std::make_unique<ValueInt>(literal);
+	inst->dependent(reg("head"));
+	auto temp = temp_reg();
+	temp.reg->type(parent->world()->get_namespace("core")->type("int"));
+	inst->output(temp.reg);
+	instruction(std::move(inst));
+	temp.sample = true;
+	return temp;
+}
 bool Program::check_instruction(const std::string &name,
 								const std::vector<RegisterData> &inputs,
 								const std::vector<RegisterData> &outputs,
@@ -411,7 +422,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	_current_module = module;
 
 	llvm::IRBuilder<> builder(context);
-	auto state = &*function->arg_begin();
+	program_state = &*function->arg_begin();
 
 	auto post_entry_block = generate_entry_block(context, builder);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
@@ -470,14 +481,9 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	generate_exit_block(context, builder);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 
-	for(auto& r: registers)
-	{
-		if(r.second->offset() != 0)
-			create_closure(r.second.get(), context, module);
-	}
 }
 
-void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context,
+llvm::Value* Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context,
 							 llvm::Module* module)
 {
 	std::vector<llvm::Type*> arg_types;
@@ -534,5 +540,7 @@ void Program::create_closure(xerxzema::Register *reg, llvm::LLVMContext& context
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
 							llvm::AtomicOrdering::AcquireRelease);
 	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+
+	return fn;
 }
 };

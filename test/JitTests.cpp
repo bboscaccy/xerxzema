@@ -198,7 +198,6 @@ TEST(TestJit, TestWhen)
 	p->instruction("trace", {"bye"}, {});
 	p->instruction("trace", {"x"}, {});
 
-	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*, double*);
@@ -303,4 +302,23 @@ TEST(TestJit, TestJitInvoke)
 
 	ASSERT_EQ(xerxzema::invoke<double>(jit.get(), "core", "test", 2.0), 256.0);
 	ASSERT_EQ(jit->get_state_size("core", "test"), sizeof(test_state_struct));
+}
+
+TEST(TestJit, TestSchedulerCallback)
+{
+	xerxzema::World world;
+
+	auto p = world.get_namespace("core")->get_program("test");
+	p->add_input("i0", world.get_namespace("core")->type("real"));
+	p->add_input("i1", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
+
+	auto at_time = p->constant_int(2000);
+	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
+
+	auto jit = world.create_jit();
+	jit->dump_after_codegen();
+	jit->compile_namespace(world.get_namespace("core"));
+
+
 }

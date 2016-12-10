@@ -14,3 +14,9 @@ void xerxzema_print(const char* fmt, ...)
 	vprintf(fmt, args);
 	va_end(args);
 }
+
+void xerxzema_schedule(void* scheduler, void(*fn)(void*), void* state, uint64_t when)
+{
+	auto s = (Scheduler*)scheduler;
+	s->schedule(fn, state, when);
+}

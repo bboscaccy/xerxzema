@@ -1,6 +1,7 @@
 #include "Instruction.h"
 #include "Register.h"
 #include "Program.h"
+#include "LLVMUtils.h"
 
 namespace xerxzema
 {
@@ -180,6 +181,16 @@ void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<>
 	auto target = _outputs[0]->fetch_value_raw(context, builder);
 	auto p = builder.CreateStore(const_value, target);
 }
+
+ValueInt::ValueInt(int64_t v):value(v)	{}
+void ValueInt::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+								   Program* program)
+{
+	auto const_value = const_int64(context, value);
+	auto target = _outputs[0]->fetch_value_raw(context, builder);
+	auto p = builder.CreateStore(const_value, target);
+}
+
 
 void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								 xerxzema::Program *program)
@@ -451,6 +462,27 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 }
 
 void Trace::generate_prolouge(llvm::LLVMContext &context,
+									llvm::IRBuilder<> &builder,
+									Program* program,
+									llvm::BasicBlock *next_block)
+{
+	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+	builder.CreateBr(next_block);
+}
+
+void Schedule::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							  Program *program)
+{
+	auto fn = program->current_module()->getFunction("xerxzema_schedule");
+	auto closure = program->create_closure(_outputs[0], context, program->current_module());
+	auto scheduler_var = program->current_module()->getGlobalVariable("xerxzema_scheduler");
+	auto scheduler = builder.CreateLoad(scheduler_var);
+	auto time = _inputs[0]->fetch_value(context, builder);
+	auto state = program->current_state();
+	builder.CreateCall(fn, {scheduler, closure, state, time});
+}
+
+void Schedule::generate_prolouge(llvm::LLVMContext &context,
 									llvm::IRBuilder<> &builder,
 									Program* program,
 									llvm::BasicBlock *next_block)

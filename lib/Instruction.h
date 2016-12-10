@@ -106,6 +106,16 @@ private:
 	double value;
 };
 
+class ValueInt : public Instruction
+{
+public:
+	ValueInt(int64_t v);
+	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
+							Program* program);
+private:
+	int64_t value;
+};
+
 class Counter : public Instruction
 {
 public:
@@ -163,6 +173,18 @@ public:
 };
 
 class Trace : public Instruction
+{
+public:
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	void generate_prolouge(llvm::LLVMContext& context,
+						   llvm::IRBuilder<> &builder,
+						   Program* program,
+						   llvm::BasicBlock* next_block);
+};
+
+class Schedule : public Instruction
 {
 public:
 	void generate_operation(llvm::LLVMContext& context,
