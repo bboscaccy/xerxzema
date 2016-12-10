@@ -96,20 +96,20 @@ void Scheduler::run()
 			current += d.tv_nsec;
 		}
 
-		while(task_start < current + step_size)
+		//TODO we will need some locks here. soon.
+		while(tasks.size() &&
+			  (task_start = tasks.top().when) < current + step_size)
 		{
-			//fire it off...
+			auto task = tasks.top();
+			tasks.pop();
+			task.state->exec_time = task_start;
+			(*task.fn)(task.state);
 			total_events++;
 			if(current > task_start && current - task_start > step_size)
 			{
 				late_events++;
-				late_total += current - task_start;
-				printf("late %f\n", late_total / late_events);
-				printf("ratio %f\n", (double)late_events / (double)total_events);
-				printf("eps %f\n", (double)total_events / (double)(current / 1000000000));
+				late_total += current - task.when;
 			}
-			task_start += 100000;
-			//printf("FIRE! %ld\n", current);
 		}
 
 		sys_current = now();
@@ -130,7 +130,7 @@ void Scheduler::run()
 
 		auto when = task_start - current;
 		when *= .5;
-		if(when > max_sleep && task_start > current)
+		if((when > max_sleep && task_start > current) || !tasks.size())
 		{
 			short_sleep.tv_nsec = when;
 			nanosleep(&short_sleep, &remaining);
