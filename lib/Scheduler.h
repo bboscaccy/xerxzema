@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <queue>
+#include <algorithm>
 
 namespace xerxzema
 {
@@ -14,12 +16,31 @@ struct CallbackState
 
 typedef void(*scheduler_callback)(void*);
 
+struct CallbackData
+{
+	CallbackState* state;
+	scheduler_callback fn;
+	uint64_t when;
+};
+
+inline bool operator < (const CallbackData& lhs, const CallbackData& rhs)
+{
+	return lhs.when < rhs.when;
+}
+inline bool operator > (const CallbackData& lhs, const CallbackData& rhs)
+{
+	return lhs.when > rhs.when;
+}
+
 class Scheduler
 {
 public:
 	void run();
 	void schedule(scheduler_callback callback, void* state, uint64_t when);
 	uint64_t calibrate_nanosleep();
+private:
+	std::priority_queue<CallbackData, std::vector<CallbackData>,
+						std::greater<CallbackData>> tasks;
 };
 
 uint64_t now();
