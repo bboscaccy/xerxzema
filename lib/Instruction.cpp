@@ -474,7 +474,8 @@ void Schedule::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> 
 							  Program *program)
 {
 	auto fn = program->current_module()->getFunction("xerxzema_schedule");
-	auto closure = program->create_closure(_outputs[0], context, program->current_module());
+	auto closure = program->create_closure(_outputs[0], true,
+										   context, program->current_module());
 	auto scheduler_var = program->current_module()->getGlobalVariable("xerxzema_scheduler");
 	auto scheduler = builder.CreateLoad(scheduler_var);
 	auto time = _inputs[0]->fetch_value(context, builder);

@@ -254,12 +254,12 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	for(auto& r:inputs)
 	{
 		data_types.push_back(r->type()->type(context)->getPointerTo());
-		i++;
+		r->offset(i++);
 	}
 	for(auto& r:outputs)
 	{
 		data_types.push_back(r->type()->type(context)->getPointerTo());
-		i++;
+		r->offset(i++);
 	}
 	state_type = llvm::StructType::create(context, data_types, _name + "_data");
 
@@ -373,6 +373,18 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	}
 	ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), 0);
 	builder.CreateStore(const_int1(context, 1), ptr);
+
+	//create backing for i/o arguments when executing head.
+	for(auto r: inputs)
+	{
+		ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+		builder.CreateStore(r->fetch_value_raw(context, builder), ptr);
+	}
+	for(auto r: outputs)
+	{
+		ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+		builder.CreateStore(r->fetch_value_raw(context, builder), ptr);
+	}
 
 	builder.CreateBr(first_block);
 

@@ -20,6 +20,8 @@ struct test_delay_data
 	delay_state delay_state_data;
 	int32_t alpha;
 	int32_t beta;
+	double* d0;
+	double* d1;
 };
 
 TEST(TestJit, TestAdd)
@@ -163,7 +165,7 @@ TEST(TestJit, TestDelay)
 	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
 	double in = 0.0;
 	double out = 0.0;
-	test_delay_data state = {0};
+	char state[128] = {0};
 	//fix this...
 	for(int i = 1; i < 20; i++)
 	{
@@ -260,6 +262,8 @@ struct test_state_struct
 	uint16_t s1;
 	uint32_t alpha;
 	uint32_t beta;
+	double* d0;
+	double* d1;
 };
 
 TEST(TestJit, TestStateSize)
@@ -319,8 +323,9 @@ TEST(TestJit, TestSchedulerCallback)
 	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
 	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
-
+	
 	auto jit = world.create_jit();
+	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 
