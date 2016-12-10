@@ -1,12 +1,15 @@
 #include "World.h"
 #include "Type.h"
 #include "Instruction.h"
+#include "RT.h"
 
 namespace xerxzema
 {
 World::World()
 {
 	create_core_namespace();
+	if(!xerxzema_scheduler)
+		xerxzema_scheduler = scheduler.get();
 }
 
 std::unique_ptr<Jit> World::create_jit()

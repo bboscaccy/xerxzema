@@ -7,6 +7,8 @@
 
 using namespace xerxzema;
 
+void* xerxzema_scheduler = nullptr;
+
 void xerxzema_print(const char* fmt, ...)
 {
 	va_list args;

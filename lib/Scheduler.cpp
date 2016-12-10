@@ -51,6 +51,7 @@ void Scheduler::schedule(scheduler_callback callback, void* state, uint64_t when
 
 void Scheduler::run()
 {
+	printf("am i running?\n");
 	struct timespec begin;
 	struct timespec next;
 	struct timespec remaining;

@@ -18,6 +18,8 @@ struct test_delay_data
 	bool resume;
 	uint16_t delay_mask;
 	delay_state delay_state_data;
+	int32_t alpha;
+	int32_t beta;
 };
 
 TEST(TestJit, TestAdd)
@@ -153,8 +155,8 @@ TEST(TestJit, TestDelay)
 	dval->input(p->reg("hi"));
 	p->instruction(std::move(dval));
 
-	//p->instruction("trace", {"hi"}, {});
-
+	p->instruction("trace", {"hi"}, {});
+	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	void (*testpointer)(void*, double*, double*);
@@ -162,8 +164,8 @@ TEST(TestJit, TestDelay)
 	double in = 0.0;
 	double out = 0.0;
 	test_delay_data state = {0};
-
-	for(int i = 1; i < 1000; i++)
+	//fix this...
+	for(int i = 1; i < 20; i++)
 	{
 		in = i;
 		(*testpointer)(&state, &in, &out);
@@ -315,9 +317,10 @@ TEST(TestJit, TestSchedulerCallback)
 
 	auto at_time = p->constant_int(2000);
 	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
+	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
+				   {p->reg_data("bye")}, {p->reg_data("run_it")});
 
 	auto jit = world.create_jit();
-	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 
