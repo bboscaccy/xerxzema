@@ -53,6 +53,7 @@ private:
 	World* _world;
 	Namespace* parent;
 	std::string _name;
+	llvm::Value* scheduler;
 };
 
 class InstructionDefinition

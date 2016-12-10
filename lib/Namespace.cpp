@@ -1,5 +1,6 @@
 #include "Namespace.h"
 #include "World.h"
+#include "llvm/IR/IRBuilder.h"
 
 namespace xerxzema
 {
@@ -18,6 +19,13 @@ Namespace::~Namespace()
 
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
+	//create required globals
+	scheduler = new llvm::GlobalVariable(*module,
+											  llvm::Type::getVoidTy(context)->getPointerTo(),
+											  false,
+											  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+											  nullptr, "xerxzema_scheduler");
+
 	for(auto& program: programs)
 	{
 		program.second->code_gen(module, context);
