@@ -269,14 +269,6 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
-	for(auto r: inputs)
-	{
-		arg_types.push_back(r->type()->type(context)->getPointerTo());
-	}
-	for(auto r: outputs)
-	{
-		arg_types.push_back(r->type()->type(context)->getPointerTo());
-	}
 
 	return llvm::FunctionType::get(llvm::Type::getInt64Ty(context), arg_types, false);
 }
@@ -289,19 +281,21 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 	args++;
 	for(auto r: inputs)
 	{
-		r->value(&*args++);
+		auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
+		r->value(value);
 	}
 
 	for(auto r: outputs)
 	{
-		r->value(&*args++);
+		auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
+		r->value(value);
 	}
 
 	for(auto r: locals)
 	{
 		auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
 		r->value(value);
-		r->type()->init(context, builder, value);
+		r->type()->init(context, builder, value); //this should only be done during head
 	}
 	for(auto& i: instructions)
 	{
@@ -319,8 +313,9 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 
 void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder)
 {
-	for(auto r: locals)
+	for(auto& reg: registers)
 	{
+		auto r = reg.second.get();
 		if(r->type()->name() != "unit")
 		{
 			auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
@@ -381,13 +376,19 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	//create backing for i/o arguments when executing head.
 	for(auto r: inputs)
 	{
-		ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-		builder.CreateStore(r->fetch_value_raw(context, builder), ptr);
+		if(r->type()->name() != "unit")
+		{
+			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+			r->type()->copy(context, builder, r->fetch_value_raw(context, builder), ptr);
+		}
 	}
 	for(auto r: outputs)
 	{
-		ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-		builder.CreateStore(r->fetch_value_raw(context, builder), ptr);
+		if(r->type()->name() != "unit")
+		{
+			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
+			r->type()->init(context, builder, ptr);
+		}
 	}
 
 	builder.CreateBr(first_block);
@@ -397,8 +398,9 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	auto beta_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), beta_offset);
 	auto beta_val = builder.CreateLoad(beta_ptr);
 	builder.CreateFence(llvm::AtomicOrdering::Acquire);
-	for(auto r: locals)
+	for(auto& reg: registers)
 	{
+		auto r = reg.second.get();
 		if(r->type()->name() != "unit")
 		{
 			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
