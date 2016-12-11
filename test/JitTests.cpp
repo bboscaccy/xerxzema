@@ -7,43 +7,19 @@
 #include <chrono>
 #include <thread>
 
-struct delay_state
-{
-	bool fired;
-	double data;
-};
-
-struct test_delay_data
-{
-	bool resume;
-	uint16_t delay_mask;
-	delay_state delay_state_data;
-	int32_t alpha;
-	int32_t beta;
-	double* d0;
-	double* d1;
-};
-
 TEST(TestJit, TestAdd)
 {
 	xerxzema::World world;
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
 
 	p->instruction("add", {"hi", "hi"}, {"bye"});
-
 	jit->compile_namespace(world.get_namespace("core"));
 
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	char state[128] = {0};
-	memset(state, 0, 128);
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 4.0);
+	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	ASSERT_EQ(invoker(2), 4.0);
 }
 
 TEST(TestJit, TestAddConst)
@@ -52,29 +28,16 @@ TEST(TestJit, TestAddConst)
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
 
-	auto baz = p->reg("baz");
-	baz->type(world.get_namespace("core")->type("real"));
-	auto val = std::make_unique<xerxzema::ValueReal>(42.0);
-	val->output(baz);
-	val->dependent(p->reg("head"));
-	p->instruction(std::move(val));
+	auto cv = p->constant(42.0);
 
-
-	p->instruction("add", {"hi", "baz"}, {"bye"});
-
-
+	p->instruction("add", {"hi", cv.reg->name()}, {"bye"});
 	jit->compile_namespace(world.get_namespace("core"));
 
-	void (*testpointer)(void*, double*, double*);
-	char state[128] = {0};
-	memset(state, 0, 128);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 44.0);
+	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	ASSERT_EQ(invoker(2), 44.0);
+
 }
 
 TEST(TestJit, TestAddChainConst)
@@ -83,67 +46,20 @@ TEST(TestJit, TestAddChainConst)
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
 
 	auto temp = p->constant(42.0);
 	p->instruction("add", {p->reg_data("hi"), temp}, {p->reg_data("bar")});
 	p->instruction("add", {p->reg_data("bar"), temp}, {p->reg_data("bye")});
 
 	jit->compile_namespace(world.get_namespace("core"));
+	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	ASSERT_EQ(invoker(2), 86.0);
 
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	char state[128] = {0};
-	memset(state, 0, 128);
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 86.0);
-}
-
-TEST(TestJit, TestAddChainConstDelay)
-{
-	xerxzema::World world;
-	auto jit = world.create_jit();
-	auto p = world.get_namespace("core")->get_program("test");
-	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
-
-	auto baz = p->reg("baz");
-	baz->type(world.get_namespace("core")->type("real"));
-	auto val = std::make_unique<xerxzema::ValueReal>(42.0);
-	val->output(baz);
-	val->dependent(p->reg("head"));
-	p->instruction(std::move(val));
-
-	auto dbaz = p->reg("dbaz");
-	dbaz->type(world.get_namespace("core")->type("real"));
-	auto dval = std::make_unique<xerxzema::Delay>();
-	dval->output(dbaz);
-	dval->input(baz);
-
-	p->instruction(std::move(dval));
-
-
-	p->instruction("add", {"hi", "baz"}, {"bar"});
-	p->instruction("add", {"bar", "baz"}, {"bye"});
-
-	jit->compile_namespace(world.get_namespace("core"));
-
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	char state[128];
-	memset(state, 0, 128);
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 86.0);
 }
 
 TEST(TestJit, TestDelay)
 {
-	/* program TestDelay(hi:real) -> bye:real
-	   hi~1 -> bye */
 
 	xerxzema::World world;
 	auto jit = world.create_jit();
@@ -151,34 +67,21 @@ TEST(TestJit, TestDelay)
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
 
-
-	auto dval = std::make_unique<xerxzema::Delay>();
-	dval->output(p->reg("bye"));
-	dval->input(p->reg("hi"));
-	p->instruction(std::move(dval));
+	p->instruction("delay", {p->reg_data("hi")}, {p->reg_data("bye")});
 
 	p->instruction("trace", {"hi"}, {});
-	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 0.0;
-	double out = 0.0;
-	char state[128] = {0};
-	//fix this...
+	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	invoker(0);
 	for(int i = 1; i < 20; i++)
 	{
-		in = i;
-		(*testpointer)(&state, &in, &out);
-		ASSERT_EQ(in - 1, out);
+		ASSERT_EQ(invoker(i), i-1);
 	}
 }
 
 TEST(TestJit, TestWhen)
 {
-	/* program TestDelay(hi:real) -> bye:real
-	   hi~1 -> bye */
 
 	xerxzema::World world;
 	auto jit = world.create_jit();
@@ -204,31 +107,11 @@ TEST(TestJit, TestWhen)
 
 	jit->compile_namespace(world.get_namespace("core"));
 
-	void (*testpointer)(void*, double*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*, double*))jit->get_jitted_function("core", "test");
-	double in0 = 1.0;
-	double in1 = 2.0;
-	double out = 0.0;
-
-	char state[128];
-	memset(state, 0, 128);
-	(*testpointer)(&state, &in0, &in1, &out);
-	ASSERT_EQ(out, 3.0);
-
-	in0 = 2.0;
-	in1 = 1.0;
-	out = 0.0;
-	(*testpointer)(&state, &in0, &in1, &out);
-	ASSERT_EQ(out, 2.0);
-
-	in0 = 2.0;
-	in1 = 1.0;
-	out = 0.0;
-	memset(state, 0, 128);
-	(*testpointer)(&state, &in0, &in1, &out);
-	ASSERT_EQ(out, 1.0);
-
-
+	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
+	ASSERT_EQ(invoker(1,2), 3);
+	ASSERT_EQ(invoker(2,1), 2);
+	ASSERT_EQ(invoker(2,1), 2);
+	ASSERT_EQ(invoker(1,2), 3);
 }
 
 TEST(TestJit, TestPow)
@@ -237,78 +120,17 @@ TEST(TestJit, TestPow)
 	auto jit = world.create_jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
+	p->add_output("bye", world.get_namespace("core")->type("real"));
 
 	auto temp = p->constant(2.0);
 	p->instruction("pow", {p->reg_data("hi"), temp}, {p->reg_data("bye")});
 
 	jit->compile_namespace(world.get_namespace("core"));
 
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	char state[128] = {0};
-	memset(state, 0, 128);
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 4.0);
+	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	ASSERT_EQ(invoker(2), 4);
 }
-
-struct test_state_struct
-{
-	bool rentry;
-	double bar;
-	uint16_t s0;
-	uint16_t s1;
-	uint32_t alpha;
-	uint32_t beta;
-	double* d0;
-	double* d1;
-};
-
-TEST(TestJit, TestStateSize)
-{
-	xerxzema::World world;
-	auto jit = world.create_jit();
-	auto p = world.get_namespace("core")->get_program("test");
-	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
-
-	auto temp = p->constant(2.0);
-	p->instruction("pow", {p->reg_data("hi"), temp}, {p->reg_data("bye")});
-
-	jit->compile_namespace(world.get_namespace("core"));
-
-	void (*testpointer)(void*, double*, double*);
-	testpointer = (void (*)(void*, double*, double*))jit->get_jitted_function("core", "test");
-	double in = 2.0;
-	double out = 3.0;
-	char state[128] = {0};
-	memset(state, 0, 128);
-	(*testpointer)(state, &in, &out);
-	ASSERT_EQ(out, 4.0);
-
-
-
-	ASSERT_EQ(jit->get_state_size("core", "test"), sizeof(test_state_struct));
-}
-
-TEST(TestJit, TestJitInvoke)
-{
-	xerxzema::World world;
-	auto jit = world.create_jit();
-	auto p = world.get_namespace("core")->get_program("test");
-	p->add_input("hi", world.get_namespace("core")->type("real"));
-	p->add_input("bye", world.get_namespace("core")->type("real"));
-
-	auto temp = p->constant(16.0);
-	p->instruction("pow", {p->reg_data("hi"), temp}, {p->reg_data("bye")});
-
-	jit->compile_namespace(world.get_namespace("core"));
-
-	ASSERT_EQ(xerxzema::invoke<double>(jit.get(), "core", "test", 2.0), 256.0);
-	ASSERT_EQ(jit->get_state_size("core", "test"), sizeof(test_state_struct));
-}
+/*
 
 TEST(TestJit, TestSchedulerCallback)
 {
@@ -323,10 +145,11 @@ TEST(TestJit, TestSchedulerCallback)
 	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
 	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
-	
+
 	auto jit = world.create_jit();
 	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 	xerxzema::invoke<double>(jit.get(), "core", "test", 2.0, 3.0);
 
 }
+*/

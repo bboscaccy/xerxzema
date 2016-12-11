@@ -29,6 +29,7 @@ namespace xerxzema
 {
 class World;
 class Namespace;
+class Program;
 
 class Jit
 {
@@ -36,11 +37,12 @@ public:
 	Jit(World* world);
 	inline llvm::LLVMContext& context() { return _context; }
 	void compile_namespace(Namespace* ns);
-	void* get_jitted_function(const std::string& ns, const std::string& name);
+	void* get_jitted_function(Program* program);
 
 	inline void dump_after_codegen() { dump_pre_optimization = true; }
 	inline void dump_after_optimization() { dump_post_optimization = true; }
-	size_t get_state_size(const std::string& ns, const std::string& name);
+	size_t get_state_size(Program* program);
+	void* get_state_offset(void* state, Program* program, int field);
 
 private:
 	void create_module(Namespace* ns);

@@ -65,10 +65,11 @@ public:
 	inline llvm::Module* current_module() { return _current_module; }
 	inline llvm::Type* state_type_value() { return state_type; }
 	inline llvm::Value* current_state() { return program_state; }
+	inline Namespace* name_space() { return parent; }
 
 	inline std::string program_name() { return _name; }
-	inline std::vector<Register*> input_registers() { return inputs; }
-	inline std::vector<Register*> output_registers() { return outputs; }
+	inline std::vector<Register*>& input_registers() { return inputs; }
+	inline std::vector<Register*>& output_registers() { return outputs; }
 
 	inline const std::vector<std::unique_ptr<Instruction>>& instruction_listing()
 	{

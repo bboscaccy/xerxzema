@@ -66,20 +66,31 @@ void Jit::compile_namespace(Namespace* ns)
 
 }
 
-size_t Jit::get_state_size(const std::string& ns, const std::string &name)
+size_t Jit::get_state_size(Program* program)
 {
-	auto fn = modules[ns]->getFunction(name);
-	auto state_ptr_type = (*fn->getArgumentList().begin()).getType();
-	auto state_type = state_ptr_type->getPointerElementType();
-	return modules[ns]->getDataLayout().getTypeAllocSize(state_type);
+	auto module = program->current_module();
+	auto fn = module->getFunction(program->program_name());
+	auto state_type = program->state_type_value();
+	return module->getDataLayout().getTypeAllocSize(state_type);
 }
 
-void* Jit::get_jitted_function(const std::string& ns, const std::string &name)
+void* Jit::get_state_offset(void* target, Program* program, int field)
 {
-	auto fn = modules[ns]->getFunction(name);
-	auto state_type = (*fn->getArgumentList().begin()).getType();
-	modules[ns]->getDataLayout().getTypeAllocSize(state_type);
-	return engines[ns]->getPointerToFunction(fn);
+	auto module = program->current_module();
+	auto fn = module->getFunction(program->program_name());
+	auto state_type = program->state_type_value();
+	auto layout = module->getDataLayout().getStructLayout((llvm::StructType*)state_type);
+	auto offset = field;
+	return ((char*)target)+layout->getElementOffset(offset);
+}
+
+
+void* Jit::get_jitted_function(Program* program)
+{
+	auto module = program->current_module();
+	auto fn = module->getFunction(program->program_name());
+	auto state_type = program->state_type_value();
+	return engines[program->name_space()->name()]->getPointerToFunction(fn);
 }
 
 };
