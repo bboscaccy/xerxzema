@@ -564,7 +564,20 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 
 	if(reinvoke)
 	{
-		builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+		//call the original function back with the bound io values...
+		std::vector<llvm::Value*> args;
+		args.push_back(state);
+		for(auto& r:inputs)
+		{
+			auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
+			args.push_back(builder.CreateLoad(ptr));
+		}
+		for(auto& r:outputs)
+		{
+			auto ptr = builder.CreateStructGEP(state_type, state, r->offset());
+			args.push_back(builder.CreateLoad(ptr));
+		}
+		builder.CreateRet(builder.CreateCall(function, args));
 	}
 	else
 	{
