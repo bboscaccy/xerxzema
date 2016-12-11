@@ -415,7 +415,8 @@ void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 	builder.CreateStore(i, program->activation_counter_value());
 	if(_inputs.size() > 1)
 	{
-		_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+		_inputs[1]->type()->copy(context, builder,
+								 _outputs[0]->fetch_value_raw(context, builder),
 								 _inputs[1]->fetch_value_raw(context, builder));
 	}
 	for(auto& r:_outputs)

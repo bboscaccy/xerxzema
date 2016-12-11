@@ -5,11 +5,9 @@
 
 namespace xerxzema
 {
-World::World()
+World::World() : _scheduler(std::make_unique<Scheduler>())
 {
 	create_core_namespace();
-	if(!xerxzema_scheduler)
-		xerxzema_scheduler = scheduler.get();
 }
 
 std::unique_ptr<Jit> World::create_jit()

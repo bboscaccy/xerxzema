@@ -50,5 +50,6 @@ private:
 	std::map<std::string, std::unique_ptr<llvm::ExecutionEngine>> engines;
 	bool dump_pre_optimization;
 	bool dump_post_optimization;
+	void* scheduler;
 };
 };

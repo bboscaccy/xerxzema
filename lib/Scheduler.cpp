@@ -44,6 +44,11 @@ uint64_t now()
 	return stamp;
 }
 
+Scheduler::Scheduler() : exit_if_empty(false)
+{
+
+}
+
 void Scheduler::schedule(scheduler_callback callback, void* state, uint64_t when)
 {
 	tasks.push(CallbackData{(CallbackState*)state, callback, when});
@@ -76,6 +81,8 @@ void Scheduler::run()
 
 	while(true)
 	{
+		if(!tasks.size() && exit_if_empty)
+			break;
 		//in here we call now() and get the authoritative time
 		//if now() hasn't changed since last now()
 		//we fall back to clock_gettime to calculate roughly

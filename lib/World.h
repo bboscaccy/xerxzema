@@ -15,9 +15,10 @@ public:
 	Namespace* get_namespace(const std::string& name);
 	std::vector<std::string> namespace_list() const;
 	std::unique_ptr<Jit> create_jit();
+	inline Scheduler* scheduler() { return _scheduler.get(); }
 private:
 	void create_core_namespace();
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
-	std::unique_ptr<Scheduler> scheduler;
+	std::unique_ptr<Scheduler> _scheduler;
 };
 };

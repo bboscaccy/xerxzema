@@ -327,6 +327,6 @@ TEST(TestJit, TestSchedulerCallback)
 	auto jit = world.create_jit();
 	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
-
+	xerxzema::invoke<double>(jit.get(), "core", "test", 2.0, 3.0);
 
 }

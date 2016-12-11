@@ -35,12 +35,15 @@ inline bool operator > (const CallbackData& lhs, const CallbackData& rhs)
 class Scheduler
 {
 public:
+	Scheduler();
 	void run();
 	void schedule(scheduler_callback callback, void* state, uint64_t when);
 	uint64_t calibrate_nanosleep();
+	void exit_when_empty();
 private:
 	std::priority_queue<CallbackData, std::vector<CallbackData>,
 						std::greater<CallbackData>> tasks;
+	bool exit_if_empty;
 };
 
 uint64_t now();

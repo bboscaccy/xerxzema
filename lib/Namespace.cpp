@@ -20,11 +20,12 @@ Namespace::~Namespace()
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	//create required globals
-	scheduler = new llvm::GlobalVariable(*module,
-											  llvm::Type::getVoidTy(context)->getPointerTo(),
-											  false,
-											  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-											  nullptr, "xerxzema_scheduler");
+    scheduler = new llvm::GlobalVariable(*module,
+										 llvm::Type::getVoidTy(context)->getPointerTo(),
+										 false,
+										 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+										 nullptr, "xerxzema_scheduler");
+
 	auto callback_type = llvm::FunctionType::get
 		(llvm::Type::getVoidTy(context), {llvm::Type::getVoidTy(context)->getPointerTo()},
 		 false);
