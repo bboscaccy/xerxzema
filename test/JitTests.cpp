@@ -142,7 +142,7 @@ TEST(TestJit, TestSchedulerCallback)
 	p->add_input("i1", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
 
-	auto at_time = p->constant_int(2000000);
+	auto at_time = p->constant_int(20000000);
 	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
 	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
@@ -151,5 +151,5 @@ TEST(TestJit, TestSchedulerCallback)
 	//jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
-	invoker(2,3);
+	ASSERT_EQ(invoker(2,3), 5);
 }
