@@ -431,7 +431,6 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	auto check_frame = builder.CreateICmpEQ(alpha_val, beta_val);
 	builder.CreateCondBr(check_frame, input_activation_block, resume_block);
 
-
 	builder.SetInsertPoint(input_activation_block);
 	for(auto r: inputs)
 	{
@@ -564,7 +563,7 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 	}
 	builder.CreateFence(llvm::AtomicOrdering::Release);
 	auto beta_ptr = builder.CreateStructGEP(state_type, state, beta_offset);
-	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
+	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, beta_ptr,
 							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
 							llvm::AtomicOrdering::AcquireRelease);
 
