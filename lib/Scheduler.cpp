@@ -107,7 +107,6 @@ void Scheduler::run()
 		while(tasks.size() &&
 			  (task_start = tasks.top().when) < current + step_size)
 		{
-			printf("fired %ld\n", now());
 			auto task = tasks.top();
 			tasks.pop();
 			task.state->exec_time = task_start;
