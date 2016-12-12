@@ -40,6 +40,8 @@ public:
 		return _outputs;
 	}
 
+	virtual void validate_mask();
+
 	inline uint32_t offset() { return _offset; }
 	inline void offset(uint32_t o)
 	{

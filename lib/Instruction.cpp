@@ -493,4 +493,10 @@ void Schedule::generate_prolouge(llvm::LLVMContext &context,
 	builder.CreateBr(next_block);
 }
 
+void Instruction::validate_mask()
+{
+	if(reset_mask == mask)
+		reset_mask = 0;
+}
+
 };

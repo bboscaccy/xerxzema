@@ -205,6 +205,7 @@ bool Program::check_instruction(const std::string &name,
 				{
 					inst->dependent(n.reg);
 				}
+				inst->validate_mask();
 				instruction(std::move(inst));
 				return true;
 			}
