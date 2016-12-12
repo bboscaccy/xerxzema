@@ -33,6 +33,7 @@ TEST(TestJit, TestAddConst)
 	auto cv = p->constant(42.0);
 
 	p->instruction("add", {"hi", cv.reg->name()}, {"bye"});
+	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
@@ -70,6 +71,7 @@ TEST(TestJit, TestDelay)
 	p->instruction("delay", {p->reg_data("hi")}, {p->reg_data("bye")});
 
 	p->instruction("trace", {"hi"}, {});
+	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
 	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
@@ -130,7 +132,6 @@ TEST(TestJit, TestPow)
 	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
 	ASSERT_EQ(invoker(2), 4);
 }
-/*
 
 TEST(TestJit, TestSchedulerCallback)
 {
@@ -141,15 +142,14 @@ TEST(TestJit, TestSchedulerCallback)
 	p->add_input("i1", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
 
-	auto at_time = p->constant_int(2000);
+	auto at_time = p->constant_int(2000000);
 	p->instruction("schedule_absolute",{at_time}, {p->reg_data("run_it")} );
 	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
-
+	p->instruction("trace", {p->reg_data("bye")}, {});
 	auto jit = world.create_jit();
-	jit->dump_after_codegen();
+	//jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
-	xerxzema::invoke<double>(jit.get(), "core", "test", 2.0, 3.0);
-
+	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
+	invoker(2,3);
 }
-*/

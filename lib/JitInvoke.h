@@ -2,6 +2,8 @@
 
 #include "Jit.h"
 #include "Program.h"
+#include "Scheduler.h"
+#include "World.h"
 
 namespace xerxzema
 {
@@ -56,9 +58,10 @@ public:
 
 	void run_fn()
 	{
-		uint64_t (*fn_ptr)(void*);
-		fn_ptr = (uint64_t (*)(void*))raw_fn;
-		(*fn_ptr)(state);
+		auto scheduler = jit->world()->scheduler();
+		scheduler->schedule((scheduler_callback)raw_fn, state, 0);
+		scheduler->exit_when_empty();
+		scheduler->run();
 	}
 
 private:

@@ -11,7 +11,7 @@ struct CallbackState
 {
 	bool retry;
 	uint64_t exec_time;
-	char* opaque[];
+	//char* opaque[];
 };
 
 typedef void(*scheduler_callback)(void*);
@@ -39,7 +39,7 @@ public:
 	void run();
 	void schedule(scheduler_callback callback, void* state, uint64_t when);
 	uint64_t calibrate_nanosleep();
-	void exit_when_empty();
+	inline void exit_when_empty() { exit_if_empty = true; }
 private:
 	std::priority_queue<CallbackData, std::vector<CallbackData>,
 						std::greater<CallbackData>> tasks;

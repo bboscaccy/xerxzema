@@ -71,7 +71,7 @@ void Scheduler::run()
 
 	start_clock();
 
-	uint64_t task_start = 0.5 * 1000000000;
+	uint64_t task_start = 0;
 
 	uint64_t sleep_skip = 0;
 	uint64_t late_events = 0;
@@ -107,6 +107,7 @@ void Scheduler::run()
 		while(tasks.size() &&
 			  (task_start = tasks.top().when) < current + step_size)
 		{
+			printf("fired %ld\n", now());
 			auto task = tasks.top();
 			tasks.pop();
 			task.state->exec_time = task_start;
@@ -117,6 +118,7 @@ void Scheduler::run()
 				late_events++;
 				late_total += current - task.when;
 			}
+
 		}
 
 		sys_current = now();

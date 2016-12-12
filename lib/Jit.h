@@ -43,6 +43,7 @@ public:
 	inline void dump_after_optimization() { dump_post_optimization = true; }
 	size_t get_state_size(Program* program);
 	void* get_state_offset(void* state, Program* program, int field);
+	inline World* world() { return _world; }
 
 private:
 	void create_module(Namespace* ns);
