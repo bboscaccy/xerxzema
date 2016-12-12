@@ -153,6 +153,11 @@ TEST(TestJit, TestSchedulerCallback)
 	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
 	ASSERT_EQ(invoker(2,3), 5);
 
+	xerxzema::JitInvoke<void, double> inv(jit.get(), p);
+	inv(2.0);
+
+	xerxzema::JitInvoke<void, void*> inv2(jit.get(), p);
+	inv2();
 	//TODO suppress input variable activations on re-runs when they don't
 	//change at all (scheduler based ones)
 }
