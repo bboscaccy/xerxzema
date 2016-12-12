@@ -148,8 +148,11 @@ TEST(TestJit, TestSchedulerCallback)
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
 	p->instruction("trace", {p->reg_data("bye")}, {});
 	auto jit = world.create_jit();
-	//jit->dump_after_codegen();
+	jit->dump_after_optimization();
 	jit->compile_namespace(world.get_namespace("core"));
 	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
 	ASSERT_EQ(invoker(2,3), 5);
+
+	//TODO suppress input variable activations on re-runs when they don't
+	//change at all (scheduler based ones)
 }
