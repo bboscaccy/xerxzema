@@ -56,6 +56,6 @@ TEST(TestNamespace, TestDefaultProgram)
 	ASSERT_EQ(prog->program_name(), "<default>");
 
 	auto jit = world.create_jit();
-	jit->dump_after_codegen();
 	jit->compile_namespace(core);
+	ASSERT_EQ(prog->symbol_name(), "core.<default>");
 }

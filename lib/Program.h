@@ -76,6 +76,7 @@ public:
 		return instructions;
 	}
 
+	std::string symbol_name();
 	llvm::Value* create_closure(Register* reg, bool reinvoke,
 								llvm::LLVMContext& context, llvm::Module* module);
 private:

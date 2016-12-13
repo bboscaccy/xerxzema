@@ -26,6 +26,11 @@ void Program::add_input(const std::string &name, xerxzema::Type *type)
 
 }
 
+std::string Program::symbol_name()
+{
+	return parent->full_name() + "." + _name;
+}
+
 void Program::add_output(const std::string &name, xerxzema::Type *type)
 {
 	auto r = std::make_unique<Register>(name);
