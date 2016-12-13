@@ -39,7 +39,8 @@ TEST(TestInstructionDef, TestCreation)
 {
 	xerxzema::World world;
 	auto core = world.get_namespace("core");
-	auto fake_def = xerxzema::BasicDefinition<xerxzema::Instruction>("foobar", {"unit"}, {"real"});
+	auto fake_def = xerxzema::BasicDefinition<xerxzema::Instruction>
+		("foobar", {"unit"}, {"real"});
 	auto v = fake_def.input_types(core);
 	ASSERT_EQ(v[0], core->type("unit"));
 	auto v1 = fake_def.output_types(core);
