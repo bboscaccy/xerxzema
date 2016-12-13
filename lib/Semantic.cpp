@@ -11,13 +11,16 @@ HandleTopLevelExpression::HandleTopLevelExpression(Namespace* n) : ns(n)
 
 void HandleTopLevelExpression::handle_default(xerxzema::Expression *e)
 {
-	//TODO flag this as invalid
-	valid = false;
+	HandleStatement default_handler(ns->get_default_program(), e);
+	default_handler.process();
+	valid = default_handler.is_valid();
 }
 
 void HandleTopLevelExpression::visit(xerxzema::CodeDefinition *e)
 {
-	valid = true;
+	HandleCodeDefinitionSignature handler(ns, e);
+	handler.process();
+	valid = handler.is_valid();
 }
 
 HandleCodeDefinitionSignature::HandleCodeDefinitionSignature(Namespace* n, CodeDefinition* d) :
