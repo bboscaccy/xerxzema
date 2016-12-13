@@ -17,10 +17,11 @@ Namespace::~Namespace()
 {
 }
 
+
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	//create required globals
-    scheduler = new llvm::GlobalVariable(*module,
+	scheduler = new llvm::GlobalVariable(*module,
 										 llvm::Type::getVoidTy(context)->getPointerTo(),
 										 false,
 										 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
@@ -63,6 +64,11 @@ Program* Namespace::get_program(const std::string &name)
 		return it->second.get();
 	programs.emplace(name, std::make_unique<Program>(this, name));
 	return programs[name].get();
+}
+
+Program* Namespace::get_default_program()
+{
+	return get_program("<default>");
 }
 
 bool Namespace::is_program(const std::string &name)

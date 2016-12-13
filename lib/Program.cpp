@@ -463,6 +463,12 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	llvm::BasicBlock* op_block = nullptr;
 	llvm::BasicBlock* first_block = nullptr;
 
+	if(!instructions.size())
+	{
+		builder.CreateBr(tail_block);
+		first_block = tail_block;
+	}
+
 	int inst = 0;
 	auto it = instructions.begin();
 	while(it != instructions.end())

@@ -36,6 +36,7 @@ public:
 		return type(name) != nullptr;
 	}
 	Program* get_program(const std::string& name);
+	Program* get_default_program();
 	bool is_program(const std::string& name);
 	void codegen(llvm::Module* module, llvm::LLVMContext& context);
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);

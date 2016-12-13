@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../lib/World.h"
 #include "../lib/Instruction.h"
+#include "../lib/Jit.h"
 #include <stdio.h>
 
 TEST(TestNamespace, TestCreation)
@@ -44,4 +45,17 @@ TEST(TestInstructionDef, TestCreation)
 	auto v1 = fake_def.output_types(core);
 	ASSERT_EQ(v1[0], core->type("real"));
 
+}
+
+TEST(TestNamespace, TestDefaultProgram)
+{
+	xerxzema::World world;
+	auto core = world.get_namespace("core");
+
+	auto prog = core->get_default_program();
+	ASSERT_EQ(prog->program_name(), "<default>");
+
+	auto jit = world.create_jit();
+	jit->dump_after_codegen();
+	jit->compile_namespace(core);
 }
