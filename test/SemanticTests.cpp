@@ -271,3 +271,23 @@ TEST(TestSemantic, TestBadSampleExpr)
 	ASSERT_EQ(stmt.count(), 1);
 	ASSERT_EQ(sig.program()->instruction_listing().size(), 2);
 }
+
+TEST(TestSemantic, DefaultHandlerTest)
+{
+	std::stringstream ss;
+	ss << "2.0 + x -> y;" \
+		  "3.0 -> x;";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleTopLevelExpression sema(ns);
+	expr->accept(sema);
+
+	auto p = ns->get_default_program();
+	ASSERT_EQ(1, p->instruction_listing().size());
+
+}
