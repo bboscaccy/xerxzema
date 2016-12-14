@@ -3,6 +3,7 @@
 #include "../lib/Instruction.h"
 #include "../lib/Diagnostics.h"
 #include "../lib/JitInvoke.h"
+#include "../lib/Session.h"
 #include <stdio.h>
 #include <chrono>
 #include <thread>
@@ -155,4 +156,15 @@ TEST(TestJit, TestSchedulerCallback)
 
 	//TODO suppress input variable activations on re-runs when they don't
 	//change at all (scheduler based ones)
+}
+
+TEST(TestJit, TestSession)
+{
+	xerxzema::World world;
+	world.scheduler()->run_async();
+	xerxzema::Session session(&world);
+	session.eval("12.0 + 0.0 -> x; trace(x);");
+	world.scheduler()->shutdown();
+	world.scheduler()->wait();
+
 }
