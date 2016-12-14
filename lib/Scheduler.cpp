@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <algorithm>
+#include <pthread.h>
 
 namespace xerxzema
 {
@@ -46,12 +47,33 @@ uint64_t now()
 
 Scheduler::Scheduler() : exit_if_empty(false)
 {
-
+	running.store(true);
 }
 
 void Scheduler::schedule(scheduler_callback callback, void* state, uint64_t when)
 {
 	tasks.push(CallbackData{(CallbackState*)state, callback, when});
+}
+
+static void scheduler_entry(Scheduler* s)
+{
+	s->run();
+}
+
+void Scheduler::run_async()
+{
+	running.store(true);
+	main_thread = std::thread(scheduler_entry, this);
+}
+
+void Scheduler::shutdown()
+{
+	running.store(false);
+}
+
+void Scheduler::wait()
+{
+	main_thread.join();
 }
 
 void Scheduler::run()
@@ -79,7 +101,7 @@ void Scheduler::run()
 	uint64_t total_events = 0;
 	double late_total = 0;
 
-	while(true)
+	while(running.load())
 	{
 		if(!tasks.size() && exit_if_empty)
 			break;

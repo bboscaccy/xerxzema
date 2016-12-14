@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <queue>
 #include <algorithm>
+#include <thread>
+#include <atomic>
 
 namespace xerxzema
 {
@@ -37,6 +39,9 @@ class Scheduler
 public:
 	Scheduler();
 	void run();
+	void run_async();
+	void wait();
+	void shutdown();
 	void schedule(scheduler_callback callback, void* state, uint64_t when);
 	uint64_t calibrate_nanosleep();
 	inline void exit_when_empty() { exit_if_empty = true; }
@@ -44,6 +49,8 @@ private:
 	std::priority_queue<CallbackData, std::vector<CallbackData>,
 						std::greater<CallbackData>> tasks;
 	bool exit_if_empty;
+	std::thread main_thread;
+	std::atomic<bool> running;
 };
 
 uint64_t now();

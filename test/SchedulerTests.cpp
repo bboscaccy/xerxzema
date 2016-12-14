@@ -14,3 +14,18 @@ TEST(TestScheduler, TestSingleInitSingle)
 	world.scheduler()->run();
 }
 
+TEST(TestScheduler, TestInitMulti)
+{
+	xerxzema::World world;
+	world.scheduler()->exit_when_empty();
+	world.scheduler()->run_async();
+	world.scheduler()->wait();
+}
+
+TEST(TestScheduler, TestInitMultiSignalLater)
+{
+	xerxzema::World world;
+	world.scheduler()->run_async();
+	world.scheduler()->shutdown();
+	world.scheduler()->wait();
+}
