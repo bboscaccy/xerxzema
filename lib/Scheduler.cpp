@@ -91,6 +91,17 @@ CallbackData Scheduler::pop_task()
 	return cb;
 }
 
+/* uint64_t Scheduler::now()
+{
+this needs to be the wall-clock difference between begin
+and clock_gettime(...)
+however this may be called from a different thread and we
+do NOT want any locking on this thing whatsoever
+so we may need to set up 2 atomic variables
+one for seconds and one for nano-seconds and use that as a feeder/loader
+into all the time calls...
+}*/
+
 const CallbackData* Scheduler::peek_task()
 {
 	std::lock_guard<std::mutex> guard(task_lock);
