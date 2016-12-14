@@ -57,6 +57,7 @@ private:
 	std::thread main_thread;
 	std::atomic<bool> running;
 	std::mutex task_lock;
+
 };
 
 uint64_t now();

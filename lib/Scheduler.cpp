@@ -28,8 +28,8 @@ void start_clock()
 	clock_gettime(CLOCK_REALTIME, &begin);
 }
 
-
-
+//TODO move this to world and allow this to be changed to a different system time
+//provider...
 uint64_t now()
 {
 	static uint64_t counter = 0;
@@ -101,7 +101,7 @@ const CallbackData* Scheduler::peek_task()
 }
 void Scheduler::run()
 {
-
+	//TODO clean this up a bit so we don't have global begins and goofy names...
 	struct timespec begin;
 	struct timespec next;
 	struct timespec remaining;
