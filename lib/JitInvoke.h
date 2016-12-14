@@ -101,7 +101,8 @@ public:
 		auto scheduler = jit->world()->scheduler();
 		scheduler->schedule((scheduler_callback)raw_fn, state, 0);
 		scheduler->exit_when_empty();
-		scheduler->run();
+		scheduler->run_async();
+		scheduler->wait();
 	}
 
 private:
