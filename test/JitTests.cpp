@@ -10,7 +10,7 @@
 TEST(TestJit, TestAdd)
 {
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
@@ -18,14 +18,14 @@ TEST(TestJit, TestAdd)
 	p->instruction("add", {"hi", "hi"}, {"bye"});
 	jit->compile_namespace(world.get_namespace("core"));
 
-	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2), 4.0);
 }
 
 TEST(TestJit, TestAddConst)
 {
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
@@ -36,7 +36,7 @@ TEST(TestJit, TestAddConst)
 	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
-	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2), 44.0);
 
 }
@@ -44,7 +44,7 @@ TEST(TestJit, TestAddConst)
 TEST(TestJit, TestAddChainConst)
 {
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
@@ -54,7 +54,7 @@ TEST(TestJit, TestAddChainConst)
 	p->instruction("add", {p->reg_data("bar"), temp}, {p->reg_data("bye")});
 
 	jit->compile_namespace(world.get_namespace("core"));
-	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2), 86.0);
 
 }
@@ -63,7 +63,7 @@ TEST(TestJit, TestDelay)
 {
 
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
@@ -74,7 +74,7 @@ TEST(TestJit, TestDelay)
 	jit->dump_after_codegen();
 	jit->compile_namespace(world.get_namespace("core"));
 
-	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double> invoker(jit, p);
 	invoker(0);
 	for(int i = 1; i < 20; i++)
 	{
@@ -86,7 +86,7 @@ TEST(TestJit, TestWhen)
 {
 
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("i0", world.get_namespace("core")->type("real"));
 	p->add_input("i1", world.get_namespace("core")->type("real"));
@@ -109,7 +109,7 @@ TEST(TestJit, TestWhen)
 
 	jit->compile_namespace(world.get_namespace("core"));
 
-	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(1,2), 3);
 	ASSERT_EQ(invoker(2,1), 2);
 	ASSERT_EQ(invoker(2,1), 2);
@@ -119,7 +119,7 @@ TEST(TestJit, TestWhen)
 TEST(TestJit, TestPow)
 {
 	xerxzema::World world;
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	auto p = world.get_namespace("core")->get_program("test");
 	p->add_input("hi", world.get_namespace("core")->type("real"));
 	p->add_output("bye", world.get_namespace("core")->type("real"));
@@ -129,7 +129,7 @@ TEST(TestJit, TestPow)
 
 	jit->compile_namespace(world.get_namespace("core"));
 
-	xerxzema::JitInvoke<double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2), 4);
 }
 
@@ -147,10 +147,10 @@ TEST(TestJit, TestSchedulerCallback)
 	p->instruction("add", {p->reg_data("i0"), p->reg_data("i1")},
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
 	p->instruction("trace", {p->reg_data("bye")}, {});
-	auto jit = world.create_jit();
+	auto jit = world.jit();
 	jit->dump_after_optimization();
 	jit->compile_namespace(world.get_namespace("core"));
-	xerxzema::JitInvoke<double, double, double> invoker(jit.get(), p);
+	xerxzema::JitInvoke<double, double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2,3), 5);
 
 	//TODO suppress input variable activations on re-runs when they don't

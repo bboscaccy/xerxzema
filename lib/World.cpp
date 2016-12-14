@@ -10,9 +10,11 @@ World::World() : _scheduler(std::make_unique<Scheduler>())
 	create_core_namespace();
 }
 
-std::unique_ptr<Jit> World::create_jit()
+Jit* World::jit()
 {
-	return std::make_unique<Jit>(this);
+	if(!jit_instance)
+		jit_instance = std::make_unique<Jit>(this);
+	return jit_instance.get();
 }
 
 Namespace* World::get_namespace(const std::string& name)
