@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 namespace xerxzema
 {
@@ -46,11 +47,16 @@ public:
 	uint64_t calibrate_nanosleep();
 	inline void exit_when_empty() { exit_if_empty = true; }
 private:
+	size_t task_count();
+	CallbackData pop_task();
+	const CallbackData* peek_task();
+
 	std::priority_queue<CallbackData, std::vector<CallbackData>,
 						std::greater<CallbackData>> tasks;
 	bool exit_if_empty;
 	std::thread main_thread;
 	std::atomic<bool> running;
+	std::mutex task_lock;
 };
 
 uint64_t now();

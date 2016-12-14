@@ -52,6 +52,7 @@ Scheduler::Scheduler() : exit_if_empty(false)
 
 void Scheduler::schedule(scheduler_callback callback, void* state, uint64_t when)
 {
+	std::lock_guard<std::mutex> guard(task_lock);
 	tasks.push(CallbackData{(CallbackState*)state, callback, when});
 }
 
@@ -76,6 +77,28 @@ void Scheduler::wait()
 	main_thread.join();
 }
 
+size_t Scheduler::task_count()
+{
+	std::lock_guard<std::mutex> guard(task_lock);
+	return tasks.size();
+}
+
+CallbackData Scheduler::pop_task()
+{
+	std::lock_guard<std::mutex> guard(task_lock);
+	auto cb = tasks.top();
+	tasks.pop();
+	return cb;
+}
+
+const CallbackData* Scheduler::peek_task()
+{
+	std::lock_guard<std::mutex> guard(task_lock);
+	if(!tasks.size())
+		return nullptr;
+	else
+		return &tasks.top();
+}
 void Scheduler::run()
 {
 
@@ -103,7 +126,7 @@ void Scheduler::run()
 
 	while(running.load())
 	{
-		if(!tasks.size() && exit_if_empty)
+		if(!task_count() && exit_if_empty)
 			break;
 		//in here we call now() and get the authoritative time
 		//if now() hasn't changed since last now()
@@ -125,12 +148,10 @@ void Scheduler::run()
 			current += d.tv_nsec;
 		}
 
-		//TODO we will need some locks here. soon.
-		while(tasks.size() &&
-			  (task_start = tasks.top().when) < current + step_size)
+		const CallbackData* next_task;
+		while((next_task = peek_task()) && next_task->when < current + step_size)
 		{
-			auto task = tasks.top();
-			tasks.pop();
+			auto task = pop_task();
 			task.state->exec_time = task_start;
 			(*task.fn)(task.state);
 			total_events++;
