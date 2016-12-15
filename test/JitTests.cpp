@@ -149,7 +149,6 @@ TEST(TestJit, TestSchedulerCallback)
 				   {p->reg_data("bye")}, {p->reg_data("run_it")});
 	p->instruction("trace", {p->reg_data("bye")}, {});
 	auto jit = world.jit();
-	jit->dump_after_optimization();
 	jit->compile_namespace(world.get_namespace("core"));
 	xerxzema::JitInvoke<double, double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(2,3), 5);

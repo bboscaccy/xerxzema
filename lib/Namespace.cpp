@@ -1,6 +1,7 @@
 #include "Namespace.h"
 #include "World.h"
 #include "llvm/IR/IRBuilder.h"
+#include "Diagnostics.h"
 
 namespace xerxzema
 {

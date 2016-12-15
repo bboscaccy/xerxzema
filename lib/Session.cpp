@@ -26,8 +26,9 @@ void Session::eval(const std::string& str, const std::string& ns)
 		HandleTopLevelExpression sema(parent);
 		expr->accept(sema);
 	}
+
 	auto program = parent->get_default_program();
-	world->jit()->compile_namespace(parent);
+    world->jit()->compile_namespace(parent);
 
 	//start the scheduler if it's not running?
 	//the malloc'd buffer will change size...
