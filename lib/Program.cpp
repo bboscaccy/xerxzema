@@ -240,7 +240,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	{
 		if(!r->type())
 		{
-			printf("%s is undefined\n", r->name().c_str());
+			emit_error("local symbol (" + r->name() + ") is undefined.");
 		}
 
 		if(r->type()->name() != "unit")

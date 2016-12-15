@@ -9,6 +9,7 @@ void emit_error(const std::string& msg)
 	std::cout << "Error: ";
 	std::cout << AnsiWhite << AnsiBright << msg << '\n';
 	std::cout << AnsiReset;
+	std::cout.flush();
 }
 
 void emit_warn(const std::string& msg)
@@ -17,6 +18,7 @@ void emit_warn(const std::string& msg)
 	std::cout << "Warning: ";
 	std::cout << AnsiWhite << AnsiBright << msg << '\n';
 	std::cout << AnsiReset;
+	std::cout.flush();
 }
 
 void emit_info(const std::string& msg)
@@ -25,6 +27,7 @@ void emit_info(const std::string& msg)
 	std::cout << "Info: ";
 	std::cout << AnsiWhite << AnsiBright << msg << '\n';
 	std::cout << AnsiReset;
+	std::cout.flush();
 }
 
 void emit_debug(const std::string& msg)
@@ -33,6 +36,7 @@ void emit_debug(const std::string& msg)
 	std::cout << "Debug: ";
 	std::cout << AnsiWhite << AnsiBright << msg << '\n';
 	std::cout << AnsiReset;
+	std::cout.flush();
 }
 
 void emit_error(Token* token, const std::string& msg)
@@ -55,6 +59,7 @@ void emit_error(Token* token, const std::string& msg)
 		std::cout << AnsiBright << AnsiRed << "^\n";
 	}
 	std::cout << AnsiReset;
+	std::cout.flush();
 }
 
 };
