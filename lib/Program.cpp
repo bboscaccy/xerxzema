@@ -3,6 +3,9 @@
 #include "World.h"
 #include "LLVMUtils.h"
 #include "llvm/IR/IRBuilder.h"
+#include "Diagnostics.h"
+#include "Parser.h"
+
 //TODO remove input and output args from function signature
 //and have them actually be bound to state
 //for executing other functions set up something for bind in the jit invoker
@@ -221,7 +224,7 @@ bool Program::check_instruction(const std::string &name,
 		}
 		else
 		{
-			//invalid/unknown instruction
+			emit_error(source->token.get(), "Unknown call to: " + name);
 		}
 	}
 	return false;
