@@ -96,6 +96,7 @@ public:
 	void visit(DivExpression* e);
 	void visit(GroupExpression* e);
 	void visit(BindExpression* e);
+	void visit(CallExpression* e);
 	void handle_default(Expression* e);
 
 	inline std::vector<RegisterData> results() { return result; }

@@ -292,6 +292,20 @@ void HandleExpression::visit(xerxzema::BindExpression *e)
 	lhs.process();
 }
 
+void HandleExpression::visit(xerxzema::CallExpression *e)
+{
+	if(!e->target->is_a<SymbolExpression>())
+	{
+		emit_error(e->token.get(), "I can handle this type of call");
+		valid = false;
+		return;
+	}
+	auto target = e->target->as_a<SymbolExpression>()->token->data;
+	HandleExpression args(program, e->args.get(), {}, dependencies);
+	args.process();
+	program->instruction(target, args.result, result, dependencies, e);
+}
+
 void HandleExpression::visit(xerxzema::GroupExpression *e)
 {
 	HandleExpression child(program, e->expr.get(), {}, dependencies);
