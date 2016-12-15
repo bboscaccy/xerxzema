@@ -1,6 +1,8 @@
 #include "Semantic.h"
 #include "Diagnostics.h"
 #include "StlUtils.h"
+#include "World.h"
+#include "Namespace.h"
 
 namespace xerxzema
 {
@@ -225,7 +227,31 @@ void HandleExpression::visit(xerxzema::SymbolExpression *e)
 void HandleExpression::visit(xerxzema::RealExpression *e)
 {
 	auto value = atof(e->token->data.c_str());
-	result.push_back(program->constant(value));
+	if(result.size() == 0)
+	{
+		result.push_back(program->constant(value));
+	}
+	else
+	{
+		auto inst = std::make_unique<ValueReal>(value);
+		inst->dependent(program->reg("head"));
+		for(auto& r: dependencies)
+			inst->dependent(r.reg);
+		inst->output(result[0].reg);
+		program->instruction(std::move(inst));
+		if(!result[0].reg->type())
+		{
+			result[0].reg->type(program->name_space()->world()
+								->get_namespace("core")->type("real"));
+		}
+		else
+		{
+			//else check error and abort
+			//TODO maybe move this somewhere else this feels
+			//A bit low level for right here...
+		}
+	}
+
 }
 
 void HandleExpression::visit(xerxzema::ArgListExpression *e)
