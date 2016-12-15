@@ -79,6 +79,8 @@ public:
 	std::string symbol_name();
 	llvm::Value* create_closure(Register* reg, bool reinvoke,
 								llvm::LLVMContext& context, llvm::Module* module);
+	inline bool is_valid() const { return valid; }
+
 private:
 	bool check_instruction(const std::string& name,
 						   const std::vector<RegisterData>& inputs,
@@ -106,6 +108,7 @@ private:
 	int beta_offset;
 	bool is_trivial;
 	llvm::Value* program_state;
+	bool valid;
 };
 
 

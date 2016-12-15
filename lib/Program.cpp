@@ -14,7 +14,7 @@
 namespace xerxzema
 {
 Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name),
-														  is_trivial(false)
+														  is_trivial(false), valid(true)
 {
 	reg("head");
 	reg("head")->type(p->world()->get_namespace("core")->type("unit"));
@@ -241,6 +241,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		if(!r->type())
 		{
 			emit_error("local symbol (" + r->name() + ") is undefined.");
+			return nullptr;
 		}
 
 		if(r->type()->name() != "unit")
@@ -453,6 +454,12 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
+	if(!ftype)
+	{
+		emit_error("aborting codegen for " + name_space()->full_name() + "." + _name);
+		valid = false;
+		return;
+	}
 	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									 _name , module);

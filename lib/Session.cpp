@@ -28,7 +28,10 @@ void Session::eval(const std::string& str, const std::string& ns)
 	}
 
 	auto program = parent->get_default_program();
-    world->jit()->compile_namespace(parent);
+	world->jit()->compile_namespace(parent);
+
+	if(!program->is_valid())
+		return;
 
 	//start the scheduler if it's not running?
 	//the malloc'd buffer will change size...
