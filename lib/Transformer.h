@@ -13,12 +13,19 @@ struct RegMapping
 	Register* next;
 };
 
+struct InstructionMapping
+{
+	Instruction* prev;
+	Instruction* next;
+};
+
 class Transformer
 {
 public:
 	Transformer(Program* prev, Program* next);
 
 	void parse_registers();
+	void parse_instructions();
 
 	inline const std::vector<Register*>& get_new_registers()
 	{
@@ -35,6 +42,25 @@ public:
 		return type_change_registers;
 	}
 
+	inline const std::vector<RegMapping>& get_reusable_registers()
+	{
+		return reusable_registers;
+	}
+
+	inline const std::vector<Instruction*> get_new_instructions()
+	{
+		return new_instructions;
+	}
+
+	inline const std::vector<Instruction*> get_deleted_instructions()
+	{
+		return new_instructions;
+	}
+
+	inline const std::vector<InstructionMapping> get_reusable_instructions()
+	{
+		return reusable_instructions;
+	}
 
 private:
 	void find_new_registers();
@@ -46,6 +72,9 @@ private:
 	std::vector<Register*> deleted_registers;
 	std::vector<RegMapping> type_change_registers;
 	std::vector<RegMapping> reusable_registers;
+	std::vector<Instruction*> new_instructions;
+	std::vector<Instruction*> deleted_instructions;
+	std::vector<InstructionMapping> reusable_instructions;
 
 };
 

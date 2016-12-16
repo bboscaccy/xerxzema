@@ -57,4 +57,28 @@ void Transformer::parse_registers()
 	find_type_change_registers();
 }
 
+void Transformer::parse_instructions()
+{
+	std::map<std::string, Instruction*> input_set;
+	for(auto& inst: next->instruction_listing())
+	{
+		input_set[inst->description()] = inst.get();
+	}
+	for(auto& inst: prev->instruction_listing())
+	{
+		auto it = input_set.find(inst->description());
+		if(it == input_set.end())
+			deleted_instructions.push_back(inst.get());
+		else
+		{
+			reusable_instructions.push_back(InstructionMapping{inst.get(), it->second});
+			input_set.erase(it);
+		}
+	}
+	for(auto& it: input_set)
+	{
+		new_instructions.push_back(it.second);
+	}
+}
+
 };
