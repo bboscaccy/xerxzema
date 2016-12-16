@@ -1,8 +1,29 @@
 #include "Parser.h"
 #include "Diagnostics.h"
+#include "Semantic.h"
+#include <sstream>
 
 namespace xerxzema
 {
+
+void parse_input(std::istream& input, Namespace* ns)
+{
+	Lexer lexer(input);
+
+	while(lexer.peek()->type != TokenType::Eof)
+	{
+		auto expr = expression(lexer);
+		HandleTopLevelExpression sema(ns);
+		expr->accept(sema);
+	}
+}
+
+void parse_input(const std::string& input, Namespace* ns)
+{
+	std::stringstream ss;
+	ss << input;
+	parse_input(ss, ns);
+}
 
 
 std::unique_ptr<Expression> expression(Lexer& lexer, int right_bind)
