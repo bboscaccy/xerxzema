@@ -494,7 +494,8 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			condition = llvm::BasicBlock::Create(context, "", function);
+			auto cond_block_name = (*it)->name() + "_cond";
+			condition = llvm::BasicBlock::Create(context, cond_block_name, function);
 			first_block = condition;
 			builder.CreateBr(condition);
 		}
@@ -506,7 +507,8 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		{
 			next_condition = llvm::BasicBlock::Create(context, "", function);
 		}
-		op_block = llvm::BasicBlock::Create(context, "", function);
+		auto op_block_name = (*it)->name() + "_op";
+		op_block = llvm::BasicBlock::Create(context, op_block_name, function);
 		(*it)->generate_check(context, builder, this, condition,op_block, next_condition);
 		builder.SetInsertPoint(op_block);
 		(*it)->generate_operation(context, builder, this);
