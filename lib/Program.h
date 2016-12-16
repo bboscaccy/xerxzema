@@ -78,6 +78,11 @@ public:
 		return instructions;
 	}
 
+	inline const std::map<std::string, std::unique_ptr<Register>>& register_listing()
+	{
+		return registers;
+	}
+
 	std::string symbol_name();
 	llvm::Value* create_closure(Register* reg, bool reinvoke,
 								llvm::LLVMContext& context, llvm::Module* module);
