@@ -29,6 +29,8 @@ struct DeferredInstruction
 	Expression* source;
 };
 
+//TODO figure out a decent way of doing diffs from an old version to a new version
+//then start updating the global symbol resolver in the runtime...
 class Program
 {
 public:

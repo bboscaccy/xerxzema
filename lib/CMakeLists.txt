@@ -15,5 +15,6 @@ add_library(xerxzema SHARED
   Scheduler.cpp
   RT.cpp
   Session.cpp
+  Transformer.cpp
   )
 target_link_libraries(xerxzema ${llvm_libs})

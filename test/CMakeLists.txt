@@ -7,6 +7,7 @@ add_executable(unittest
   SemanticTests.cpp
   DiagnosticTests.cpp
   SchedulerTests.cpp
+  TransformerTests.cpp
   )
 
 include_directories(../lib)
