@@ -47,6 +47,7 @@ std::string Instruction::description()
 {
 	std::stringstream ss;
 	ss << name() << "( ";
+	ss << constant_description();
 	for(auto& reg:_inputs)
 	{
 		ss << reg->name();

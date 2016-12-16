@@ -27,6 +27,7 @@ public:
 	void sample(Register* reg);
 	void oneshot_dependent(Register* reg);
 	virtual inline std::string name() { return "undef"; }
+	virtual inline std::string constant_description() { return ""; }
 	std::string description();
 	inline std::vector<Register*>& inputs()
 	{
@@ -109,6 +110,7 @@ public:
 							Program* program);
 
 	inline std::string name() { return "value_real";}
+	inline std::string constant_description() { return std::to_string(value); }
 private:
 	double value;
 };
@@ -120,6 +122,7 @@ public:
 	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
 							Program* program);
 	inline std::string name() { return "value_int";}
+	inline std::string constant_description() { return std::to_string(value); }
 private:
 	int64_t value;
 };
