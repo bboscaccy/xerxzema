@@ -35,10 +35,24 @@ void Transformer::find_deleted_registers()
 	}
 }
 
+void Transformer::find_type_change_registers()
+{
+	for(auto& reg_pair: prev->register_listing())
+	{
+		auto it = next->register_listing().find(reg_pair.first);
+		if(it != next->register_listing().end())
+		{
+			if(it->second->type() != reg_pair.second->type())
+				type_change_registers.push_back(it->second.get());
+		}
+	}
+}
+
 void Transformer::parse_registers()
 {
 	find_new_registers();
 	find_deleted_registers();
+	find_type_change_registers();
 }
 
 };
