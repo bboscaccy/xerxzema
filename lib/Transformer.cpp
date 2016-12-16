@@ -43,7 +43,9 @@ void Transformer::find_type_change_registers()
 		if(it != next->register_listing().end())
 		{
 			if(it->second->type() != reg_pair.second->type())
-				type_change_registers.push_back(it->second.get());
+				type_change_registers.push_back(RegMapping{reg_pair.second.get(), it->second.get()});
+			else
+				reusable_registers.push_back(RegMapping{reg_pair.second.get(), it->second.get()});
 		}
 	}
 }

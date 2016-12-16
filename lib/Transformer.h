@@ -7,6 +7,12 @@
 namespace xerxzema
 {
 
+struct RegMapping
+{
+	Register* prev;
+	Register* next;
+};
+
 class Transformer
 {
 public:
@@ -24,7 +30,7 @@ public:
 		return deleted_registers;
 	}
 
-	inline const std::vector<Register*>& get_type_change_registers()
+	inline const std::vector<RegMapping>& get_type_change_registers()
 	{
 		return type_change_registers;
 	}
@@ -38,7 +44,8 @@ private:
 	Program* next;
 	std::vector<Register*> new_registers;
 	std::vector<Register*> deleted_registers;
-	std::vector<Register*> type_change_registers;
+	std::vector<RegMapping> type_change_registers;
+	std::vector<RegMapping> reusable_registers;
 
 };
 
