@@ -27,6 +27,7 @@ public:
 	void sample(Register* reg);
 	void oneshot_dependent(Register* reg);
 	virtual inline std::string name() { return "undef"; }
+	std::string input_description();
 	inline std::vector<Register*>& inputs()
 	{
 		return _inputs;

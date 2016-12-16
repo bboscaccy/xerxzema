@@ -2,6 +2,7 @@
 #include "Register.h"
 #include "Program.h"
 #include "LLVMUtils.h"
+#include <sstream>
 
 namespace xerxzema
 {
@@ -41,6 +42,23 @@ void Instruction::oneshot_dependent(xerxzema::Register *reg)
 	reset_mask |= (1 << _deps.size());
 	_deps.push_back(reg);
 }
+
+std::string Instruction::input_description()
+{
+	std::stringstream ss;
+	ss << name() << "( ";
+	for(auto& reg:_inputs)
+	{
+		ss << reg->name();
+		if(reg->type())
+			ss << ':' << reg->type()->name() << ' ';
+		else
+			ss << ":null ";
+	}
+	ss << ')';
+	return ss.str();
+}
+
 
 bool Instruction::is_ugen()
 {
