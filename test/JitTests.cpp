@@ -162,7 +162,7 @@ TEST(TestJit, TestSession)
 	xerxzema::World world;
 	world.scheduler()->run_async();
 	xerxzema::Session session(&world);
-	session.eval("7.0 -> x; 6.0 -> y; x*y->z; trace(x); trace(y); trace(z);");
+	session.eval("7.0 -> x; 6.0 -> y; 2.0*x*y->z; trace(x); trace(y); trace(z);");
 	world.scheduler()->shutdown();
 	world.scheduler()->wait();
 

@@ -43,7 +43,7 @@ void Instruction::oneshot_dependent(xerxzema::Register *reg)
 	_deps.push_back(reg);
 }
 
-std::string Instruction::input_description()
+std::string Instruction::description()
 {
 	std::stringstream ss;
 	ss << name() << "( ";
@@ -55,7 +55,27 @@ std::string Instruction::input_description()
 		else
 			ss << ":null ";
 	}
-	ss << ')';
+	ss << ") -> ( ";
+	for(auto& reg:_outputs)
+	{
+		ss << reg->name();
+		if(reg->type())
+			ss << ':' << reg->type()->name() << ' ';
+		else
+			ss << ":null ";
+	}
+	ss << ") { deps: ";
+	for(auto& reg:_deps)
+	{
+		ss << reg->name();
+		if(reg->type())
+			ss << ':' << reg->type()->name() << ' ';
+		else
+			ss << ":null ";
+	}
+	ss << "}";
+	ss << " activate: " << mask;
+	ss << " reset: " << reset_mask;
 	return ss.str();
 }
 
