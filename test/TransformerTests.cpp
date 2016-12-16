@@ -127,3 +127,53 @@ TEST(TestTransformer, TestInstDiff)
 	ASSERT_EQ(trans.get_new_instructions().size(), 1);
 	ASSERT_EQ(trans.get_deleted_instructions().size(), 1);
 }
+
+
+TEST(TestTransformer, TestInstPartialReuse)
+{
+	xerxzema::World world;
+	auto ns0 = world.get_namespace("test0");
+	auto ns1 = world.get_namespace("test1");
+
+	auto p0 = "12.0 -> x; 13.0 -> y; x*y->z;";
+	auto p1 = "12.0 -> x; 10.0 -> y; x*y->z;";
+
+	xerxzema::parse_input(p0, ns0);
+	xerxzema::parse_input(p1, ns1);
+
+	auto v0 = ns0->get_default_program();
+	auto v1 = ns1->get_default_program();
+
+	xerxzema::Transformer trans(v0, v1);
+	trans.parse_registers();
+	trans.parse_instructions();
+
+	ASSERT_EQ(trans.get_new_instructions().size(), 1);
+	ASSERT_EQ(trans.get_deleted_instructions().size(), 1);
+	ASSERT_EQ(trans.get_reusable_instructions().size(), 2);
+}
+
+TEST(TestTransformer, TestInstRetValChange)
+{
+	xerxzema::World world;
+	auto ns0 = world.get_namespace("test0");
+	auto ns1 = world.get_namespace("test1");
+
+	auto p0 = "12.0 -> x; 13.0 -> y; x*y->z;";
+	auto p1 = "12.0 -> x; 10.0 -> y; x*y->q;";
+
+	xerxzema::parse_input(p0, ns0);
+	xerxzema::parse_input(p1, ns1);
+
+	auto v0 = ns0->get_default_program();
+	auto v1 = ns1->get_default_program();
+
+	xerxzema::Transformer trans(v0, v1);
+	trans.parse_registers();
+	trans.parse_instructions();
+
+	ASSERT_EQ(trans.get_new_instructions().size(), 1);
+	ASSERT_EQ(trans.get_deleted_instructions().size(), 1);
+	ASSERT_EQ(trans.get_reusable_instructions().size(), 2);
+	ASSERT_EQ(trans.get_new_registers().size(), 1);
+}

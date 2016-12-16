@@ -29,6 +29,7 @@ public:
 	virtual inline std::string name() { return "undef"; }
 	virtual inline std::string constant_description() { return ""; }
 	std::string description();
+	std::string diff_description();
 	inline std::vector<Register*>& inputs()
 	{
 		return _inputs;

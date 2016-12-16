@@ -59,14 +59,14 @@ void Transformer::parse_registers()
 
 void Transformer::parse_instructions()
 {
-	std::map<std::string, Instruction*> input_set;
+	std::multimap<std::string, Instruction*> input_set;
 	for(auto& inst: next->instruction_listing())
 	{
-		input_set[inst->description()] = inst.get();
+		input_set.insert({inst->diff_description(), inst.get()});
 	}
 	for(auto& inst: prev->instruction_listing())
 	{
-		auto it = input_set.find(inst->description());
+		auto it = input_set.find(inst->diff_description());
 		if(it == input_set.end())
 			deleted_instructions.push_back(inst.get());
 		else

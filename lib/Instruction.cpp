@@ -46,8 +46,8 @@ void Instruction::oneshot_dependent(xerxzema::Register *reg)
 std::string Instruction::description()
 {
 	std::stringstream ss;
-	ss << name() << "( ";
-	ss << constant_description();
+	ss << name() << "(";
+	ss << constant_description() << " ";
 	for(auto& reg:_inputs)
 	{
 		ss << reg->name();
@@ -80,6 +80,54 @@ std::string Instruction::description()
 	return ss.str();
 }
 
+std::string Instruction::diff_description()
+{
+	bool include_outputs = false;
+	std::stringstream ss;
+	ss << name() << "(";
+	auto const_desc = constant_description();
+	if(const_desc.size() > 0)
+	{
+		ss << " " << constant_description() << " ";
+		include_outputs = true;
+	}
+	for(auto& reg:_inputs)
+	{
+		ss << reg->name();
+		if(reg->type())
+			ss << ':' << reg->type()->name() << ' ';
+		else
+			ss << ":null ";
+	}
+	ss << ") -> ( ";
+
+	if(include_outputs)
+	{
+		for(auto& reg:_outputs)
+		{
+			ss << reg->name();
+			if(reg->type())
+				ss << ':' << reg->type()->name() << ' ';
+			else
+				ss << ":null ";
+		}
+	}
+	else
+	{
+		ss << "... ";
+	}
+	ss << ") { deps: ";
+	for(auto& reg:_deps)
+	{
+		ss << reg->name();
+		if(reg->type())
+			ss << ':' << reg->type()->name() << ' ';
+		else
+			ss << ":null ";
+	}
+	ss << "}";
+	return ss.str();
+}
 
 bool Instruction::is_ugen()
 {
