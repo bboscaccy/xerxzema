@@ -79,4 +79,5 @@ TEST(TestTransformer, TestRegDiffType)
 
 	xerxzema::Transformer trans(v0, v1);
 	trans.parse_registers();
-	ASSERT_EQ(trans.get_type_change_registers().size(), 1);}
+	ASSERT_EQ(trans.get_type_change_registers().size(), 1);
+}

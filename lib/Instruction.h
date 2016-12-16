@@ -10,9 +10,10 @@
 namespace xerxzema
 {
 
-#define DECL_INST(X) class X : public Instruction { \
+#define DECL_INST(X, N) class X : public Instruction {					\
 	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder, \
-							Program* program); };
+							Program* program);\
+	inline std::string name() { return N; } };
 
 class Register;
 class Program;
@@ -25,6 +26,7 @@ public:
 	void dependent(Register* reg);
 	void sample(Register* reg);
 	void oneshot_dependent(Register* reg);
+	virtual inline std::string name() { return "undef"; }
 	inline std::vector<Register*>& inputs()
 	{
 		return _inputs;
@@ -104,6 +106,8 @@ public:
 	ValueReal(double v);
 	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
 							Program* program);
+
+	inline std::string name() { return "value_real";}
 private:
 	double value;
 };
@@ -114,6 +118,7 @@ public:
 	ValueInt(int64_t v);
 	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
 							Program* program);
+	inline std::string name() { return "value_int";}
 private:
 	int64_t value;
 };
@@ -122,6 +127,7 @@ class Counter : public Instruction
 {
 public:
 	inline bool is_ugen() { return true; }
+	inline std::string name() { return "counter";}
 
 };
 
@@ -136,6 +142,7 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "delay";}
 };
 
 //input[0] is a bool, input[1] is any, output[0] == input[1]
@@ -152,6 +159,7 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "when";}
 };
 
 class Cond : public Instruction
@@ -164,6 +172,7 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "cond";}
 };
 
 class Bang : public Instruction
@@ -172,6 +181,7 @@ public:
 	void generate_operation(llvm::LLVMContext& context,
 							llvm::IRBuilder<> &builder,
 							Program* program);
+	inline std::string name() { return "bang";}
 };
 
 class Trace : public Instruction
@@ -184,6 +194,7 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "trace";}
 };
 
 class Schedule : public Instruction
@@ -196,6 +207,7 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "schedule";}
 };
 
 class Merge : public Instruction
@@ -215,19 +227,20 @@ public:
 						   llvm::IRBuilder<> &builder,
 						   Program* program,
 						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "merge";}
 };
 
 
-DECL_INST(AddReal)
-DECL_INST(SubReal)
-DECL_INST(MulReal)
-DECL_INST(DivReal)
-DECL_INST(PowReal)
-DECL_INST(EqReal)
-DECL_INST(NeReal)
-DECL_INST(LtReal)
-DECL_INST(LeReal)
-DECL_INST(GtReal)
-DECL_INST(GeReal)
+DECL_INST(AddReal, "add")
+DECL_INST(SubReal, "sub")
+DECL_INST(MulReal, "mul")
+DECL_INST(DivReal, "div")
+DECL_INST(PowReal, "pow")
+DECL_INST(EqReal, "eq")
+DECL_INST(NeReal, "ne")
+DECL_INST(LtReal, "lt")
+DECL_INST(LeReal, "le")
+DECL_INST(GtReal, "gt")
+DECL_INST(GeReal, "ge")
 
 };
