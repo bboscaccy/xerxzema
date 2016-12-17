@@ -1,7 +1,8 @@
 #include "Transformer.h"
 #include <algorithm>
 #include <map>
-
+#include "LLVMUtils.h"
+#include <iostream>
 
 namespace xerxzema
 {
@@ -79,6 +80,50 @@ void Transformer::parse_instructions()
 	{
 		new_instructions.push_back(it.second);
 	}
+}
+
+llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
+{
+	auto prev_type = prev->state_type_value();
+	auto next_type = next->state_type_value();
+
+	std::vector<llvm::Type*> arg_types;
+	arg_types.push_back(prev_type->getPointerTo());
+	arg_types.push_back(next_type->getPointerTo());
+
+	auto transformer_type = llvm::FunctionType::get(llvm::Type::getInt64Ty(context)
+													,arg_types, false);
+
+	auto function = llvm::Function::Create(transformer_type,
+										   llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+										   next->program_name() + "@transformer",
+										   next->current_module());
+
+	auto arg_it = function->arg_begin();
+
+	auto prev_arg = &*arg_it++;
+	auto next_arg = &*arg_it++;
+
+	auto block = llvm::BasicBlock::Create(context, "entry", function);
+	llvm::IRBuilder<> builder(context);
+
+	builder.SetInsertPoint(block);
+
+	for(auto mapping: reusable_registers)
+	{
+		if(mapping.prev->offset() > 0)
+		{
+			std::cout << mapping.prev->name() << std::endl;
+			std::cout << mapping.prev->offset() << std::endl;
+			auto prev_ptr = builder.CreateStructGEP(prev_type, prev_arg, mapping.prev->offset());
+			auto next_ptr = builder.CreateStructGEP(next_type, next_arg, mapping.next->offset());
+			mapping.next->type()->copy(context, builder, next_ptr, prev_ptr);
+		}
+	}
+
+	builder.CreateRet(const_int64(context, 0));
+	next->current_module()->dump();
+	return function;
 }
 
 };

@@ -4,6 +4,9 @@
 
 #include "Program.h"
 
+#include "llvm/IR/Module.h"
+#include "llvm/IR/LLVMContext.h"
+
 namespace xerxzema
 {
 
@@ -26,6 +29,7 @@ public:
 
 	void parse_registers();
 	void parse_instructions();
+	llvm::Function* generate_transformer(llvm::LLVMContext& context);
 
 	inline const std::vector<Register*>& get_new_registers()
 	{
