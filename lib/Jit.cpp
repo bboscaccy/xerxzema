@@ -6,6 +6,20 @@
 namespace xerxzema
 {
 
+//TODO look into ObjectCache for persistantly stored ir/stuff/whatever
+//TODO IndirectStubManager allows you to create stub pointers in IR that
+//allow resolving symbols later, e.g fn0 -> trans -> fn2 -> fn3 etc...
+//if you just want to manually implement trampolines take a look at
+//https://github.com/llvm-mirror/llvm/blob/master/lib/ExecutionEngine/Orc/IndirectionUtils.cpp
+//in there make-stub function they create a function that calls a random pointer
+//with whatever address you already have in there
+//we could do something similar since we need to implement
+//transformer logic at each call
+//so then calls args become pointer-to-pointers so the transformer can
+//fixup input state args? kind-of... but does that get into fights with the
+//scheduler callbacks? idk...
+
+
 Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false)
 {
 	llvm::InitializeNativeTarget();
