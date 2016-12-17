@@ -39,6 +39,13 @@ class World;
 class Namespace;
 class Program;
 
+class JitOptimizer
+{
+public:
+	std::unique_ptr<llvm::Module> operator () (std::unique_ptr<llvm::Module> module);
+};
+
+
 class Jit
 {
 public:
@@ -58,8 +65,6 @@ private:
 	std::unique_ptr<llvm::Module> create_module(Namespace* ns);
 	llvm::LLVMContext _context;
 	World* _world;
-	std::map<std::string, llvm::Module*> modules;
-	std::map<std::string, std::unique_ptr<llvm::ExecutionEngine>> engines;
 	bool dump_pre_optimization;
 	bool dump_post_optimization;
 
@@ -67,6 +72,8 @@ private:
 	llvm::DataLayout data_layout;
 	llvm::orc::ObjectLinkingLayer<> linker;
 	llvm::orc::IRCompileLayer<llvm::orc::ObjectLinkingLayer<>> compiler;
+	llvm::orc::IRTransformLayer<llvm::orc::IRCompileLayer<llvm::orc::ObjectLinkingLayer<>>,
+								JitOptimizer> optimizer;
 
 };
 

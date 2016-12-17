@@ -52,7 +52,8 @@ static llvm::RuntimeDyld::SymbolInfo get_symbol(llvm::orc::JITSymbol& symbol)
 Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
 						 target_machine(llvm::EngineBuilder().selectTarget()),
 						 data_layout(target_machine->createDataLayout()),
-						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine))
+						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine)),
+						 optimizer(compiler, JitOptimizer())
 {
 	scheduler = world->scheduler();
 	llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
@@ -77,20 +78,22 @@ void Jit::compile_namespace(Namespace* ns)
 	std::vector<std::unique_ptr<llvm::Module>> module_set;
 	module_set.push_back(std::move(module));
 
-	compiler.addModuleSet(std::move(module_set),
+	optimizer.addModuleSet(std::move(module_set),
 						  std::make_unique<llvm::SectionMemoryManager>(),
 						  std::make_unique<JitResolver>(_world));
 
 	/*
-	engines[ns->full_name()]->addGlobalMapping
-		(modules[ns->full_name()]->getGlobalVariable("xerxzema_scheduler"),
-			 &scheduler);
-
 	if(dump_pre_optimization)
 		modules[ns->full_name()]->dump();
 
+	if(dump_post_optimization)
+		modules[ns->full_name()]->dump();
+	*/
+}
 
-	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(modules[ns->full_name()]);
+std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Module> module)
+{
+	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(module.get());
 
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
 	fpm->add(llvm::createLoadCombinePass());
@@ -102,20 +105,13 @@ void Jit::compile_namespace(Namespace* ns)
 
 	fpm->doInitialization();
 
-	for(auto& f: modules[ns->full_name()]->functions())
+	for(auto& f: module->functions())
 	{
 		fpm->run(f);
 	}
-
-	if(dump_post_optimization)
-		modules[ns->full_name()]->dump();
-
-	//TODO investigate ways to speed this up ALOT
-	//currently it's the dominate factor
-	//look into ORC and doing our own sectionManager memoryManager and symbolManager
-	engines[ns->full_name()]->finalizeObject();
-	*/
+	return std::move(module);
 }
+
 
 size_t Jit::get_state_size(Program* program)
 {
