@@ -1,9 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Mangler.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace xerxzema
 {
@@ -38,4 +42,15 @@ inline llvm::Value* const_int64(llvm::LLVMContext& context, uint64_t v)
 {
 	return llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), v);
 }
+
+inline std::string mangle(const std::string& name, const llvm::DataLayout& layout)
+{
+	std::string store;
+	llvm::Mangler mangler;
+	llvm::raw_string_ostream mangle_stream(store);
+	mangler.getNameWithPrefix(mangle_stream, name, layout);
+	return mangle_stream.str();
+}
+
+
 };
