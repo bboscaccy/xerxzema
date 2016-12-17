@@ -54,5 +54,8 @@ private:
 	bool dump_pre_optimization;
 	bool dump_post_optimization;
 	void* scheduler;
+
+	std::unique_ptr<llvm::TargetMachine> target_machine;
+	llvm::DataLayout data_layout;
 };
 };

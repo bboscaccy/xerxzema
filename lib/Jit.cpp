@@ -3,6 +3,25 @@
 #include "llvm/Analysis/Passes.h"
 #include "RT.h"
 
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/RuntimeDyld.h"
+#include "llvm/ExecutionEngine/SectionMemoryManager.h"
+#include "llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h"
+#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
+#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
+#include "llvm/ExecutionEngine/Orc/IRTransformLayer.h"
+#include "llvm/ExecutionEngine/Orc/LambdaResolver.h"
+#include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Mangler.h"
+#include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+
 namespace xerxzema
 {
 
@@ -18,14 +37,14 @@ namespace xerxzema
 //so then calls args become pointer-to-pointers so the transformer can
 //fixup input state args? kind-of... but does that get into fights with the
 //scheduler callbacks? idk...
+//you can add input args to a program during live-coding, if and only if they
+//have default values.
 
 
-Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false)
+Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
+						 target_machine(llvm::EngineBuilder().selectTarget()),
+						 data_layout(target_machine->createDataLayout())
 {
-	llvm::InitializeNativeTarget();
-	llvm::InitializeNativeTargetAsmParser();
-	llvm::InitializeNativeTargetAsmPrinter();
-	llvm::InitializeNativeTargetDisassembler();
 	scheduler = world->scheduler();
 }
 
@@ -37,8 +56,10 @@ void Jit::create_module(Namespace* ns)
 	auto engine = std::unique_ptr<llvm::ExecutionEngine>(llvm::EngineBuilder(std::move(module))
 														 .setEngineKind(llvm::EngineKind::JIT)
 														 .setErrorStr(&err_str).create());
+
 	handle->setDataLayout(engine->getTargetMachine()->createDataLayout());
 	handle->setTargetTriple(engine->getTargetMachine()->getTargetTriple().getTriple());
+
 
 	modules[ns->full_name()] = handle;
 	engines[ns->full_name()] = std::move(engine);

@@ -8,6 +8,10 @@ namespace xerxzema
 World::World() : _scheduler(std::make_unique<Scheduler>())
 {
 	create_core_namespace();
+	llvm::InitializeNativeTarget();
+	llvm::InitializeNativeTargetAsmParser();
+	llvm::InitializeNativeTargetAsmPrinter();
+	llvm::InitializeNativeTargetDisassembler();
 }
 
 Jit* World::jit()
