@@ -74,7 +74,8 @@ private:
 	llvm::orc::IRCompileLayer<llvm::orc::ObjectLinkingLayer<>> compiler;
 	llvm::orc::IRTransformLayer<llvm::orc::IRCompileLayer<llvm::orc::ObjectLinkingLayer<>>,
 								JitOptimizer> optimizer;
-
+	std::unique_ptr<llvm::orc::JITCompileCallbackManager> compile_callback_manager;
+	std::unique_ptr<llvm::orc::IndirectStubsManager> indirect_stubs_manager;
 };
 
 class JitResolver : public llvm::RuntimeDyld::SymbolResolver

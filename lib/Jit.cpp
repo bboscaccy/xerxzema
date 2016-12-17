@@ -50,10 +50,22 @@ static llvm::RuntimeDyld::SymbolInfo get_symbol(llvm::orc::JITSymbol& symbol)
 
 
 Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
+
 						 target_machine(llvm::EngineBuilder().selectTarget()),
+
 						 data_layout(target_machine->createDataLayout()),
+
 						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine)),
-						 optimizer(compiler, JitOptimizer())
+
+						 optimizer(compiler, JitOptimizer()),
+
+						 compile_callback_manager(llvm::orc::createLocalCompileCallbackManager
+												  (target_machine->getTargetTriple(), 0)),
+
+						 indirect_stubs_manager(llvm::orc
+												::createLocalIndirectStubsManagerBuilder
+												(target_machine->getTargetTriple())())
+
 {
 	scheduler = world->scheduler();
 	llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
@@ -81,6 +93,7 @@ void Jit::compile_namespace(Namespace* ns)
 	optimizer.addModuleSet(std::move(module_set),
 						  std::make_unique<llvm::SectionMemoryManager>(),
 						  std::make_unique<JitResolver>(_world));
+
 
 	/*
 	if(dump_pre_optimization)
