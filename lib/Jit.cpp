@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Jit.h"
 #include "World.h"
 #include "llvm/Analysis/Passes.h"
@@ -36,35 +37,50 @@ namespace xerxzema
 //have default values.
 
 
+
+static llvm::RuntimeDyld::SymbolInfo get_symbol(void* addr)
+{
+	return llvm::RuntimeDyld::SymbolInfo((uint64_t)addr, llvm::JITSymbolFlags::Exported);
+}
+
+static llvm::RuntimeDyld::SymbolInfo get_symbol(llvm::orc::JITSymbol& symbol)
+{
+	return llvm::RuntimeDyld::SymbolInfo(symbol.getAddress(), symbol.getFlags());
+}
+
+
 Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
 						 target_machine(llvm::EngineBuilder().selectTarget()),
 						 data_layout(target_machine->createDataLayout()),
 						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine))
 {
 	scheduler = world->scheduler();
+	llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 }
 
-void Jit::create_module(Namespace* ns)
+std::unique_ptr<llvm::Module> Jit::create_module(Namespace* ns)
 {
 	auto module = std::make_unique<llvm::Module>(ns->full_name(), _context);
 	auto handle = module.get();
-	std::string err_str;
-	auto engine = std::unique_ptr<llvm::ExecutionEngine>(llvm::EngineBuilder(std::move(module))
-														 .setEngineKind(llvm::EngineKind::JIT)
-														 .setErrorStr(&err_str).create());
 
 	handle->setDataLayout(data_layout);
 	handle->setTargetTriple(target_machine->getTargetTriple().getTriple());
 
-
-	modules[ns->full_name()] = handle;
-	engines[ns->full_name()] = std::move(engine);
+	return module;
 }
 
 void Jit::compile_namespace(Namespace* ns)
 {
-	create_module(ns);
-	ns->codegen(modules[ns->full_name()], _context);
+	auto module = create_module(ns);
+	ns->codegen(module.get(), _context);
+
+	std::vector<std::unique_ptr<llvm::Module>> module_set;
+	module_set.push_back(std::move(module));
+
+	compiler.addModuleSet(std::move(module_set),
+						  std::make_unique<llvm::SectionMemoryManager>(),
+						  std::make_unique<JitResolver>(_world));
+	/*
 	engines[ns->full_name()]->addGlobalMapping
 		(modules[ns->full_name()]->getGlobalVariable("xerxzema_scheduler"),
 			 &scheduler);
@@ -97,23 +113,19 @@ void Jit::compile_namespace(Namespace* ns)
 	//currently it's the dominate factor
 	//look into ORC and doing our own sectionManager memoryManager and symbolManager
 	engines[ns->full_name()]->finalizeObject();
-
+	*/
 }
 
 size_t Jit::get_state_size(Program* program)
 {
-	auto module = program->current_module();
-	auto fn = module->getFunction(program->program_name());
 	auto state_type = program->state_type_value();
-	return module->getDataLayout().getTypeAllocSize(state_type);
+	return data_layout.getTypeAllocSize(state_type);
 }
 
 void* Jit::get_state_offset(void* target, Program* program, int field)
 {
-	auto module = program->current_module();
-	auto fn = module->getFunction(program->program_name());
 	auto state_type = program->state_type_value();
-	auto layout = module->getDataLayout().getStructLayout((llvm::StructType*)state_type);
+	auto layout = data_layout.getStructLayout((llvm::StructType*)state_type);
 	auto offset = field;
 	return ((char*)target)+layout->getElementOffset(offset);
 }
@@ -121,10 +133,27 @@ void* Jit::get_state_offset(void* target, Program* program, int field)
 
 void* Jit::get_jitted_function(Program* program)
 {
-	auto module = program->current_module();
-	auto fn = module->getFunction(program->program_name());
-	auto state_type = program->state_type_value();
-	return engines[program->name_space()->name()]->getPointerToFunction(fn);
+	return (void*)compiler.findSymbol(program->program_name(),false).getAddress();
+}
+
+JitResolver::JitResolver(World* world) : world(world)
+{
+
+}
+
+llvm::RuntimeDyld::SymbolInfo JitResolver::findSymbol(const std::string &name)
+{
+	if(name == "xerxzema_scheduler")
+		return llvm::RuntimeDyld::SymbolInfo((uint64_t)world->scheduler(),
+											 llvm::JITSymbolFlags::Exported);
+	return llvm::RuntimeDyld::SymbolInfo(0);
+}
+
+llvm::RuntimeDyld::SymbolInfo JitResolver::findSymbolInLogicalDylib(const std::string &name)
+{
+	//TODO look up functions in world, for right now load them from our process?
+	auto addr = llvm::RTDyldMemoryManager::getSymbolAddressInProcess(name);
+	return llvm::RuntimeDyld::SymbolInfo(addr, llvm::JITSymbolFlags::Exported);
 }
 
 };

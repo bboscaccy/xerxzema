@@ -54,7 +54,7 @@ public:
 	inline World* world() { return _world; }
 
 private:
-	void create_module(Namespace* ns);
+	std::unique_ptr<llvm::Module> create_module(Namespace* ns);
 	llvm::LLVMContext _context;
 	World* _world;
 	std::map<std::string, llvm::Module*> modules;
@@ -68,6 +68,16 @@ private:
 	llvm::orc::ObjectLinkingLayer<> linker;
 	llvm::orc::IRCompileLayer<llvm::orc::ObjectLinkingLayer<>> compiler;
 
+};
+
+class JitResolver : public llvm::RuntimeDyld::SymbolResolver
+{
+public:
+	JitResolver(World* world);
+	llvm::RuntimeDyld::SymbolInfo findSymbol(const std::string &name);
+	llvm::RuntimeDyld::SymbolInfo findSymbolInLogicalDylib(const std::string &name);
+private:
+	World* world;
 };
 
 
