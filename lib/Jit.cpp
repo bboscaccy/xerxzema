@@ -6,12 +6,7 @@
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/RuntimeDyld.h"
 #include "llvm/ExecutionEngine/SectionMemoryManager.h"
-#include "llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h"
-#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
-#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
-#include "llvm/ExecutionEngine/Orc/IRTransformLayer.h"
-#include "llvm/ExecutionEngine/Orc/LambdaResolver.h"
-#include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
+
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Mangler.h"
@@ -43,7 +38,8 @@ namespace xerxzema
 
 Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
 						 target_machine(llvm::EngineBuilder().selectTarget()),
-						 data_layout(target_machine->createDataLayout())
+						 data_layout(target_machine->createDataLayout()),
+						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine))
 {
 	scheduler = world->scheduler();
 }
