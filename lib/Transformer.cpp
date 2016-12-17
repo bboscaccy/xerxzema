@@ -149,7 +149,6 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 	}
 
 	builder.CreateRet(const_int64(context, 0));
-	next->current_module()->dump();
 	return function;
 }
 

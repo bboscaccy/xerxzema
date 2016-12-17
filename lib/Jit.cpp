@@ -41,6 +41,7 @@ void Jit::compile_namespace(Namespace* ns)
 	if(dump_pre_optimization)
 		modules[ns->full_name()]->dump();
 
+
 	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(modules[ns->full_name()]);
 
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
@@ -61,7 +62,9 @@ void Jit::compile_namespace(Namespace* ns)
 	if(dump_post_optimization)
 		modules[ns->full_name()]->dump();
 
-
+	//TODO investigate ways to speed this up ALOT
+	//currently it's the dominate factor
+	//look into ORC and doing our own sectionManager memoryManager and symbolManager
 	engines[ns->full_name()]->finalizeObject();
 
 }

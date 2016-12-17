@@ -182,11 +182,12 @@ TEST(TestTransformer, TestInstRetValChange)
 TEST(TestTransformer, TestCodeGenSimple)
 {
 	xerxzema::World world;
+
 	auto ns0 = world.get_namespace("test0");
 	auto ns1 = world.get_namespace("test1");
 
 	auto p0 = "12.0 -> x; 13.0 -> y; x*y->z;";
-	auto p1 = "12.0 -> x; 10.0 -> y; x*y->q;";
+	auto p1 = "12.0 -> x; 10.0 -> y; `x*y->q;";
 
 	xerxzema::parse_input(p0, ns0);
 	xerxzema::parse_input(p1, ns1);
@@ -202,5 +203,6 @@ TEST(TestTransformer, TestCodeGenSimple)
 	trans.parse_instructions();
 
 	auto fn = trans.generate_transformer(world.jit()->context());
+
 
 }
