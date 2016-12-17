@@ -80,6 +80,7 @@ void Jit::compile_namespace(Namespace* ns)
 	compiler.addModuleSet(std::move(module_set),
 						  std::make_unique<llvm::SectionMemoryManager>(),
 						  std::make_unique<JitResolver>(_world));
+
 	/*
 	engines[ns->full_name()]->addGlobalMapping
 		(modules[ns->full_name()]->getGlobalVariable("xerxzema_scheduler"),
@@ -143,8 +144,9 @@ JitResolver::JitResolver(World* world) : world(world)
 
 llvm::RuntimeDyld::SymbolInfo JitResolver::findSymbol(const std::string &name)
 {
+	//TODO make this sane...
 	if(name == "xerxzema_scheduler")
-		return llvm::RuntimeDyld::SymbolInfo((uint64_t)world->scheduler(),
+		return llvm::RuntimeDyld::SymbolInfo((uint64_t)&world->jit()->scheduler,
 											 llvm::JITSymbolFlags::Exported);
 	return llvm::RuntimeDyld::SymbolInfo(0);
 }

@@ -53,6 +53,7 @@ public:
 	void* get_state_offset(void* state, Program* program, int field);
 	inline World* world() { return _world; }
 
+	void* scheduler;
 private:
 	std::unique_ptr<llvm::Module> create_module(Namespace* ns);
 	llvm::LLVMContext _context;
@@ -61,7 +62,6 @@ private:
 	std::map<std::string, std::unique_ptr<llvm::ExecutionEngine>> engines;
 	bool dump_pre_optimization;
 	bool dump_post_optimization;
-	void* scheduler;
 
 	std::unique_ptr<llvm::TargetMachine> target_machine;
 	llvm::DataLayout data_layout;
