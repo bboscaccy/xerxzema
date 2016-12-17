@@ -104,21 +104,32 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 	auto prev_arg = &*arg_it++;
 	auto next_arg = &*arg_it++;
 
-	auto block = llvm::BasicBlock::Create(context, "entry", function);
+	auto copy_reg_block = llvm::BasicBlock::Create(context, "copy_regs", function);
+	auto copy_inst_block = llvm::BasicBlock::Create(context, "copy_inst", function);
 	llvm::IRBuilder<> builder(context);
 
-	builder.SetInsertPoint(block);
+	builder.SetInsertPoint(copy_reg_block);
 
 	for(auto mapping: reusable_registers)
 	{
 		if(mapping.prev->offset() > 0)
 		{
-			std::cout << mapping.prev->name() << std::endl;
-			std::cout << mapping.prev->offset() << std::endl;
 			auto prev_ptr = builder.CreateStructGEP(prev_type, prev_arg, mapping.prev->offset());
 			auto next_ptr = builder.CreateStructGEP(next_type, next_arg, mapping.next->offset());
 			mapping.next->type()->copy(context, builder, next_ptr, prev_ptr);
 		}
+	}
+
+	builder.CreateBr(copy_inst_block);
+	builder.SetInsertPoint(copy_inst_block);
+
+	for(auto mapping: reusable_instructions)
+	{
+		auto prev_ptr = builder.CreateStructGEP(prev_type, prev_arg, mapping.prev->offset());
+		auto next_ptr = builder.CreateStructGEP(next_type, next_arg, mapping.next->offset());
+		auto value = builder.CreateLoad(prev_ptr);
+		builder.CreateStore(value, next_ptr);
+		//TODO copy instruction state
 	}
 
 	builder.CreateRet(const_int64(context, 0));
