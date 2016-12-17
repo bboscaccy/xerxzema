@@ -106,6 +106,7 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 
 	auto copy_reg_block = llvm::BasicBlock::Create(context, "copy_regs", function);
 	auto copy_inst_block = llvm::BasicBlock::Create(context, "copy_inst", function);
+	auto fire_head_block = llvm::BasicBlock::Create(context, "fire_head", function);
 	llvm::IRBuilder<> builder(context);
 
 	builder.SetInsertPoint(copy_reg_block);
@@ -130,6 +131,21 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 		auto value = builder.CreateLoad(prev_ptr);
 		builder.CreateStore(value, next_ptr);
 		//TODO copy instruction state
+	}
+
+	builder.CreateBr(fire_head_block);
+	builder.SetInsertPoint(fire_head_block);
+
+	for(auto& activate:next->reg("head")->activations)
+	{
+		auto it = std::find(new_instructions.begin(), new_instructions.end(), activate.instruction);
+		if(it != new_instructions.end())
+		{
+			auto ptr = builder.CreateStructGEP(next_type, next_arg, activate.instruction->offset());
+			auto mask = builder.CreateLoad(ptr);
+			auto update = builder.CreateOr(mask, llvm::APInt(16, activate.value));
+			builder.CreateStore(update, ptr);
+		}
 	}
 
 	builder.CreateRet(const_int64(context, 0));
