@@ -57,8 +57,8 @@ void Jit::create_module(Namespace* ns)
 														 .setEngineKind(llvm::EngineKind::JIT)
 														 .setErrorStr(&err_str).create());
 
-	handle->setDataLayout(engine->getTargetMachine()->createDataLayout());
-	handle->setTargetTriple(engine->getTargetMachine()->getTargetTriple().getTriple());
+	handle->setDataLayout(data_layout);
+	handle->setTargetTriple(target_machine->getTargetTriple().getTriple());
 
 
 	modules[ns->full_name()] = handle;
