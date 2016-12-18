@@ -18,6 +18,18 @@ Namespace::~Namespace()
 {
 }
 
+void Namespace::add_external_mapping(xerxzema::ExternalDefinition *def, const std::string& name)
+{
+	if(name == "")
+	{
+		externals[def->short_name()] = def;
+	}
+	else
+	{
+		externals[name] = def;
+	}
+}
+
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	//create required globals

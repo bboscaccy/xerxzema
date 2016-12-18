@@ -20,9 +20,11 @@ public:
 	llvm::GlobalVariable* get_variable(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::RuntimeDyld::SymbolInfo resolve();
 	const std::string& name() { return symbol_name; }
+	const std::string& short_name() { return local_name; }
 
 private:
 	std::string symbol_name;
+	std::string local_name;
 	llvm::sys::DynamicLibrary lib;
 	std::vector<Type*> types;
 	Type* result_type;

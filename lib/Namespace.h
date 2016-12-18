@@ -15,6 +15,7 @@ namespace xerxzema
 {
 class World;
 class InstructionDefinition;
+class ExternalDefinition;
 class Namespace
 {
 public:
@@ -42,6 +43,7 @@ public:
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
 	InstructionDefinition* resolve_instruction(const std::string& name,
 											   const std::vector<Type*>& inputs);
+	void add_external_mapping(ExternalDefinition* def, const std::string& local_name="");
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<Program>> programs;
@@ -50,6 +52,7 @@ private:
 	std::map<std::string, std::unique_ptr<ParameterizedType>> parameterized_types;
 	std::map<std::string, std::unique_ptr<ParameterizedType>> parameterized_type_instances;
 	std::map<std::string, std::vector<std::unique_ptr<InstructionDefinition>>> instructions;
+	std::map<std::string, ExternalDefinition*> externals;
 	World* _world;
 	Namespace* parent;
 	std::string _name;

@@ -130,7 +130,7 @@ ExternalDefinition::ExternalDefinition(const std::string& name, const std::vecto
 									   Type* result_type, const std::string& lib_name, void* address,
 									   bool var_arg):
 	types(types), result_type(result_type), address(address),
-	var_arg(var_arg)
+	var_arg(var_arg), local_name(name)
 {
 	std::string err_msg;
 	if(lib_name == "")
