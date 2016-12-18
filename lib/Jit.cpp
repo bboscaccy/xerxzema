@@ -49,7 +49,9 @@ static llvm::RuntimeDyld::SymbolInfo get_symbol(llvm::orc::JITSymbol& symbol)
 }
 
 
-Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_optimization(false),
+Jit::Jit(World* world) : _world(world),
+						 dump_pre_optimization(false),
+						 dump_post_optimization(false),
 
 						 target_machine(llvm::EngineBuilder().selectTarget()),
 
@@ -70,7 +72,7 @@ Jit::Jit(World* world) : _world(world), dump_pre_optimization(false), dump_post_
 	scheduler = world->scheduler();
 	llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 }
-
+//ON demand compiling breaks the assumption that 1 namespace == 1 module
 std::unique_ptr<llvm::Module> Jit::create_module(Namespace* ns)
 {
 	auto module = std::make_unique<llvm::Module>(ns->full_name(), _context);

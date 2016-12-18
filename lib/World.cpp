@@ -74,4 +74,31 @@ void World::create_core_namespace()
 
 }
 
+llvm::Function*	ExternalDefinition::get_call(llvm::Module *module, llvm::LLVMContext& context)
+{
+	auto fn = module->getFunction(symbol_name);
+	if(fn)
+		return fn;
+	std::vector<llvm::Type*> call_args;
+	for(auto& type:types)
+	{
+		call_args.push_back(type->type(context));
+	}
+	auto fn_type = llvm::FunctionType::get(result_type->type(context), call_args, var_arg);
+	fn = llvm::Function::Create(fn_type, llvm::Function::ExternalLinkage, symbol_name, module);
+	fn->setCallingConv(llvm::CallingConv::C);
+	return fn;
+}
+
+llvm::GlobalVariable* ExternalDefinition::get_variable(llvm::Module* module, llvm::LLVMContext& context)
+{
+	auto gv = module->getGlobalVariable(symbol_name);
+	if(gv)
+		return gv;
+
+	return new llvm::GlobalVariable(*module, result_type->type(context), false,
+									llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+									nullptr, symbol_name);
+}
+
 };

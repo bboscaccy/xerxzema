@@ -18,10 +18,14 @@ Namespace::~Namespace()
 {
 }
 
-
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	//create required globals
+	//TODO we don't want to just dump every possible global and extern
+	//into every module.
+	//load these on demand.
+	//so we want extern_function(...
+	//and extern_var(...
 	scheduler = new llvm::GlobalVariable(*module,
 										 llvm::Type::getVoidTy(context)->getPointerTo(),
 										 false,
@@ -195,5 +199,4 @@ InstructionDefinition* Namespace::resolve_instruction(const std::string &name,
 	}
 	return nullptr;
 }
-
 };
