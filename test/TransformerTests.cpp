@@ -178,7 +178,7 @@ TEST(TestTransformer, TestInstRetValChange)
 	ASSERT_EQ(trans.get_new_registers().size(), 1);
 }
 
-
+//TODO this is exposing a subtle race condition somewhere
 TEST(TestTransformer, TestCodeGenSimple)
 {
 	xerxzema::World world;
