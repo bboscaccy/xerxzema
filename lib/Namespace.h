@@ -43,7 +43,12 @@ public:
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
 	InstructionDefinition* resolve_instruction(const std::string& name,
 											   const std::vector<Type*>& inputs);
+
 	void add_external_mapping(ExternalDefinition* def, const std::string& local_name="");
+	llvm::GlobalVariable* get_external_variable(const std::string& name, llvm::Module* module,
+												llvm::LLVMContext& context);
+	llvm::Function* get_external_function(const std::string& name, llvm::Module* module,
+										  llvm::LLVMContext& context);
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<Program>> programs;

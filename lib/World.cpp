@@ -155,7 +155,7 @@ llvm::RuntimeDyld::SymbolInfo ExternalDefinition::resolve()
 		return llvm::RuntimeDyld::SymbolInfo((uint64_t)address,
 											 llvm::JITSymbolFlags::Exported);
 	else
-		return llvm::RuntimeDyld::SymbolInfo((uint64_t)lib.SearchForAddressOfSymbol(symbol_name),
+		return llvm::RuntimeDyld::SymbolInfo((uint64_t)lib.SearchForAddressOfSymbol(local_name),
 											 llvm::JITSymbolFlags::Exported);
 }
 

@@ -18,6 +18,21 @@ Namespace::~Namespace()
 {
 }
 
+llvm::Function* Namespace::get_external_function(const std::string &name, llvm::Module *module,
+												 llvm::LLVMContext& context)
+{
+	auto external = externals[name];
+	return external->get_call(module, context);
+}
+
+llvm::GlobalVariable* Namespace::get_external_variable(const std::string &name, llvm::Module *module,
+													   llvm::LLVMContext& context)
+{
+	auto external = externals[name];
+	return external->get_variable(module, context);
+}
+
+
 void Namespace::add_external_mapping(xerxzema::ExternalDefinition *def, const std::string& name)
 {
 	if(name == "")
