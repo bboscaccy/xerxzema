@@ -17,6 +17,7 @@ void xerxzema_print(const char* fmt, ...)
 
 void xerxzema_schedule(void* scheduler, void(*fn)(void*), void* state, uint64_t when)
 {
+	printf("i got called %p?\n", scheduler);
 	auto s = (Scheduler*)scheduler;
 	s->schedule(fn, state, when);
 }

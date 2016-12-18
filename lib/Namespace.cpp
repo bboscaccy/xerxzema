@@ -73,33 +73,6 @@ void Namespace::add_external_mapping(xerxzema::ExternalDefinition *def, const st
 
 void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
 {
-	//create required globals
-	//TODO we don't want to just dump every possible global and extern
-	//into every module.
-	//load these on demand.
-	//so we want extern_function(...
-	//and extern_var(...
-	scheduler = new llvm::GlobalVariable(*module,
-										 llvm::Type::getVoidTy(context)->getPointerTo(),
-										 false,
-										 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-										 nullptr, "xerxzema_scheduler");
-
-	auto callback_type = llvm::FunctionType::get
-		(llvm::Type::getVoidTy(context), {llvm::Type::getVoidTy(context)->getPointerTo()},
-		 false);
-
-	auto scheduler_run_type = llvm::FunctionType::get
-		(llvm::Type::getVoidTy(context),
-		 { llvm::Type::getVoidTy(context)->getPointerTo(),
-				 callback_type->getPointerTo(),
-				 llvm::Type::getVoidTy(context)->getPointerTo(),
-				 llvm::Type::getInt64Ty(context)}, false);
-
-	auto schedule_fn = llvm::Function::Create(scheduler_run_type,
-											  llvm::Function::ExternalLinkage,
-											  "xerxzema_schedule", module);
-
 	for(auto& program: programs)
 	{
 		program.second->code_gen(module, context);

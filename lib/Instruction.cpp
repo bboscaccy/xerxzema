@@ -3,6 +3,7 @@
 #include "Program.h"
 #include "LLVMUtils.h"
 #include <sstream>
+#include "Namespace.h"
 
 namespace xerxzema
 {
@@ -531,21 +532,7 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 	input_str += ") %f\n";
 	auto format_str = builder.CreateGlobalString(input_str);
 
-
-	auto fn = program->current_module()->getFunction("xerxzema_print");
-	if(!fn)
-	{
-		std::vector<llvm::Type*> printf_arg_types;
-		printf_arg_types.push_back(llvm::Type::getInt8PtrTy(context));
-
-		llvm::FunctionType* printf_type =
-			llvm::FunctionType::get(llvm::Type::getInt32Ty(context), printf_arg_types, true);
-
-		fn = llvm::Function::Create(printf_type, llvm::Function::ExternalLinkage,
-									"xerxzema_print", program->current_module());
-
-		fn->setCallingConv(llvm::CallingConv::C);
-	}
+	auto fn = program->name_space()->get_external_function("print", program->current_module(), context);
 	builder.CreateCall(fn, {format_str, _inputs[0]->fetch_value(context, builder)});
 }
 
@@ -561,10 +548,13 @@ void Trace::generate_prolouge(llvm::LLVMContext &context,
 void Schedule::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 							  Program *program)
 {
-	auto fn = program->current_module()->getFunction("xerxzema_schedule");
+	auto fn = program->name_space()->get_external_function
+		("schedule", program->current_module(), context);
 	auto closure = program->create_closure(_outputs[0], true,
 										   context, program->current_module());
-	auto scheduler_var = program->current_module()->getGlobalVariable("xerxzema_scheduler");
+	auto scheduler_var = program->name_space()->get_external_variable
+		("scheduler", program->current_module(), context);
+
 	auto scheduler = builder.CreateLoad(scheduler_var);
 	auto time = _inputs[0]->fetch_value(context, builder);
 	auto state = program->current_state();

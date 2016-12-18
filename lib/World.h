@@ -47,6 +47,8 @@ private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<ExternalDefinition>> externals;
 	std::unique_ptr<Scheduler> _scheduler;
+	Scheduler* scheduler_export;
 	std::unique_ptr<Jit> jit_instance;
+	Jit* jit_export;
 };
 };

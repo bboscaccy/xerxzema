@@ -13,6 +13,7 @@ World::World() : _scheduler(std::make_unique<Scheduler>())
 	llvm::InitializeNativeTargetAsmParser();
 	llvm::InitializeNativeTargetAsmPrinter();
 	llvm::InitializeNativeTargetDisassembler();
+	scheduler_export = _scheduler.get();
 }
 
 Jit* World::jit()
@@ -87,17 +88,17 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<Schedule>("schedule_absolute", {"int"}, {"unit"}));
 
 	add_external(std::make_unique<ExternalDefinition>
-				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &*_scheduler));
+				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &scheduler_export));
 
 	add_external(std::make_unique<ExternalDefinition>
 				 ("print", std::vector<Type*>{core->type("opaque")},
 				  core->type("unit"), "", (void*)&xerxzema_print, true));
 
-	//TODO add a proper c function type maybe? idk...
+	//TODO add a proper c function type maybe?
 	add_external(std::make_unique<ExternalDefinition>
 				 ("schedule", std::vector<Type*>{core->type("opaque"), core->type("opaque"),
 						 core->type("opaque"), core->type("int")},
-				  core->type("unit"), "", (void*)&xerxzema_print, true));
+				  core->type("unit"), "", (void*)&xerxzema_schedule));
 
 	core->add_external_mapping(externals["xerxzema:print"].get());
 	core->add_external_mapping(externals["xerxzema:scheduler"].get());

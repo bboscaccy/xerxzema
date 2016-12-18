@@ -89,6 +89,9 @@ void Jit::compile_namespace(Namespace* ns)
 	auto module = create_module(ns);
 	ns->codegen(module.get(), _context);
 
+	if(dump_pre_optimization)
+		module->dump();
+
 	std::vector<std::unique_ptr<llvm::Module>> module_set;
 	module_set.push_back(std::move(module));
 
@@ -155,18 +158,24 @@ JitResolver::JitResolver(World* world) : world(world)
 
 llvm::RuntimeDyld::SymbolInfo JitResolver::findSymbol(const std::string &name)
 {
-	//TODO make this sane...
-	if(name == "xerxzema_scheduler")
-		return llvm::RuntimeDyld::SymbolInfo((uint64_t)&world->jit()->scheduler,
-											 llvm::JITSymbolFlags::Exported);
-	return llvm::RuntimeDyld::SymbolInfo(0);
+	//TODO resolve currently jitted functions/programs.
+	auto addr = llvm::RTDyldMemoryManager::getSymbolAddressInProcess(name);
+	if(addr)
+		//we need this for certian instrinsics that are just forwarded
+		//calls from libc
+		return llvm::RuntimeDyld::SymbolInfo(addr, llvm::JITSymbolFlags::Exported);
+	else
+		return llvm::RuntimeDyld::SymbolInfo(0);
 }
 
+//Resolve externals
 llvm::RuntimeDyld::SymbolInfo JitResolver::findSymbolInLogicalDylib(const std::string &name)
 {
-	//TODO look up functions in world, for right now load them from our process?
-	auto addr = llvm::RTDyldMemoryManager::getSymbolAddressInProcess(name);
-	return llvm::RuntimeDyld::SymbolInfo(addr, llvm::JITSymbolFlags::Exported);
+	auto external = world->get_external(name);
+	if(external)
+		return external->resolve();
+	else
+		return llvm::RuntimeDyld::SymbolInfo(0);
 }
 
 };
