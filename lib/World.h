@@ -19,6 +19,8 @@ public:
 	llvm::Function* get_call(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::GlobalVariable* get_variable(llvm::Module* module, llvm::LLVMContext& context);
 
+	llvm::RuntimeDyld::SymbolInfo resolve();
+
 private:
 	std::string symbol_name;
 	llvm::sys::DynamicLibrary lib;

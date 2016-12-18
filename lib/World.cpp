@@ -128,5 +128,14 @@ ExternalDefinition::ExternalDefinition(const std::string& name, const std::vecto
 	}
 }
 
+llvm::RuntimeDyld::SymbolInfo ExternalDefinition::resolve()
+{
+	if(address)
+		return llvm::RuntimeDyld::SymbolInfo((uint64_t)address,
+											 llvm::JITSymbolFlags::Exported);
+	else
+		return llvm::RuntimeDyld::SymbolInfo((uint64_t)lib.SearchForAddressOfSymbol(symbol_name),
+											 llvm::JITSymbolFlags::Exported);
+}
 
 };
