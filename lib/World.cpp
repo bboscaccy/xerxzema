@@ -2,6 +2,7 @@
 #include "Type.h"
 #include "Instruction.h"
 #include "RT.h"
+#include "Diagnostics.h"
 
 namespace xerxzema
 {
@@ -100,5 +101,32 @@ llvm::GlobalVariable* ExternalDefinition::get_variable(llvm::Module* module, llv
 									llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									nullptr, symbol_name);
 }
+
+//In the background LLVM maintaines a static thread safe contianer for lookups in here.
+//our symbol resolution will append a lib name as a prefix.
+//that should let us have duplicate named functions/vars in different external libs
+ExternalDefinition::ExternalDefinition(const std::string& name, const std::vector<Type*> types,
+									   Type* result_type, const std::string& lib_name, void* address,
+									   bool var_arg):
+	types(types), result_type(result_type), address(address),
+	var_arg(var_arg)
+{
+	std::string err_msg;
+	if(lib_name == "")
+	{
+		lib = llvm::sys::DynamicLibrary::getPermanentLibrary(nullptr);
+		symbol_name = "xerxzema:" + name;
+	}
+	else
+	{
+		lib = llvm::sys::DynamicLibrary::getPermanentLibrary(lib_name.c_str(), &err_msg);
+		symbol_name = lib_name + ":" + name;
+		if(!lib.isValid())
+		{
+			emit_error(err_msg);
+		}
+	}
+}
+
 
 };
