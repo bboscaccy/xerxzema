@@ -88,9 +88,20 @@ void World::create_core_namespace()
 
 	add_external(std::make_unique<ExternalDefinition>
 				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &*_scheduler));
+
 	add_external(std::make_unique<ExternalDefinition>
 				 ("print", std::vector<Type*>{core->type("opaque")},
 				  core->type("unit"), "", (void*)&xerxzema_print, true));
+
+	//TODO add a proper c function type maybe? idk...
+	add_external(std::make_unique<ExternalDefinition>
+				 ("schedule", std::vector<Type*>{core->type("opaque"), core->type("opaque"),
+						 core->type("opaque"), core->type("int")},
+				  core->type("unit"), "", (void*)&xerxzema_print, true));
+
+	core->add_external_mapping(externals["xerxzema:print"].get());
+	core->add_external_mapping(externals["xerxzema:scheduler"].get());
+	core->add_external_mapping(externals["xerxzema:schedule"].get());
 
 	namespaces.emplace("core", std::move(core));
 
