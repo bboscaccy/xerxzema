@@ -18,8 +18,8 @@ public:
 
 	llvm::Function* get_call(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::GlobalVariable* get_variable(llvm::Module* module, llvm::LLVMContext& context);
-
 	llvm::RuntimeDyld::SymbolInfo resolve();
+	const std::string& name() { return symbol_name; }
 
 private:
 	std::string symbol_name;
@@ -36,6 +36,8 @@ public:
 	World();
 	Namespace* get_namespace(const std::string& name);
 	std::vector<std::string> namespace_list() const;
+	void add_external(std::unique_ptr<ExternalDefinition>&& def);
+	ExternalDefinition* get_external(const std::string& name);
 	Jit* jit();
 	inline Scheduler* scheduler() { return _scheduler.get(); }
 private:

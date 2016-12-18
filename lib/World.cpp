@@ -43,6 +43,20 @@ std::vector<std::string> World::namespace_list() const
 	return names;
 }
 
+void World::add_external(std::unique_ptr<ExternalDefinition> &&def)
+{
+	externals.emplace(def->name(), std::move(def));
+}
+
+ExternalDefinition* World::get_external(const std::string &name)
+{
+	auto it = externals.find(name);
+	if(it == externals.end())
+		return nullptr;
+	return it->second.get();
+}
+
+
 void World::create_core_namespace()
 {
 	auto core = std::make_unique<Namespace>(this, "core");
