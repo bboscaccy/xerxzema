@@ -21,15 +21,41 @@ Namespace::~Namespace()
 llvm::Function* Namespace::get_external_function(const std::string &name, llvm::Module *module,
 												 llvm::LLVMContext& context)
 {
-	auto external = externals[name];
-	return external->get_call(module, context);
+	auto it = externals.find(name);
+	if(it == externals.end())
+	{
+		for(auto& ns:imports)
+		{
+			auto res = ns->get_external_function(name, module, context);
+			if(res)
+				return res;
+		}
+		return nullptr;
+	}
+	else
+	{
+		return it->second->get_call(module, context);
+	}
 }
 
 llvm::GlobalVariable* Namespace::get_external_variable(const std::string &name, llvm::Module *module,
 													   llvm::LLVMContext& context)
 {
-	auto external = externals[name];
-	return external->get_variable(module, context);
+	auto it = externals.find(name);
+	if(it == externals.end())
+	{
+		for(auto& ns:imports)
+		{
+			auto res = ns->get_external_variable(name, module, context);
+			if(res)
+				return res;
+		}
+		return nullptr;
+	}
+	else
+	{
+		return it->second->get_variable(module, context);
+	}
 }
 
 
