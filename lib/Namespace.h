@@ -42,7 +42,6 @@ public:
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
 	InstructionDefinition* resolve_instruction(const std::string& name,
 											   const std::vector<Type*>& inputs);
-
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<Program>> programs;

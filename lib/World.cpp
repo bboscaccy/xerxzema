@@ -59,6 +59,7 @@ ExternalDefinition* World::get_external(const std::string &name)
 
 void World::create_core_namespace()
 {
+
 	auto core = std::make_unique<Namespace>(this, "core");
 	core->add_type("bool", std::make_unique<Bool>());
 	core->add_type("int", std::make_unique<Int>());
@@ -84,6 +85,12 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<Delay>("delay", {"real"}, {"real"}));
 	core->add_instruction(create_def<Bang>("bang", {}, {"real"}));
 	core->add_instruction(create_def<Schedule>("schedule_absolute", {"int"}, {"unit"}));
+
+	add_external(std::make_unique<ExternalDefinition>
+				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &*_scheduler));
+	add_external(std::make_unique<ExternalDefinition>
+				 ("print", std::vector<Type*>{core->type("opaque")},
+				  core->type("unit"), "", (void*)&xerxzema_print, true));
 
 	namespaces.emplace("core", std::move(core));
 
