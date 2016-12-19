@@ -86,8 +86,15 @@ std::unique_ptr<llvm::Module> Jit::create_module(Namespace* ns)
 
 void Jit::compile_namespace(Namespace* ns)
 {
+
 	auto module = create_module(ns);
-	ns->codegen(module.get(), _context);
+	auto programs = ns->get_programs();
+
+	for(auto p: programs)
+	{
+		p->code_gen(module.get(), _context);
+	}
+
 
 	if(dump_pre_optimization)
 		module->dump();

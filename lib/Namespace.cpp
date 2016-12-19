@@ -71,14 +71,6 @@ void Namespace::add_external_mapping(xerxzema::ExternalDefinition *def, const st
 	}
 }
 
-void Namespace::codegen(llvm::Module *module, llvm::LLVMContext &context)
-{
-	for(auto& program: programs)
-	{
-		program.second->code_gen(module, context);
-	}
-}
-
 Namespace* Namespace::get_namespace(const std::string& name)
 {
 	auto it = namespaces.find(name);

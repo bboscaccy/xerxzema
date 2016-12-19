@@ -39,7 +39,7 @@ public:
 	Program* get_program(const std::string& name);
 	Program* get_default_program();
 	bool is_program(const std::string& name);
-	void codegen(llvm::Module* module, llvm::LLVMContext& context);
+
 	void add_instruction(std::unique_ptr<InstructionDefinition>&& def);
 	InstructionDefinition* resolve_instruction(const std::string& name,
 											   const std::vector<Type*>& inputs);
@@ -49,6 +49,18 @@ public:
 												llvm::LLVMContext& context);
 	llvm::Function* get_external_function(const std::string& name, llvm::Module* module,
 										  llvm::LLVMContext& context);
+
+	inline std::vector<Program*> get_programs()
+	{
+		std::vector<Program*> p;
+		p.reserve(programs.size());
+		for(auto& it: programs)
+		{
+			p.push_back(it.second.get());
+		}
+		return p;
+	}
+
 private:
 	std::map<std::string, std::unique_ptr<Namespace>> namespaces;
 	std::map<std::string, std::unique_ptr<Program>> programs;
