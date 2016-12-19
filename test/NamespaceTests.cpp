@@ -54,9 +54,9 @@ TEST(TestNamespace, TestDefaultProgram)
 	auto core = world.get_namespace("core");
 
 	auto prog = core->get_default_program();
-	ASSERT_EQ(prog->program_name(), "<default>");
+	ASSERT_EQ(prog->program_name(), "core.default");
 
 	auto jit = world.jit();
 	jit->compile_namespace(core);
-	ASSERT_EQ(prog->symbol_name(), "core.<default>");
+	ASSERT_EQ(prog->symbol_name(), "core.core.default");
 }

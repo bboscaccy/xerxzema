@@ -549,7 +549,7 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 
 	auto fn = llvm::Function::Create(closure_type,
 									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									  _name + "_closure" + reg->name(), module);
+									  _name + ".closure." + reg->name(), module);
 	llvm::Value* arg_ptr = nullptr;
 	auto args = fn->arg_begin();
 
