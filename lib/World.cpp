@@ -14,12 +14,12 @@ World::World() : _scheduler(std::make_unique<Scheduler>())
 	llvm::InitializeNativeTargetAsmPrinter();
 	llvm::InitializeNativeTargetDisassembler();
 	scheduler_export = _scheduler.get();
+	jit_instance = std::make_unique<Jit>(this);
+	jit_export = jit_instance.get();
 }
 
 Jit* World::jit()
 {
-	if(!jit_instance)
-		jit_instance = std::make_unique<Jit>(this);
 	return jit_instance.get();
 }
 
@@ -91,6 +91,9 @@ void World::create_core_namespace()
 				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &scheduler_export));
 
 	add_external(std::make_unique<ExternalDefinition>
+				 ("jit", std::vector<Type*>(), core->type("opaque"), "", &jit_export));
+
+	add_external(std::make_unique<ExternalDefinition>
 				 ("print", std::vector<Type*>{core->type("opaque")},
 				  core->type("unit"), "", (void*)&xerxzema_print, true));
 
@@ -102,6 +105,7 @@ void World::create_core_namespace()
 
 	core->add_external_mapping(externals["xerxzema.print"].get());
 	core->add_external_mapping(externals["xerxzema.scheduler"].get());
+	core->add_external_mapping(externals["xerxzema.jit"].get());
 	core->add_external_mapping(externals["xerxzema.schedule"].get());
 
 	namespaces.emplace("core", std::move(core));
