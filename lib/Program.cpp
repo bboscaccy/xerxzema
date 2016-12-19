@@ -276,7 +276,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		data_types.push_back(r->type()->type(context)->getPointerTo());
 		r->offset(i++);
 	}
-	state_type = llvm::StructType::create(context, data_types, _name + "_data");
+	state_type = llvm::StructType::create(context, data_types, _name + ".state.data");
 
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());

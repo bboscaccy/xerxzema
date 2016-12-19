@@ -99,7 +99,7 @@ Program* Namespace::get_program(const std::string &name)
 
 Program* Namespace::get_default_program()
 {
-	return get_program("<default>");
+	return get_program(_name + ".default");
 }
 
 bool Namespace::is_program(const std::string &name)

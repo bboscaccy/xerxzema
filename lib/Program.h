@@ -56,7 +56,7 @@ public:
 
 	inline RegisterData temp_reg()
 	{
-		return reg_data("temp@" + std::to_string(locals.size() + 1));
+		return reg_data("temp." + std::to_string(locals.size() + 1));
 	}
 
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);

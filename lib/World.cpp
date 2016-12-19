@@ -100,9 +100,9 @@ void World::create_core_namespace()
 						 core->type("opaque"), core->type("int")},
 				  core->type("unit"), "", (void*)&xerxzema_schedule));
 
-	core->add_external_mapping(externals["xerxzema:print"].get());
-	core->add_external_mapping(externals["xerxzema:scheduler"].get());
-	core->add_external_mapping(externals["xerxzema:schedule"].get());
+	core->add_external_mapping(externals["xerxzema.print"].get());
+	core->add_external_mapping(externals["xerxzema.scheduler"].get());
+	core->add_external_mapping(externals["xerxzema.schedule"].get());
 
 	namespaces.emplace("core", std::move(core));
 
@@ -148,12 +148,12 @@ ExternalDefinition::ExternalDefinition(const std::string& name, const std::vecto
 	if(lib_name == "")
 	{
 		lib = llvm::sys::DynamicLibrary::getPermanentLibrary(nullptr);
-		symbol_name = "xerxzema:" + name;
+		symbol_name = "xerxzema." + name;
 	}
 	else
 	{
 		lib = llvm::sys::DynamicLibrary::getPermanentLibrary(lib_name.c_str(), &err_msg);
-		symbol_name = lib_name + ":" + name;
+		symbol_name = lib_name + "." + name;
 		if(!lib.isValid())
 		{
 			emit_error(err_msg);
