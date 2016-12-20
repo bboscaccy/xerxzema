@@ -606,6 +606,9 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 }
 
+//TODO create a trampoline-transform wrapper around closures as well
+//and we need to implement a mutex around transformers and closures
+//PROBABLY a r/w type of lock
 llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 									 llvm::LLVMContext& context, llvm::Module* module)
 {
@@ -668,7 +671,7 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 		//call the original function back with the bound io values...
 		std::vector<llvm::Value*> args;
 		args.push_back(state);
-		builder.CreateRet(builder.CreateCall(function, args));
+		builder.CreateRet(builder.CreateCall(trampoline, args));
 	}
 	else
 	{
