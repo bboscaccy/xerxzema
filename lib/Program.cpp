@@ -451,6 +451,32 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	return first_block;
 }
 
+void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
+{
+	auto ftype = function_type(context);
+	if(!ftype)
+	{
+		emit_error("aborting codegen for " + name_space()->full_name() + "." + _name);
+		valid = false;
+		return;
+	}
+	auto function_trampoline = llvm::Function::Create
+		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name, module);
+
+	auto call_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
+											  llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
+											  function, _name + ".call_site");
+
+	llvm::IRBuilder<> builder(context);
+	auto bb = llvm::BasicBlock::Create(context, "trampoline", function_trampoline);
+	builder.SetInsertPoint(bb);
+	std::vector<llvm::Value*> args;
+	args.push_back(&*function_trampoline->arg_begin());
+	auto call_value = builder.CreateLoad(call_site);
+	builder.CreateRet(builder.CreateCall(call_value, args));
+
+}
+
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);
@@ -464,22 +490,9 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									 _name + ".impl.0" , module);
 
-	auto function_trampoline = llvm::Function::Create(ftype,
-									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									  _name,  module);
-
-
 	_current_module = module;
 
 	llvm::IRBuilder<> builder(context);
-	{
-		auto bb = llvm::BasicBlock::Create(context, "trampoline", function_trampoline);
-		builder.SetInsertPoint(bb);
-		std::vector<llvm::Value*> args;
-		args.push_back(&*function_trampoline->arg_begin());
-		builder.CreateRet(builder.CreateCall(function, args));
-	}
-
 
 	program_state = &*function->arg_begin();
 

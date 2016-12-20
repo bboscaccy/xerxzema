@@ -59,6 +59,7 @@ public:
 		return reg_data("temp." + std::to_string(locals.size() + 1));
 	}
 
+	void trampoline_gen(llvm::Module* module, llvm::LLVMContext& context);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
