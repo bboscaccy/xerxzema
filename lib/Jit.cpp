@@ -84,7 +84,6 @@ void Jit::compile_namespace(Namespace* ns)
 	for(auto p: programs)
 	{
 		p->code_gen(module.get(), _context);
-		p->trampoline_gen(module.get(), _context);
 	}
 
 

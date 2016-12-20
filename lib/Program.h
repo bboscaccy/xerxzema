@@ -59,7 +59,6 @@ public:
 		return reg_data("temp." + std::to_string(locals.size() + 1));
 	}
 
-	void trampoline_gen(llvm::Module* module, llvm::LLVMContext& context);
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
@@ -88,6 +87,7 @@ public:
 	llvm::Value* create_closure(Register* reg, bool reinvoke,
 								llvm::LLVMContext& context, llvm::Module* module);
 	inline bool is_valid() const { return valid; }
+	inline llvm::GlobalVariable* get_call_site() { return call_site; }
 
 private:
 	bool check_instruction(const std::string& name,
@@ -98,6 +98,7 @@ private:
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
+	void trampoline_gen(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::BasicBlock* generate_entry_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 
 	std::map<std::string, std::unique_ptr<Register>> registers;
@@ -110,7 +111,9 @@ private:
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;
 	llvm::Function* function;
+	llvm::Function* trampoline;
 	llvm::Module* _current_module;
+	llvm::GlobalVariable* call_site;
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
 	int alpha_offset;
 	int beta_offset;
