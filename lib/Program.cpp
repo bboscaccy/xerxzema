@@ -233,12 +233,16 @@ bool Program::check_instruction(const std::string &name,
 
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
+	//WHY dont' we just spin-wait for the initial version of this
+	//and try to get clever later that will really simplify
+	//
 	std::vector<llvm::Type*> data_types;
-	data_types.push_back(llvm::Type::getInt1Ty(context));  //remove this and use version
+	data_types.push_back(llvm::Type::getInt1Ty(context));  //the "has initialized yet" flag
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //version data
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //ref counter
+	data_types.push_back(llvm::Type::getInt32Ty(context)); //user counter
 	data_types.push_back(llvm::Type::getInt64Ty(context)); //time when scheduled
-	int i = 4;
+	int i = 5;
 	for(auto r: locals)
 	{
 		if(!r->type())
@@ -461,9 +465,22 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name, module);
 
 	llvm::IRBuilder<> builder(context);
+	auto entry_block = llvm::BasicBlock::Create(context, "entry", trampoline);
 	auto check_block = llvm::BasicBlock::Create(context, "check", trampoline);
 	auto jump_block = llvm::BasicBlock::Create(context, "trampoline", trampoline);
 	auto fix_block = llvm::BasicBlock::Create(context, "fix", trampoline);
+
+
+	builder.SetInsertPoint(entry_block);
+	auto user_counter_ptr = builder.CreateStructGEP(state_type, &*trampoline->arg_begin(), 3);
+	auto attempt_val = builder.CreateAtomicCmpXchg(user_counter_ptr, const_int32(context, 0),
+												   const_int32(context, 1),
+												   llvm::AtomicOrdering::AcquireRelease,
+												   llvm::AtomicOrdering::AcquireRelease);
+	auto succeded = builder.CreateExtractValue(attempt_val, 1);
+	builder.CreateCondBr(succeded, check_block, entry_block);
+	builder.CreateBr(check_block);
+
 	builder.SetInsertPoint(check_block);
 	auto version_value = builder.CreateLoad(version_number);
 
@@ -475,6 +492,7 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 
 
 	builder.SetInsertPoint(fix_block);
+	//spin wait here until there are no pending uses
 	std::vector<llvm::Value*> fix_args;
 	fix_args.push_back(&*trampoline->arg_begin());
 	auto transform_value = builder.CreateLoad(transform_site);
@@ -485,8 +503,13 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 	std::vector<llvm::Value*> args;
 	args.push_back(&*trampoline->arg_begin());
 	auto call_value = builder.CreateLoad(call_site);
-	builder.CreateRet(builder.CreateCall(call_value, args));
+	auto ret = builder.CreateCall(call_value, args);
 
+
+	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Sub, user_counter_ptr,
+							const_int32(context, 1), llvm::AtomicOrdering::AcquireRelease);
+
+	builder.CreateRet(ret);
 }
 
 void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
@@ -637,6 +660,9 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 	llvm::IRBuilder<> builder(context);
 	auto block = llvm::BasicBlock::Create(context, "entry", fn);
 	builder.SetInsertPoint(block);
+
+	//TODO insert user/mutator? lock right here using atomics
+
 
 	auto alpha_ptr = builder.CreateStructGEP(state_type, state, alpha_offset);
 	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
