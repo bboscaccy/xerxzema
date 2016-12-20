@@ -235,8 +235,10 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;
 	data_types.push_back(llvm::Type::getInt1Ty(context));
+	data_types.push_back(llvm::Type::getInt32Ty(context)); //version data
+	data_types.push_back(llvm::Type::getInt32Ty(context)); //ref counter
 	data_types.push_back(llvm::Type::getInt64Ty(context));//state value
-	int i = 2;
+	int i = 4;
 	for(auto r: locals)
 	{
 		if(!r->type())
