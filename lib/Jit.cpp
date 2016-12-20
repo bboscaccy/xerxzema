@@ -52,27 +52,16 @@ static llvm::RuntimeDyld::SymbolInfo get_symbol(llvm::orc::JITSymbol& symbol)
 Jit::Jit(World* world) : _world(world),
 						 dump_pre_optimization(false),
 						 dump_post_optimization(false),
-
 						 target_machine(llvm::EngineBuilder().selectTarget()),
-
 						 data_layout(target_machine->createDataLayout()),
-
 						 compiler(linker, llvm::orc::SimpleCompiler(*target_machine)),
-
-						 optimizer(compiler, JitOptimizer()),
-
-						 compile_callback_manager(llvm::orc::createLocalCompileCallbackManager
-												  (target_machine->getTargetTriple(), 0)),
-
-						 indirect_stubs_manager(llvm::orc
-												::createLocalIndirectStubsManagerBuilder
-												(target_machine->getTargetTriple())())
+						 optimizer(compiler, JitOptimizer())
 
 {
 	scheduler = world->scheduler();
 	llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
 }
-//ON demand compiling breaks the assumption that 1 namespace == 1 module
+
 std::unique_ptr<llvm::Module> Jit::create_module(Namespace* ns)
 {
 	auto module = std::make_unique<llvm::Module>(ns->full_name(), _context);
@@ -86,9 +75,11 @@ std::unique_ptr<llvm::Module> Jit::create_module(Namespace* ns)
 
 void Jit::compile_namespace(Namespace* ns)
 {
+	std::vector<std::unique_ptr<llvm::Module>> module_set;
 
 	auto module = create_module(ns);
 	auto programs = ns->get_programs();
+
 
 	for(auto p: programs)
 	{
@@ -99,7 +90,6 @@ void Jit::compile_namespace(Namespace* ns)
 	if(dump_pre_optimization)
 		module->dump();
 
-	std::vector<std::unique_ptr<llvm::Module>> module_set;
 	module_set.push_back(std::move(module));
 
 	optimizer.addModuleSet(std::move(module_set),
@@ -108,9 +98,6 @@ void Jit::compile_namespace(Namespace* ns)
 
 
 	/*
-	if(dump_pre_optimization)
-		modules[ns->full_name()]->dump();
-
 	if(dump_post_optimization)
 		modules[ns->full_name()]->dump();
 	*/

@@ -462,10 +462,25 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	}
 	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									 _name , module);
+									 _name + ".impl.0" , module);
+
+	auto function_trampoline = llvm::Function::Create(ftype,
+									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+									  _name,  module);
+
+
 	_current_module = module;
 
 	llvm::IRBuilder<> builder(context);
+	{
+		auto bb = llvm::BasicBlock::Create(context, "trampoline", function_trampoline);
+		builder.SetInsertPoint(bb);
+		std::vector<llvm::Value*> args;
+		args.push_back(&*function_trampoline->arg_begin());
+		builder.CreateRet(builder.CreateCall(function, args));
+	}
+
+
 	program_state = &*function->arg_begin();
 
 	auto post_entry_block = generate_entry_block(context, builder);
