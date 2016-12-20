@@ -234,10 +234,10 @@ bool Program::check_instruction(const std::string &name,
 llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 {
 	std::vector<llvm::Type*> data_types;
-	data_types.push_back(llvm::Type::getInt1Ty(context));
+	data_types.push_back(llvm::Type::getInt1Ty(context));  //remove this and use version
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //version data
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //ref counter
-	data_types.push_back(llvm::Type::getInt64Ty(context));//state value
+	data_types.push_back(llvm::Type::getInt64Ty(context)); //time when scheduled
 	int i = 4;
 	for(auto r: locals)
 	{
@@ -461,13 +461,43 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name, module);
 
 	llvm::IRBuilder<> builder(context);
-	auto bb = llvm::BasicBlock::Create(context, "trampoline", trampoline);
-	builder.SetInsertPoint(bb);
+	auto check_block = llvm::BasicBlock::Create(context, "check", trampoline);
+	auto jump_block = llvm::BasicBlock::Create(context, "trampoline", trampoline);
+	auto fix_block = llvm::BasicBlock::Create(context, "fix", trampoline);
+	builder.SetInsertPoint(check_block);
+	auto version_value = builder.CreateLoad(version_number);
+	auto current_ptr = builder.CreateStructGEP(state_type, &*trampoline->arg_begin(), 1);
+	auto current_value = builder.CreateLoad(current_ptr);
+	auto compare = builder.CreateICmpEQ(current_value, version_value);
+	builder.CreateCondBr(compare, jump_block, fix_block);
+
+
+	builder.SetInsertPoint(fix_block);
+	std::vector<llvm::Value*> fix_args;
+	fix_args.push_back(&*trampoline->arg_begin());
+	auto transform_value = builder.CreateLoad(transform_site);
+	builder.CreateCall(transform_value, fix_args);
+	builder.CreateBr(jump_block);
+
+	builder.SetInsertPoint(jump_block);
 	std::vector<llvm::Value*> args;
 	args.push_back(&*trampoline->arg_begin());
 	auto call_value = builder.CreateLoad(call_site);
 	builder.CreateRet(builder.CreateCall(call_value, args));
 
+}
+
+void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
+{
+	//just generate the default transformer for right now
+	auto ftype = function->getFunctionType();
+	transformer = llvm::Function::Create
+		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name + ".transformer.impl0", module);
+
+	llvm::IRBuilder<> builder(context);
+	auto bb = llvm::BasicBlock::Create(context, "transform", transformer);
+	builder.SetInsertPoint(bb);
+	builder.CreateRet(const_int64(context, 0));
 }
 
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
@@ -488,11 +518,16 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		call_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
 											 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
 											 function, _name + ".call_site");
+		transform_gen(module, context);
+		transform_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
+											 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
+											 transformer, _name + ".transform_site");
 
 		version_number = new llvm::GlobalVariable
 			(*module, llvm::Type::getInt32Ty(context), false,
 			 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
 			 const_int32(context, 0), _name + ".version_number");
+
 		trampoline_gen(module, context);
 	}
 

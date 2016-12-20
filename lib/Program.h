@@ -99,6 +99,8 @@ private:
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 	void trampoline_gen(llvm::Module* module, llvm::LLVMContext& context);
+	void transform_stub_gen(llvm::Module* module, llvm::LLVMContext& context);
+	void transform_gen(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::BasicBlock* generate_entry_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 
 	std::map<std::string, std::unique_ptr<Register>> registers;
@@ -112,9 +114,11 @@ private:
 	llvm::Value* activation_counter;
 	llvm::Function* function;
 	llvm::Function* trampoline;
+	llvm::Function* transformer;
 	llvm::Module* _current_module;
 	llvm::GlobalVariable* call_site;
 	llvm::GlobalVariable* version_number;
+	llvm::GlobalVariable* transform_site;
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
 	int alpha_offset;
 	int beta_offset;
