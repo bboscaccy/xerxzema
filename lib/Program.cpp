@@ -466,6 +466,8 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 	auto fix_block = llvm::BasicBlock::Create(context, "fix", trampoline);
 	builder.SetInsertPoint(check_block);
 	auto version_value = builder.CreateLoad(version_number);
+
+	//stuff like this is very fragile...
 	auto current_ptr = builder.CreateStructGEP(state_type, &*trampoline->arg_begin(), 1);
 	auto current_value = builder.CreateLoad(current_ptr);
 	auto compare = builder.CreateICmpEQ(current_value, version_value);
