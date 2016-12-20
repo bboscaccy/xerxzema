@@ -486,6 +486,11 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		call_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
 											 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
 											 function, _name + ".call_site");
+
+		version_number = new llvm::GlobalVariable
+			(*module, llvm::Type::getInt32Ty(context), false,
+			 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
+			 const_int32(context, 0), _name + ".version_number");
 		trampoline_gen(module, context);
 	}
 
