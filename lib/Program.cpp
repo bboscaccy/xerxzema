@@ -344,15 +344,7 @@ void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>&
 	{
 		auto val = builder.CreateLoad(r->value());
 		auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-		if(is_trivial)
-		{
-			builder.CreateStore(val, ptr);
-		}
-		else
-		{
-			builder.CreateAtomicRMW(llvm::AtomicRMWInst::Or, ptr, val,
-									llvm::AtomicOrdering::AcquireRelease);
-		}
+		builder.CreateStore(val, ptr);
 
 		auto instruction_state_type = r->state_type(context);
 		if(instruction_state_type != nullptr)
@@ -412,10 +404,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	builder.CreateBr(first_block);
 
 	builder.SetInsertPoint(resume_block);
-	//TODO add is_trivial check here...
-	auto beta_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), beta_offset);
-	auto beta_val = builder.CreateLoad(beta_ptr);
-	builder.CreateFence(llvm::AtomicOrdering::Acquire);
+
 	for(auto& reg: registers)
 	{
 		auto r = reg.second.get();
@@ -442,12 +431,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 			builder.CreateMemCpy(dst_ptr, src_ptr, sz, 0);
 		}
 	}
-	builder.CreateFence(llvm::AtomicOrdering::Release);
-	auto alpha_ptr =  builder.CreateStructGEP(state_type, &*function->arg_begin(), alpha_offset);
-	auto alpha_val = builder.CreateLoad(alpha_ptr);
-
-	auto check_frame = builder.CreateICmpEQ(alpha_val, beta_val);
-	builder.CreateCondBr(check_frame, input_activation_block, resume_block);
+	builder.CreateBr(input_activation_block);
 
 	builder.SetInsertPoint(input_activation_block);
 	for(auto r: inputs)
