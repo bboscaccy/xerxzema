@@ -661,15 +661,6 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 	auto block = llvm::BasicBlock::Create(context, "entry", fn);
 	builder.SetInsertPoint(block);
 
-	//TODO insert user/mutator? lock right here using atomics
-
-
-	auto alpha_ptr = builder.CreateStructGEP(state_type, state, alpha_offset);
-	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, alpha_ptr,
-							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
-							llvm::AtomicOrdering::AcquireRelease);
-
-	builder.CreateFence(llvm::AtomicOrdering::Acquire);
 	if(reg->type()->name() != "unit")
 	{
 		auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
@@ -682,21 +673,18 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 		auto ptr = builder.CreateStructGEP(state_type, state,
 										   activate.instruction->offset());
 		auto mask = llvm::ConstantInt::get(llvm::Type::getInt16Ty(context), activate.value);
-		builder.CreateAtomicRMW(llvm::AtomicRMWInst::Or, ptr, mask,
-								llvm::AtomicOrdering::AcquireRelease);
-
+		auto val = builder.CreateLoad(ptr);
+		auto new_val = builder.CreateOr(val, mask);
+		builder.CreateStore(new_val, ptr);
 	}
-	builder.CreateFence(llvm::AtomicOrdering::Release);
-	auto beta_ptr = builder.CreateStructGEP(state_type, state, beta_offset);
-	builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, beta_ptr,
-							llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 1),
-							llvm::AtomicOrdering::AcquireRelease);
 
 	if(reinvoke)
 	{
 		//call the original function back with the bound io values...
 		std::vector<llvm::Value*> args;
 		args.push_back(state);
+		//TODO as soon as you have trampolines calling closures, make sure to
+		//decrement the use counter here..
 		builder.CreateRet(builder.CreateCall(trampoline, args));
 	}
 	else
