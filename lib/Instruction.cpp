@@ -560,7 +560,9 @@ void Schedule::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> 
 	auto scheduler = builder.CreateLoad(scheduler_var);
 	auto time = _inputs[0]->fetch_value(context, builder);
 	auto state = program->current_state();
-	builder.CreateCall(fn, {scheduler, closure, state, time});
+	auto state_cast = builder.CreateBitCast(state, llvm::Type::getInt8PtrTy(context));
+	auto closure_cast = builder.CreateBitCast(closure, llvm::Type::getInt8PtrTy(context));
+	builder.CreateCall(fn, {scheduler, closure_cast, state_cast, time});
 }
 
 void Schedule::generate_prolouge(llvm::LLVMContext &context,
