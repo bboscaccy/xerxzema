@@ -269,11 +269,6 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		}
 	}
 
-	data_types.push_back(llvm::Type::getInt32Ty(context));
-	alpha_offset = i++;
-	data_types.push_back(llvm::Type::getInt32Ty(context));
-	beta_offset = i++;
-
 	for(auto& r:inputs)
 	{
 		data_types.push_back(r->type()->type(context)->getPointerTo());

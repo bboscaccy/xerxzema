@@ -121,8 +121,6 @@ private:
 	llvm::GlobalVariable* version_number;
 	llvm::GlobalVariable* transform_site;
 	std::vector<std::unique_ptr<DeferredInstruction>> deferred;
-	int alpha_offset;
-	int beta_offset;
 	bool is_trivial;
 	llvm::Value* program_state;
 	bool valid;
