@@ -96,7 +96,7 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 
 	auto function = llvm::Function::Create(transformer_type,
 										   llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-										   next->program_name() + "@transformer",
+										   next->program_name() + ".transformer",
 										   next->current_module());
 
 	auto arg_it = function->arg_begin();
