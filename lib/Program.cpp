@@ -307,9 +307,12 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 
 	for(auto r: locals)
 	{
-		auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
-		r->value(value);
-		r->type()->init(context, builder, value); //this should only be done during head
+		if(r->type()->name() != "unit")
+		{
+			auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
+			r->value(value);
+			r->type()->init(context, builder, value); //this should only be done during head
+		}
 	}
 	for(auto& i: instructions)
 	{
