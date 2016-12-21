@@ -98,7 +98,8 @@ private:
 	void allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 							llvm::Function* fn);
 	void generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
-	void trampoline_gen(llvm::Module* module, llvm::LLVMContext& context);
+	llvm::Function* trampoline_gen(llvm::Module* module, llvm::LLVMContext& context,
+								   llvm::GlobalVariable* target_call, const std::string& call_name);
 	void transform_stub_gen(llvm::Module* module, llvm::LLVMContext& context);
 	void transform_gen(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::BasicBlock* generate_entry_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
@@ -113,8 +114,8 @@ private:
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;
 	llvm::Function* function;
-	llvm::Function* trampoline;
 	llvm::Function* transformer;
+	llvm::Function* trampoline_entry;
 	llvm::Module* _current_module;
 	llvm::GlobalVariable* call_site;
 	llvm::GlobalVariable* version_number;

@@ -15,7 +15,7 @@ namespace xerxzema
 {
 Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name),
 														  is_trivial(false), valid(true),
-														  call_site(nullptr), trampoline(nullptr)
+														  call_site(nullptr)
 {
 	reg("head");
 	reg("head")->type(p->world()->get_namespace("core")->type("unit"));
@@ -242,6 +242,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //ref counter
 	data_types.push_back(llvm::Type::getInt32Ty(context)); //user counter
 	data_types.push_back(llvm::Type::getInt64Ty(context)); //time when scheduled
+	//we may want to promote the time-when-scheduled to a function argument
 	int i = 5;
 	for(auto r: locals)
 	{
@@ -442,11 +443,12 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 	return first_block;
 }
 
-void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
+llvm::Function* Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context,
+										llvm::GlobalVariable* target_call, const std::string& call_name)
 {
 	auto ftype = function->getFunctionType();
-	trampoline = llvm::Function::Create
-		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name, module);
+	auto trampoline = llvm::Function::Create
+		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, call_name, module);
 
 	llvm::IRBuilder<> builder(context);
 	auto entry_block = llvm::BasicBlock::Create(context, "entry", trampoline);
@@ -463,7 +465,6 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 												   llvm::AtomicOrdering::AcquireRelease);
 	auto succeded = builder.CreateExtractValue(attempt_val, 1);
 	builder.CreateCondBr(succeded, check_block, entry_block);
-	builder.CreateBr(check_block);
 
 	builder.SetInsertPoint(check_block);
 	auto version_value = builder.CreateLoad(version_number);
@@ -486,7 +487,7 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 	builder.SetInsertPoint(jump_block);
 	std::vector<llvm::Value*> args;
 	args.push_back(&*trampoline->arg_begin());
-	auto call_value = builder.CreateLoad(call_site);
+	auto call_value = builder.CreateLoad(target_call);
 	auto ret = builder.CreateCall(call_value, args);
 
 
@@ -494,6 +495,8 @@ void Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext& context)
 							const_int32(context, 1), llvm::AtomicOrdering::AcquireRelease);
 
 	builder.CreateRet(ret);
+
+	return trampoline;
 }
 
 void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
@@ -537,7 +540,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 			 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
 			 const_int32(context, 0), _name + ".version_number");
 
-		trampoline_gen(module, context);
+		trampoline_entry = trampoline_gen(module, context, call_site, _name);
 	}
 
 	_current_module = module;
@@ -630,7 +633,15 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 
 	auto fn = llvm::Function::Create(closure_type,
 									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									  _name + ".closure." + reg->name(), module);
+									 _name + ".closure." + reg->name() + ".impl0", module);
+
+	auto closure_var  = new llvm::GlobalVariable(*module, closure_type->getPointerTo(), false,
+												 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
+												 fn, _name + ".closure." + reg->name() + ".call_site");
+
+	//TODO get this to work with extra input variables.
+	auto wrapper = trampoline_gen(module, context, closure_var, _name + ".closure." + reg->name());
+
 	llvm::Value* arg_ptr = nullptr;
 	auto args = fn->arg_begin();
 
@@ -664,18 +675,21 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 
 	if(reinvoke)
 	{
+		//decrement the lock counter
+		auto user_counter_ptr = builder.CreateStructGEP(state_type, &*fn->arg_begin(), 3);
+		builder.CreateAtomicRMW(llvm::AtomicRMWInst::Sub, user_counter_ptr,
+							const_int32(context, 1), llvm::AtomicOrdering::AcquireRelease);
+
 		//call the original function back with the bound io values...
 		std::vector<llvm::Value*> args;
 		args.push_back(state);
-		//TODO as soon as you have trampolines calling closures, make sure to
-		//decrement the use counter here..
-		builder.CreateRet(builder.CreateCall(trampoline, args));
+		builder.CreateRet(builder.CreateCall(trampoline_entry, args));
 	}
 	else
 	{
 		builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 	}
 
-	return fn;
+	return wrapper;
 }
 };
