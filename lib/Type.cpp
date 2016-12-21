@@ -91,7 +91,7 @@ void Int::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Val
 
 llvm::Type* Opaque::type(llvm::LLVMContext &context)
 {
-	return llvm::Type::getVoidTy(context)->getPointerTo();
+	return llvm::Type::getInt8PtrTy(context);
 }
 
 std::string Opaque::name()
