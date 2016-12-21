@@ -271,12 +271,12 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 
 	for(auto& r:inputs)
 	{
-		data_types.push_back(r->type()->type(context)->getPointerTo());
+		data_types.push_back(r->type()->type(context));
 		r->offset(i++);
 	}
 	for(auto& r:outputs)
 	{
-		data_types.push_back(r->type()->type(context)->getPointerTo());
+		data_types.push_back(r->type()->type(context));
 		r->offset(i++);
 	}
 	state_type = llvm::StructType::create(context, data_types, _name + ".state.data");
