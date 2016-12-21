@@ -532,8 +532,11 @@ void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bu
 	input_str += ") %f\n";
 	auto format_str = builder.CreateGlobalString(input_str);
 
+	auto format_addr = builder.CreateInBoundsGEP(format_str,
+										 {builder.getInt32(0), builder.getInt32(0)});
+
 	auto fn = program->name_space()->get_external_function("print", program->current_module(), context);
-	builder.CreateCall(fn, {format_str, _inputs[0]->fetch_value(context, builder)});
+	builder.CreateCall(fn, {format_addr, _inputs[0]->fetch_value(context, builder)});
 }
 
 void Trace::generate_prolouge(llvm::LLVMContext &context,
