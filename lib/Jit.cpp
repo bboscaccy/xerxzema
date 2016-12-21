@@ -11,6 +11,7 @@
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Mangler.h"
+#include "llvm/IR/Verifier.h"
 #include "llvm/Support/DynamicLibrary.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
@@ -96,17 +97,13 @@ void Jit::compile_namespace(Namespace* ns)
 						  std::make_unique<llvm::SectionMemoryManager>(),
 						  std::make_unique<JitResolver>(_world));
 
-
-	/*
-	if(dump_post_optimization)
-		modules[ns->full_name()]->dump();
-	*/
 }
 
 std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Module> module)
 {
 	auto fpm = std::make_unique<llvm::legacy::FunctionPassManager>(module.get());
 
+	fpm->add(llvm::createVerifierPass());
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
 	fpm->add(llvm::createLoadCombinePass());
 	fpm->add(llvm::createInstructionCombiningPass());
@@ -121,6 +118,12 @@ std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Mod
 	{
 		fpm->run(f);
 	}
+
+	/*
+	if(dump_post_optimization)
+		modules[ns->full_name()]->dump();
+	*/
+
 	return std::move(module);
 }
 
