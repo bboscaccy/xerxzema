@@ -450,19 +450,22 @@ llvm::Function* Program::trampoline_gen(llvm::Module* module, llvm::LLVMContext&
 
 	llvm::IRBuilder<> builder(context);
 	auto entry_block = llvm::BasicBlock::Create(context, "entry", trampoline);
+	auto lock_block =  llvm::BasicBlock::Create(context, "lock", trampoline);
 	auto check_block = llvm::BasicBlock::Create(context, "check", trampoline);
 	auto jump_block = llvm::BasicBlock::Create(context, "trampoline", trampoline);
 	auto fix_block = llvm::BasicBlock::Create(context, "fix", trampoline);
 
 
 	builder.SetInsertPoint(entry_block);
+	builder.CreateBr(lock_block);
+	builder.SetInsertPoint(lock_block);
 	auto user_counter_ptr = builder.CreateStructGEP(state_type, &*trampoline->arg_begin(), 3);
 	auto attempt_val = builder.CreateAtomicCmpXchg(user_counter_ptr, const_int32(context, 0),
 												   const_int32(context, 1),
 												   llvm::AtomicOrdering::AcquireRelease,
-												   llvm::AtomicOrdering::AcquireRelease);
+												   llvm::AtomicOrdering::Monotonic);
 	auto succeded = builder.CreateExtractValue(attempt_val, 1);
-	builder.CreateCondBr(succeded, check_block, entry_block);
+	builder.CreateCondBr(succeded, check_block, lock_block);
 
 	builder.SetInsertPoint(check_block);
 	auto version_value = builder.CreateLoad(version_number);
