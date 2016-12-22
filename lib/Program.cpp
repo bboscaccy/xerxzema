@@ -552,6 +552,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 	auto post_entry_block = generate_entry_block(context, builder);
 	auto tail_block = llvm::BasicBlock::Create(context, "tail", function);
+
 	builder.SetInsertPoint(post_entry_block);
 
 
@@ -617,9 +618,6 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 }
 
-//TODO create a trampoline-transform wrapper around closures as well
-//and we need to implement a mutex around transformers and closures
-//PROBABLY a r/w type of lock
 llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 									 llvm::LLVMContext& context, llvm::Module* module)
 {

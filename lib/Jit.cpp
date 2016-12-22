@@ -105,12 +105,17 @@ std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Mod
 
 	fpm->add(llvm::createVerifierPass());
 	fpm->add(llvm::createPromoteMemoryToRegisterPass());
+	fpm->add(llvm::createLoopIdiomPass());
+	fpm->add(llvm::createStraightLineStrengthReducePass());
+	fpm->add(llvm::createAggressiveDCEPass());
+	fpm->add(llvm::createInstructionSimplifierPass());
+	fpm->add(llvm::createConstantPropagationPass());
+	fpm->add(llvm::createCorrelatedValuePropagationPass());
+	fpm->add(llvm::createReassociatePass());
 	fpm->add(llvm::createLoadCombinePass());
 	fpm->add(llvm::createInstructionCombiningPass());
-	fpm->add(llvm::createDeadCodeEliminationPass());
-	fpm->add(llvm::createConstantPropagationPass());
+	fpm->add(llvm::createDeadStoreEliminationPass());
 	fpm->add(llvm::createJumpThreadingPass());
-	fpm->add(llvm::createReassociatePass());
 
 	fpm->doInitialization();
 
@@ -123,6 +128,7 @@ std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Mod
 	if(dump_post_optimization)
 		modules[ns->full_name()]->dump();
 	*/
+	module->dump();
 
 	return std::move(module);
 }
