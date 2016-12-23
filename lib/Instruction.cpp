@@ -4,6 +4,7 @@
 #include "LLVMUtils.h"
 #include <sstream>
 #include "Namespace.h"
+#include "Diagnostics.h"
 
 namespace xerxzema
 {
@@ -283,7 +284,11 @@ void ValueInt::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> 
 ProgramDirectCall::ProgramDirectCall(Program* target) : target(target) {}
 llvm::Type* ProgramDirectCall::state_type(llvm::LLVMContext &context)
 {
-	return target->state_type_value()->getPointerTo();
+
+	if(_state_type)
+		return _state_type;
+	_state_type = target->state_type_value()->getPointerTo();
+	return _state_type;
 }
 
 void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,

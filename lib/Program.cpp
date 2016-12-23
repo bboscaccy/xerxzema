@@ -531,6 +531,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		valid = false;
 		return;
 	}
+	emit_debug("codegen for: " + symbol_name());
 	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 									 symbol_name() + ".impl.0" , module);

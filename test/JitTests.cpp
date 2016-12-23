@@ -184,5 +184,6 @@ foo(2.0) -> res;
 trace(res);
 )EOF";
 	xerxzema::parse_input(program_str, ns);
+	world.jit()->compile_namespace(ns);
 
 }
