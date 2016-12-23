@@ -128,6 +128,19 @@ private:
 	int64_t value;
 };
 
+class ProgramDirectCall : public Instruction
+{
+public:
+	llvm::Type* state_type(llvm::LLVMContext& context);
+	ProgramDirectCall(Program* target);
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	std::string name();
+private:
+	Program* target;
+};
+
 class Counter : public Instruction
 {
 public:

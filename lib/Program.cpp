@@ -513,6 +513,20 @@ void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
 	builder.CreateRet(const_int64(context, 0));
 }
 
+llvm::Function* Program::create_declaration(llvm::Module* module, llvm::LLVMContext& context)
+{
+
+	auto ftype = function_type(context);
+	if(!ftype)
+	{
+		//report this somehow...
+		return nullptr;
+	}
+	return llvm::Function::Create(ftype,
+								  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+								  symbol_name(), module);
+}
+
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);

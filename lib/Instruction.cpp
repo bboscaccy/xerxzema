@@ -280,6 +280,50 @@ void ValueInt::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> 
 }
 
 
+ProgramDirectCall::ProgramDirectCall(Program* target) : target(target) {}
+llvm::Type* ProgramDirectCall::state_type(llvm::LLVMContext &context)
+{
+	return target->state_type_value()->getPointerTo();
+}
+
+void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+										   xerxzema::Program *program)
+{
+	auto fn = program->current_module()->getFunction(target->symbol_name());
+	if(!fn)
+	{
+		fn = program->create_declaration(program->current_module(), context);
+	}
+
+	//state_value locally is an alloca so that makes it a pointer to a pointer.
+	auto state = builder.CreateLoad(state_value());
+	auto in_counter = 0;
+	for(auto& reg:_inputs)
+	{
+		auto program_offset = program->input_registers()[in_counter]->offset();
+		auto value_ptr = builder.CreateStructGEP(program->state_type_value(), state, program_offset);
+		reg->type()->copy(context, builder, value_ptr, reg->fetch_value_raw(context, builder));
+		in_counter++;
+	}
+	auto call_ret = builder.CreateCall(fn, {state});
+	//TODO once we hook up return states from functions
+	//assign this...
+	auto out_counter = 0;
+	for(auto& reg:_outputs)
+	{
+		auto program_offset = program->input_registers()[in_counter]->offset();
+		auto value_ptr = builder.CreateStructGEP(program->state_type_value(), state, program_offset);
+		reg->type()->copy(context, builder, reg->fetch_value_raw(context, builder), value_ptr);
+		out_counter++;
+	}
+}
+
+std::string ProgramDirectCall::name()
+{
+	return "call " + target->symbol_name();
+}
+
+
 void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								 xerxzema::Program *program)
 {
