@@ -23,6 +23,12 @@ void HandleTopLevelExpression::visit(xerxzema::CodeDefinition *e)
 	HandleCodeDefinitionSignature handler(ns, e);
 	handler.process();
 	valid = handler.is_valid();
+	if(valid)
+	{
+		emit_debug(e->body->show());
+		HandleStatement body(handler.program(), e->body.get());
+		body.process();
+	}
 }
 
 HandleCodeDefinitionSignature::HandleCodeDefinitionSignature(Namespace* n, CodeDefinition* d) :
@@ -184,7 +190,7 @@ void HandleStatement::visit(StatementBlock *e)
 {
 	for(auto& s: e->expressions)
 	{
-		e->accept(*this);
+		s->accept(*this);
 	}
 }
 
