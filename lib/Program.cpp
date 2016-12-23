@@ -317,7 +317,6 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 		if(instruction_state_type != nullptr)
 		{
 			i->state_value(builder.CreateAlloca(instruction_state_type));
-			i->generate_state_initializer(context, builder, this);
 		}
 	}
 	activation_counter = builder.CreateAlloca(llvm::Type::getInt64Ty(context), nullptr, "counter");
@@ -392,6 +391,16 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 		{
 			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
 			r->type()->init(context, builder, ptr);
+		}
+	}
+
+	//initialize any default instruction state
+	for(auto& i: instructions)
+	{
+		auto instruction_state_type = i->state_type(context);
+		if(instruction_state_type != nullptr)
+		{
+			i->generate_state_initializer(context, builder, this);
 		}
 	}
 
