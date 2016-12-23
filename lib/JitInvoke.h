@@ -30,11 +30,6 @@ public:
 		return do_invoke(std::is_void<R>{}, args...);
 	}
 
-	R operator()()
-	{
-		return do_invoke(std::is_void<R>{});
-	}
-
 	R do_invoke(std::false_type)
 	{
 		auto r0 = program->output_registers()[0]->offset();
