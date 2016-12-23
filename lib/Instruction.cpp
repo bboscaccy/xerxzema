@@ -329,6 +329,15 @@ std::string ProgramDirectCall::name()
 	return "call." + target->symbol_name();
 }
 
+void ProgramDirectCall::generate_state_initializer(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+												   xerxzema::Program *program)
+{
+	auto size = llvm::ConstantExpr::getSizeOf(state_type(context));
+	auto fn = program->name_space()->get_external_function("malloc", program->current_module(), context);
+	auto result = builder.CreateCall(fn, {size});
+	auto ptr = builder.CreateBitCast(result, state_type(context));
+	builder.CreateStore(ptr, state_value());
+}
 
 void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 								 xerxzema::Program *program)

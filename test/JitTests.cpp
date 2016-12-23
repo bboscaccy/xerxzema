@@ -185,5 +185,7 @@ trace(res);
 )EOF";
 	xerxzema::parse_input(program_str, ns);
 	world.jit()->compile_namespace(ns);
-
+	auto p = ns->get_default_program();
+	xerxzema::JitInvoke<void> invoker(world.jit(), p);
+	invoker();
 }

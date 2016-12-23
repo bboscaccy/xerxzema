@@ -136,6 +136,9 @@ public:
 	void generate_operation(llvm::LLVMContext& context,
 							llvm::IRBuilder<> &builder,
 							Program* program);
+	void generate_state_initializer(llvm::LLVMContext& context,
+									llvm::IRBuilder<> &builder,
+									Program* program);
 	std::string name();
 private:
 	Program* target;
