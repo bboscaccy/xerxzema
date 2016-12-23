@@ -305,8 +305,8 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 	auto in_counter = 0;
 	for(auto& reg:_inputs)
 	{
-		auto program_offset = program->input_registers()[in_counter]->offset();
-		auto value_ptr = builder.CreateStructGEP(program->state_type_value(), state, program_offset);
+		auto program_offset = target->input_registers()[in_counter]->offset();
+		auto value_ptr = builder.CreateStructGEP(target->state_type_value(), state, program_offset);
 		reg->type()->copy(context, builder, value_ptr, reg->fetch_value_raw(context, builder));
 		in_counter++;
 	}
@@ -316,8 +316,8 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 	auto out_counter = 0;
 	for(auto& reg:_outputs)
 	{
-		auto program_offset = program->input_registers()[in_counter]->offset();
-		auto value_ptr = builder.CreateStructGEP(program->state_type_value(), state, program_offset);
+		auto program_offset = target->output_registers()[out_counter]->offset();
+		auto value_ptr = builder.CreateStructGEP(target->state_type_value(), state, program_offset);
 		reg->type()->copy(context, builder, reg->fetch_value_raw(context, builder), value_ptr);
 		out_counter++;
 	}
