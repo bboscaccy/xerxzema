@@ -151,7 +151,7 @@ void* Jit::get_state_offset(void* target, Program* program, int field)
 
 void* Jit::get_jitted_function(Program* program)
 {
-	return (void*)compiler.findSymbol(program->program_name(),false).getAddress();
+	return (void*)compiler.findSymbol(program->symbol_name(),false).getAddress();
 }
 
 JitResolver::JitResolver(World* world) : world(world)

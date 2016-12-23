@@ -69,7 +69,7 @@ public:
 	inline llvm::Value* current_state() { return program_state; }
 	inline Namespace* name_space() { return parent; }
 
-	inline std::string program_name() { return _name; }
+	inline std::string program_name() { return root_name; }
 	inline std::vector<Register*>& input_registers() { return inputs; }
 	inline std::vector<Register*>& output_registers() { return outputs; }
 
@@ -109,7 +109,7 @@ private:
 	std::vector<Register*> outputs;
 	std::vector<Register*> locals;
 	std::vector<std::unique_ptr<Instruction>> instructions;
-	std::string _name;
+	std::string root_name;
 	Namespace* parent;
 	llvm::Type* state_type;
 	llvm::Value* activation_counter;

@@ -13,7 +13,7 @@
 //the scheduler can then just invoke main like anything else...
 namespace xerxzema
 {
-Program::Program(Namespace* p, const std::string& name) : parent(p), _name(name),
+Program::Program(Namespace* p, const std::string& name) : parent(p), root_name(name),
 														  is_trivial(false), valid(true),
 														  call_site(nullptr)
 {
@@ -32,7 +32,7 @@ void Program::add_input(const std::string &name, xerxzema::Type *type)
 
 std::string Program::symbol_name()
 {
-	return parent->full_name() + "." + _name;
+	return parent->full_name() + "." + root_name;
 }
 
 void Program::add_output(const std::string &name, xerxzema::Type *type)
@@ -279,7 +279,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 		data_types.push_back(r->type()->type(context));
 		r->offset(i++);
 	}
-	state_type = llvm::StructType::create(context, data_types, _name + ".state.data");
+	state_type = llvm::StructType::create(context, data_types, symbol_name() + ".state.data");
 
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
@@ -505,7 +505,7 @@ void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
 	//just generate the default transformer for right now
 	auto ftype = function->getFunctionType();
 	transformer = llvm::Function::Create
-		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, _name + ".transformer.impl0", module);
+		(ftype, llvm::GlobalValue::LinkageTypes::ExternalLinkage, symbol_name() + ".transformer.impl0", module);
 
 	llvm::IRBuilder<> builder(context);
 	auto bb = llvm::BasicBlock::Create(context, "transform", transformer);
@@ -518,30 +518,30 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	auto ftype = function_type(context);
 	if(!ftype)
 	{
-		emit_error("aborting codegen for " + name_space()->full_name() + "." + _name);
+		emit_error("aborting codegen for " + symbol_name());
 		valid = false;
 		return;
 	}
 	function = llvm::Function::Create(ftype,
 									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									 _name + ".impl.0" , module);
+									 symbol_name() + ".impl.0" , module);
 
 	if(!call_site)
 	{
 		call_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
 											 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
-											 function, _name + ".call_site");
+											 function, symbol_name() + ".call_site");
 		transform_gen(module, context);
 		transform_site = new llvm::GlobalVariable(*module, ftype->getPointerTo(), false,
 											 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
-											 transformer, _name + ".transform_site");
+											 transformer, symbol_name() + ".transform_site");
 
 		version_number = new llvm::GlobalVariable
 			(*module, llvm::Type::getInt32Ty(context), false,
 			 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
-			 const_int32(context, 0), _name + ".version_number");
+			 const_int32(context, 0), symbol_name() + ".version_number");
 
-		trampoline_entry = trampoline_gen(module, context, call_site, _name);
+		trampoline_entry = trampoline_gen(module, context, call_site, symbol_name());
 	}
 
 	_current_module = module;
@@ -631,15 +631,16 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 												arg_types, false);
 
 	auto fn = llvm::Function::Create(closure_type,
-									  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-									 _name + ".closure." + reg->name() + ".impl0", module);
+									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+									 symbol_name() + ".closure." + reg->name() + ".impl0", module);
 
 	auto closure_var  = new llvm::GlobalVariable(*module, closure_type->getPointerTo(), false,
 												 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
-												 fn, _name + ".closure." + reg->name() + ".call_site");
+												 fn,
+												 symbol_name() + ".closure." + reg->name() + ".call_site");
 
 	//TODO get this to work with extra input variables.
-	auto wrapper = trampoline_gen(module, context, closure_var, _name + ".closure." + reg->name());
+	auto wrapper = trampoline_gen(module, context, closure_var, symbol_name() + ".closure." + reg->name());
 
 	llvm::Value* arg_ptr = nullptr;
 	auto args = fn->arg_begin();
