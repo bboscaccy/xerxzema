@@ -279,7 +279,7 @@ llvm::FunctionType* Program::function_type(llvm::LLVMContext& context)
 	std::vector<llvm::Type*> arg_types;
 	arg_types.push_back(state_type->getPointerTo());
 
-	return llvm::FunctionType::get(llvm::Type::getInt64Ty(context), arg_types, false);
+	return llvm::FunctionType::get(state_type->getPointerTo(), arg_types, false);
 }
 
 
@@ -505,7 +505,8 @@ void Program::transform_gen(llvm::Module* module, llvm::LLVMContext& context)
 	llvm::IRBuilder<> builder(context);
 	auto bb = llvm::BasicBlock::Create(context, "transform", transformer);
 	builder.SetInsertPoint(bb);
-	builder.CreateRet(const_int64(context, 0));
+	//this should actually return a malloc'd state structure
+	builder.CreateRet(&*transformer->arg_begin());
 }
 
 llvm::Function* Program::create_declaration(llvm::Module* module, llvm::LLVMContext& context)
@@ -624,7 +625,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 
 	builder.SetInsertPoint(exit_block);
 	generate_exit_block(context, builder);
-	builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+	builder.CreateRet(program_state);
 
 }
 
@@ -637,7 +638,7 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 	if(reg->type()->name() != "unit")
 		arg_types.push_back(reg->type()->type(context)->getPointerTo());
 
-	auto closure_type = llvm::FunctionType::get(llvm::Type::getInt64Ty(context),
+	auto closure_type = llvm::FunctionType::get(state_type->getPointerTo(),
 												arg_types, false);
 
 	auto fn = llvm::Function::Create(closure_type,

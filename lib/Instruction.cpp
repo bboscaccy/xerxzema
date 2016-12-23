@@ -321,6 +321,7 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 		reg->type()->copy(context, builder, reg->fetch_value_raw(context, builder), value_ptr);
 		out_counter++;
 	}
+	builder.CreateStore(call_ret, state_value());
 }
 
 std::string ProgramDirectCall::name()

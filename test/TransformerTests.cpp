@@ -202,7 +202,7 @@ TEST(TestTransformer, TestCodeGenSimple)
 	trans.parse_registers();
 	trans.parse_instructions();
 
-	auto fn = trans.generate_transformer(world.jit()->context());
+	//auto fn = trans.generate_transformer(world.jit()->context());
 
 
 }
