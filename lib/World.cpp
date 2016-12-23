@@ -107,6 +107,9 @@ void World::create_core_namespace()
 				 ("malloc", std::vector<Type*>{core->type("int")},
 				  core->type("opaque"), "", (void*)&malloc));
 
+	add_external(std::make_unique<ExternalDefinition>
+				 ("free", std::vector<Type*>{core->type("int")},
+				  core->type("opaque"), "", (void*)&free));
 
 	core->add_external_mapping(externals["xerxzema.print"].get());
 	core->add_external_mapping(externals["xerxzema.scheduler"].get());
