@@ -48,6 +48,8 @@ void HandleCodeDefinitionSignature::process()
 {
 	state = ProcessState::Entry;
 	def->signature->accept(*this);
+	if(valid) // TODO and NOT generic?
+		ns->add_instruction(std::make_unique<ProgramCallDefinition>(prog));
 }
 
 void HandleCodeDefinitionSignature::visit(BindExpression *e)

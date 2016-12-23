@@ -2,6 +2,7 @@
 #include "World.h"
 #include "llvm/IR/IRBuilder.h"
 #include "Diagnostics.h"
+#include "Instruction.h"
 
 namespace xerxzema
 {
@@ -217,4 +218,36 @@ InstructionDefinition* Namespace::resolve_instruction(const std::string &name,
 	}
 	return nullptr;
 }
+
+ProgramCallDefinition::ProgramCallDefinition(Program* target): target(target) {}
+std::string ProgramCallDefinition::name()
+{
+	return target->program_name();
+}
+
+std::unique_ptr<Instruction> ProgramCallDefinition::create()
+{
+	return std::make_unique<ProgramDirectCall>(target);
+}
+
+std::vector<Type*> ProgramCallDefinition::input_types(Namespace* parent)
+{
+	std::vector<Type*> types;
+	for(auto& r:target->input_registers())
+	{
+		types.push_back(r->type());
+	}
+	return types;
+}
+
+std::vector<Type*> ProgramCallDefinition::output_types(Namespace* parent)
+{
+	std::vector<Type*> types;
+	for(auto& r:target->output_registers())
+	{
+		types.push_back(r->type());
+	}
+	return types;
+}
+
 };

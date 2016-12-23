@@ -4,6 +4,7 @@
 #include "../lib/Diagnostics.h"
 #include "../lib/JitInvoke.h"
 #include "../lib/Session.h"
+#include "../lib/Parser.h"
 #include <stdio.h>
 #include <chrono>
 #include <thread>
@@ -160,11 +161,28 @@ TEST(TestJit, TestSchedulerCallback)
 TEST(TestJit, TestSession)
 {
 	xerxzema::World world;
-	world.jit()->dump_after_codegen();
+
 	world.scheduler()->run_async();
 	xerxzema::Session session(&world);
 	session.eval("7.0 -> x; 6.0 -> y; 2.0*x*y->z; trace(x); trace(y); trace(z);");
 	world.scheduler()->shutdown();
 	world.scheduler()->wait();
+
+}
+
+TEST(TestJit, TestProgramCall)
+{
+	xerxzema::World world;
+	auto ns = world.get_namespace("test");
+	auto program_str =
+R"EOF(
+prog foo(x:real) -> y:real
+{
+	 x + 2.0 -> y;
+}
+foo(2.0) -> res;
+trace(res);
+)EOF";
+	xerxzema::parse_input(program_str, ns);
 
 }

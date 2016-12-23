@@ -6,11 +6,6 @@
 #include "Diagnostics.h"
 #include "Parser.h"
 
-//TODO remove input and output args from function signature
-//and have them actually be bound to state
-//for executing other functions set up something for bind in the jit invoker
-//and codegen for calling other instructions.
-//the scheduler can then just invoke main like anything else...
 namespace xerxzema
 {
 Program::Program(Namespace* p, const std::string& name) : parent(p), root_name(name),

@@ -127,6 +127,20 @@ private:
 
 };
 
+class ProgramCallDefinition : public InstructionDefinition
+{
+public:
+	ProgramCallDefinition(Program* target);
+	std::unique_ptr<Instruction> create();
+	std::vector<Type*> input_types(Namespace* parent);
+	std::vector<Type*> output_types(Namespace* parent);
+	std::string name();
+
+private:
+	Program* target;
+
+};
+
 template<class T>
 std::unique_ptr<BasicDefinition<T>> create_def(const std::string& name,
 											   const std::vector<std::string>& inputs,
