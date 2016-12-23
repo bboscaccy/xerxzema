@@ -598,7 +598,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 		}
 		else
 		{
-			next_condition = llvm::BasicBlock::Create(context, (*it)->name() + "_cond", function);
+			next_condition = llvm::BasicBlock::Create(context, (*(it+1))->name() + "_cond", function);
 		}
 		auto op_block_name = (*it)->name() + "_op";
 		op_block = llvm::BasicBlock::Create(context, op_block_name, function);

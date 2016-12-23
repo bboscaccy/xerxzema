@@ -325,7 +325,7 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 
 std::string ProgramDirectCall::name()
 {
-	return "call " + target->symbol_name();
+	return "call." + target->symbol_name();
 }
 
 

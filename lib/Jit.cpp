@@ -128,8 +128,6 @@ std::unique_ptr<llvm::Module> JitOptimizer::operator()(std::unique_ptr<llvm::Mod
 	if(dump_post_optimization)
 		modules[ns->full_name()]->dump();
 	*/
-	module->dump();
-
 	return std::move(module);
 }
 
