@@ -50,6 +50,7 @@ public:										 \
  void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* value);	};
 
 DECL_TYPE(Bool)
+DECL_TYPE(Byte)
 DECL_TYPE(Unit)
 DECL_TYPE(Real)
 DECL_TYPE(Int)

@@ -88,6 +88,22 @@ void Int::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Val
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
 
+std::string Byte::name()
+{
+	return "byte";
+}
+
+llvm::Type* Byte::type(llvm::LLVMContext &context)
+{
+	return llvm::Type::getInt8Ty(context);
+}
+
+void Byte::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+{
+	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
+}
+
+
 
 llvm::Type* Opaque::type(llvm::LLVMContext &context)
 {
@@ -119,7 +135,7 @@ std::unique_ptr<ParameterizedType> Array::instantiate(const std::vector<Type *> 
 
 std::string Array::name()
 {
-	return "array@" + type_params[0]->name() + "@";
+	return "array." + type_params[0]->name();
 }
 
 llvm::Type* Array::type(llvm::LLVMContext& context)
