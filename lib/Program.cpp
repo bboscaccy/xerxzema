@@ -716,7 +716,10 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 		//call the original function back with the bound io values...
 		std::vector<llvm::Value*> args;
 		args.push_back(state);
-		builder.CreateRet(builder.CreateCall(trampoline_entry, args));
+		auto ret_val = builder.CreateCall(trampoline_entry, args);
+		builder.CreateAtomicRMW(llvm::AtomicRMWInst::Add, user_counter_ptr,
+							const_int32(context, 1), llvm::AtomicOrdering::AcquireRelease);
+		builder.CreateRet(ret_val);
 	}
 	else
 	{
