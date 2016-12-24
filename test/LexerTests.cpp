@@ -178,3 +178,22 @@ TEST(TestLexer, TestSymbols)
 	lex.get();
 	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Symbol);
 }
+
+TEST(TestLexer, TestSeqInitializer)
+{
+	std::stringstream ss;
+	ss << "[1,2]";
+
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BraceBegin);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Seperator);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::Int);
+	lex.get();
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::BraceEnd);
+	lex.get();
+
+}
