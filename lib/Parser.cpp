@@ -66,6 +66,8 @@ int left_bind(Token* token)
 		return 100;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
+	if(token->type == TokenType::BraceBegin)
+		return 1000;
 	if(token->type == TokenType::Term)
 		return 1;
 	return -1;
@@ -91,6 +93,24 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		}
 		auto v = std::make_unique<GroupExpression>(std::move(token), expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::GroupEnd)
+		{
+			lexer.get();
+			return v;
+		}
+		else
+		{
+			emit_error(diag, "Missing closing parenthesis");
+			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
+		}
+	}
+	if(token->type == TokenType::BraceBegin)
+	{
+		if(lexer.peek()->type == TokenType::BraceEnd)
+		{
+			//TODO unit expression
+		}
+		auto v = std::make_unique<SequenceExpression>(std::move(token), expression(lexer, 0));
+		if(lexer.peek()->type == TokenType::BraceEnd)
 		{
 			lexer.get();
 			return v;

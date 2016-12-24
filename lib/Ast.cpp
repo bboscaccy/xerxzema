@@ -392,6 +392,22 @@ void CodeDefinition::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+SequenceExpression::SequenceExpression(std::unique_ptr<Token>&& d,
+									   std::unique_ptr<Expression>&& i) :
+	Expression(std::move(d)), items(std::move(i))
+{
+}
+
+void SequenceExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
+std::string SequenceExpression::show()
+{
+	return "(seq " + items->show() + ")";
+}
+
 std::string Expression::show()
 {
 	return "unimplemented";
@@ -474,6 +490,10 @@ void AstVisitor::visit(AssignExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(NegateExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(SequenceExpression *e)
 {
 	handle_default(e);
 }

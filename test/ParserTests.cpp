@@ -354,3 +354,15 @@ TEST(TestParser, TestRealExpr)
 	ASSERT_EQ(expr->show(), "(bind (add (real 12.0) (symbol b)) (symbol c))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestSeqExpr)
+{
+
+	std::stringstream ss;
+	ss << "[ 1.0, 2.0, 3.0]";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(seq (arg-list (arg-list (real 1.0) (real 2.0)) (real 3.0)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
