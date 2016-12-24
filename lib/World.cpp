@@ -76,6 +76,7 @@ void World::create_core_namespace()
 	core->add_type("real", std::make_unique<Real>());
 	core->add_type("unit", std::make_unique<Unit>());
 	core->add_type("opaque", std::make_unique<Opaque>());
+	core->add_parameterized_type("array", std::make_unique<Array>());
 	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
 	core->add_instruction(create_def<AddReal>("add", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<SubReal>("sub", {"real", "real"}, {"real"}));
@@ -175,6 +176,8 @@ ExternalDefinition::ExternalDefinition(const std::string& name, const std::vecto
 	}
 	else
 	{
+		//TODO their loading sucks for this fwiw. we need to append platform specific
+		//extensions, .sonames and whathaveyou...
 		lib = llvm::sys::DynamicLibrary::getPermanentLibrary(lib_name.c_str(), &err_msg);
 		symbol_name = lib_name + "." + name;
 		if(!lib.isValid())
