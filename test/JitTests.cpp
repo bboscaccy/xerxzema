@@ -189,7 +189,6 @@ trace(res);
 	auto p = ns->get_default_program();
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
-	//TODO this is leaking....
 }
 
 TEST(TestJit, TestProgramCallMulti)
@@ -216,5 +215,5 @@ trace(result);
 	auto p = ns->get_default_program();
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
-	//TODO this is leaking....
+	//TODO are we leaking here?
 }
