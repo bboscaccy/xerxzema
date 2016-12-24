@@ -354,8 +354,12 @@ void ProgramDirectCall::generate_state_destructor(llvm::LLVMContext &context,
 												  xerxzema::Program *program,
 												  llvm::Value* state_ptr)
 {
+	auto value = builder.CreateLoad(state_ptr);
+
+	//call the dtor on this pointer.
+
 	auto fn = program->name_space()->get_external_function("free", program->current_module(), context);
-	auto cast = builder.CreateBitCast(state_ptr, llvm::Type::getInt8PtrTy(context));
+	auto cast = builder.CreateBitCast(value, llvm::Type::getInt8PtrTy(context));
 	builder.CreateCall(fn, {cast});
 }
 

@@ -24,7 +24,7 @@ public:
 	{
 		typedef void*(*dtor_fn)(void*);
 		auto dtor = (dtor_fn)jit->get_jitted_dtor(program);
-		//(*dtor)(state);
+		(*dtor)(state);
 		free(state);
 	}
 
