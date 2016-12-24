@@ -635,7 +635,7 @@ void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 	builder.SetInsertPoint(exit_block);
 	generate_exit_block(context, builder);
 	builder.CreateRet(program_state);
-
+	destructor_gen(module, context);
 }
 
 llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
@@ -712,4 +712,54 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 
 	return wrapper;
 }
+
+
+void Program::destructor_gen(llvm::Module* module, llvm::LLVMContext& context)
+{
+	std::vector<llvm::Type*> arg_types;
+	arg_types.push_back(state_type->getPointerTo());
+
+	llvm::FunctionType::get(state_type->getPointerTo(),
+							arg_types, false);
+
+	auto closure_type = llvm::FunctionType::get(state_type->getPointerTo(),
+												arg_types, false);
+
+	auto fn = llvm::Function::Create(closure_type,
+									 llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+									 symbol_name() + ".dtor.impl0", module);
+
+	auto closure_var  = new llvm::GlobalVariable(*module, closure_type->getPointerTo(), false,
+												 llvm::GlobalVariable::LinkageTypes::ExternalLinkage,
+												 fn,
+												 symbol_name() + ".dtor.call_site");
+
+	auto wrapper = trampoline_gen(module, context, closure_var, symbol_name() + ".dtor");
+
+	auto state = &*fn->arg_begin();
+
+	llvm::IRBuilder<> builder(context);
+	auto block = llvm::BasicBlock::Create(context, "entry", fn);
+	builder.SetInsertPoint(block);
+
+	for(auto& r:registers)
+	{
+		auto reg = r.second.get();
+		if(reg->type()->name() != "unit")
+		{
+			auto site_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
+			reg->type()->destroy(context, builder, site_ptr);
+		}
+	}
+	for(auto& inst:instructions)
+	{
+		if(inst->state_type(context) != nullptr)
+		{
+			auto site_ptr = builder.CreateStructGEP(state_type, state, inst->offset()+1);
+			inst->generate_state_destructor(context, builder, this, site_ptr);
+		}
+	}
+	builder.CreateRet(state);
+}
+
 };

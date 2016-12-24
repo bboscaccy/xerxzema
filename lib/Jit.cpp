@@ -152,6 +152,11 @@ void* Jit::get_jitted_function(Program* program)
 	return (void*)compiler.findSymbol(program->symbol_name(),false).getAddress();
 }
 
+void* Jit::get_jitted_dtor(Program* program)
+{
+	return (void*)compiler.findSymbol(program->symbol_name() + ".dtor", false).getAddress();
+}
+
 JitResolver::JitResolver(World* world) : world(world)
 {
 

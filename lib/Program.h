@@ -104,6 +104,7 @@ private:
 								   llvm::GlobalVariable* target_call, const std::string& call_name);
 	void transform_stub_gen(llvm::Module* module, llvm::LLVMContext& context);
 	void transform_gen(llvm::Module* module, llvm::LLVMContext& context);
+	void destructor_gen(llvm::Module* module, llvm::LLVMContext& context);
 	llvm::BasicBlock* generate_entry_block(llvm::LLVMContext& context, llvm::IRBuilder<>& builder);
 
 	std::map<std::string, std::unique_ptr<Register>> registers;

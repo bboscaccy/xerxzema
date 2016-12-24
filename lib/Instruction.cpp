@@ -199,7 +199,8 @@ void Instruction::generate_state_initializer(llvm::LLVMContext &context,
 
 void Instruction::generate_state_destructor(llvm::LLVMContext &context,
 											llvm::IRBuilder<> &builder,
-											xerxzema::Program *program)
+											xerxzema::Program *program,
+											llvm::Value* state_ptr)
 {
 }
 
@@ -350,11 +351,12 @@ void ProgramDirectCall::generate_state_initializer(llvm::LLVMContext &context,
 
 void ProgramDirectCall::generate_state_destructor(llvm::LLVMContext &context,
 												  llvm::IRBuilder<> &builder,
-												  xerxzema::Program *program)
+												  xerxzema::Program *program,
+												  llvm::Value* state_ptr)
 {
-	auto ptr = builder.CreateLoad(state_value());
 	auto fn = program->name_space()->get_external_function("free", program->current_module(), context);
-	builder.CreateCall(fn, {ptr});
+	auto cast = builder.CreateBitCast(state_ptr, llvm::Type::getInt8PtrTy(context));
+	builder.CreateCall(fn, {cast});
 }
 
 void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,

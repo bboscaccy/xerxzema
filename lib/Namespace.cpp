@@ -31,6 +31,7 @@ llvm::Function* Namespace::get_external_function(const std::string &name, llvm::
 			if(res)
 				return res;
 		}
+		emit_error("cannot find external function: " + name);
 		return nullptr;
 	}
 	else

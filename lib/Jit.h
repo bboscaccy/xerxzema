@@ -53,6 +53,7 @@ public:
 	inline llvm::LLVMContext& context() { return _context; }
 	void compile_namespace(Namespace* ns);
 	void* get_jitted_function(Program* program);
+	void* get_jitted_dtor(Program* program);
 
 	inline void dump_after_codegen() { dump_pre_optimization = true; }
 	inline void dump_after_optimization() { dump_post_optimization = true; }
