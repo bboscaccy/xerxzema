@@ -79,7 +79,7 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<LeReal>("le", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<GtReal>("gt", {"real", "real"}, {"bool"}));
 	core->add_instruction(create_def<GeReal>("ge", {"real", "real"}, {"bool"}));
-	core->add_instruction(create_def<Trace>("trace", {"real"}, {}));
+	core->add_instruction(create_def<Trace>("trace", {"real"}, {"unit"}));
 	core->add_instruction(create_def<Merge>("merge", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<Cond>("cond", {"bool", "real"}, {"real"}));
 	core->add_instruction(create_def<When>("when", {"bool", "real"}, {"real"}));
