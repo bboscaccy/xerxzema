@@ -62,8 +62,16 @@ void* trace_malloc(size_t size)
 	emit_debug("malloc called");
 	emit_debug(std::to_string(size));
 	auto ptr = malloc(size);
+	printf("%p\n", ptr);
 	memset(ptr, 0, size);
 	return ptr;
+}
+
+void trace_free(void* ptr)
+{
+	emit_debug("free called");
+	printf("%p\n", ptr);
+	free(ptr);
 }
 
 void World::create_core_namespace()
@@ -115,11 +123,11 @@ void World::create_core_namespace()
 
 	add_external(std::make_unique<ExternalDefinition>
 				 ("malloc", std::vector<Type*>{core->type("int")},
-				  core->type("opaque"), "", (void*)&malloc));
+				  core->type("opaque"), "", (void*)&trace_malloc));
 
 	add_external(std::make_unique<ExternalDefinition>
 				 ("free", std::vector<Type*>{core->type("opaque")},
-				  core->type("unit"), "", (void*)&free));
+				  core->type("unit"), "", (void*)&trace_free));
 
 	core->add_external_mapping(externals["xerxzema.print"].get());
 	core->add_external_mapping(externals["xerxzema.scheduler"].get());
