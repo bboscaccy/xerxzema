@@ -81,6 +81,10 @@ public:
 											llvm::IRBuilder<> &builder,
 											Program* program);
 
+	virtual void generate_state_destructor(llvm::LLVMContext& context,
+										   llvm::IRBuilder<> &builder,
+										   Program* program);
+
 	inline void value(llvm::Value* val) { _value = val; }
 	inline llvm::Value* value() { return _value; }
 
@@ -139,6 +143,10 @@ public:
 	void generate_state_initializer(llvm::LLVMContext& context,
 									llvm::IRBuilder<> &builder,
 									Program* program);
+	void generate_state_destructor(llvm::LLVMContext& context,
+								   llvm::IRBuilder<> &builder,
+								   Program* program);
+
 	std::string name();
 private:
 	Program* target;

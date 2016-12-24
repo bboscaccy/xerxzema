@@ -197,6 +197,13 @@ void Instruction::generate_state_initializer(llvm::LLVMContext &context,
 	builder.CreateMemSet(ptr, llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), 0), size, 0);
 }
 
+void Instruction::generate_state_destructor(llvm::LLVMContext &context,
+											llvm::IRBuilder<> &builder,
+											xerxzema::Program *program)
+{
+}
+
+
 void Merge::generate_check(llvm::LLVMContext& context,
 								 llvm::IRBuilder<> &builder,
 								 Program* program,
@@ -329,7 +336,8 @@ std::string ProgramDirectCall::name()
 	return "call." + target->symbol_name();
 }
 
-void ProgramDirectCall::generate_state_initializer(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+void ProgramDirectCall::generate_state_initializer(llvm::LLVMContext &context,
+												   llvm::IRBuilder<> &builder,
 												   xerxzema::Program *program)
 {
 	auto size = llvm::ConstantExpr::getSizeOf(target->state_type_value());
@@ -338,6 +346,15 @@ void ProgramDirectCall::generate_state_initializer(llvm::LLVMContext &context, l
 	builder.CreateMemSet(result, builder.getInt8(0), size, 0);
 	auto ptr = builder.CreateBitCast(result, state_type(context));
 	builder.CreateStore(ptr, state_value());
+}
+
+void ProgramDirectCall::generate_state_destructor(llvm::LLVMContext &context,
+												  llvm::IRBuilder<> &builder,
+												  xerxzema::Program *program)
+{
+	auto ptr = builder.CreateLoad(state_value());
+	auto fn = program->name_space()->get_external_function("free", program->current_module(), context);
+	builder.CreateCall(fn, {ptr});
 }
 
 void AddReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,

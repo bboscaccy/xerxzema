@@ -62,6 +62,7 @@ public:
 	void code_gen(llvm::Module* module, llvm::LLVMContext& context);
 
 	llvm::FunctionType* function_type(llvm::LLVMContext& context);
+
 	inline llvm::Value* activation_counter_value() { return activation_counter; }
 	inline llvm::Function* function_value() { return function; }
 	inline llvm::Module* current_module() { return _current_module; }

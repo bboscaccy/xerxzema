@@ -12,6 +12,8 @@ namespace xerxzema
 
 struct CallbackState
 {
+	//TODO make the header field a single word in size
+	//basically use uint16_t's for everything
 	bool retry;
 	uint32_t version;
 	uint32_t ref_count;
