@@ -57,6 +57,14 @@ ExternalDefinition* World::get_external(const std::string &name)
 	return it->second.get();
 }
 
+void* trace_malloc(size_t size)
+{
+	emit_debug("malloc called");
+	emit_debug(std::to_string(size));
+	auto ptr = malloc(size);
+	memset(ptr, 0, size);
+	return ptr;
+}
 
 void World::create_core_namespace()
 {

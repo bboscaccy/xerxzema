@@ -337,6 +337,8 @@ void HandleExpression::visit(xerxzema::CallExpression *e)
 	auto target = e->target->as_a<SymbolExpression>()->token->data;
 	HandleExpression args(program, e->args.get(), {}, dependencies);
 	args.process();
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
 	program->instruction(target, args.result, result, dependencies, e);
 }
 

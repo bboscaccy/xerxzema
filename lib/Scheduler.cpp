@@ -1,5 +1,5 @@
 #include "Scheduler.h"
-
+#include "Diagnostics.h"
 #include <time.h>
 #include <stdio.h>
 #include <algorithm>
@@ -171,7 +171,6 @@ void Scheduler::run()
 				late_events++;
 				late_total += current - task.when;
 			}
-
 		}
 
 		sys_current = now();

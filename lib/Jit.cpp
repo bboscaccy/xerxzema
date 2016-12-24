@@ -88,7 +88,7 @@ void Jit::compile_namespace(Namespace* ns)
 	}
 
 
-	//if(dump_pre_optimization)
+	if(dump_pre_optimization)
 		module->dump();
 
 	module_set.push_back(std::move(module));

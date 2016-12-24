@@ -13,6 +13,9 @@ namespace xerxzema
 struct CallbackState
 {
 	bool retry;
+	uint32_t version;
+	uint32_t ref_count;
+	uint32_t lock;
 	uint64_t exec_time;
 	//char* opaque[];
 };

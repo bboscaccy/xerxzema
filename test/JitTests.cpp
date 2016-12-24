@@ -188,4 +188,32 @@ trace(res);
 	auto p = ns->get_default_program();
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
+	//TODO this is leaking....
+}
+
+TEST(TestJit, TestProgramCallMulti)
+{
+	xerxzema::World world;
+	auto ns = world.get_namespace("test");
+	auto program_str =
+R"EOF(
+prog bar(x:real) -> y:real
+{
+	x * 2.0 + x -> y;
+}
+
+prog foo(x:real) -> y:real
+{
+	 bar(x) + 2.0 -> y;
+}
+
+foo(2.0) -> result;
+trace(result);
+)EOF";
+	xerxzema::parse_input(program_str, ns);
+	world.jit()->compile_namespace(ns);
+	auto p = ns->get_default_program();
+	xerxzema::JitInvoke<void> invoker(world.jit(), p);
+	invoker();
+	//TODO this is leaking....
 }
