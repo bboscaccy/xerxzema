@@ -532,6 +532,19 @@ llvm::Function* Program::create_declaration(llvm::Module* module, llvm::LLVMCont
 								  symbol_name(), module);
 }
 
+llvm::Function* Program::create_dtor_declaration(llvm::Module* module, llvm::LLVMContext& context)
+{
+	auto ftype = function_type(context);
+	if(!ftype)
+	{
+		//report this somehow...
+		return nullptr;
+	}
+	return llvm::Function::Create(ftype,
+								  llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+								  symbol_name() + ".dtor", module);
+}
+
 void Program::code_gen(llvm::Module *module, llvm::LLVMContext &context)
 {
 	auto ftype = function_type(context);

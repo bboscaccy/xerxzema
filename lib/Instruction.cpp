@@ -357,6 +357,13 @@ void ProgramDirectCall::generate_state_destructor(llvm::LLVMContext &context,
 	auto value = builder.CreateLoad(state_ptr);
 
 	//call the dtor on this pointer.
+	auto dtorfn = program->current_module()->getFunction(target->symbol_name() + ".dtor");
+	if(!dtorfn)
+	{
+		dtorfn = program->create_dtor_declaration(program->current_module(), context);
+	}
+
+	builder.CreateCall(dtorfn, {value});
 
 	auto fn = program->name_space()->get_external_function("free", program->current_module(), context);
 	auto cast = builder.CreateBitCast(value, llvm::Type::getInt8PtrTy(context));

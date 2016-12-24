@@ -90,6 +90,7 @@ public:
 	inline bool is_valid() const { return valid; }
 	inline llvm::GlobalVariable* get_call_site() { return call_site; }
 	llvm::Function* create_declaration(llvm::Module* module, llvm::LLVMContext& context);
+	llvm::Function* create_dtor_declaration(llvm::Module* module, llvm::LLVMContext& context);
 
 private:
 	bool check_instruction(const std::string& name,
