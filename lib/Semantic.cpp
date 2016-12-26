@@ -241,6 +241,7 @@ void HandleExpression::visit(xerxzema::RealExpression *e)
 	}
 	else
 	{
+		//assign this value to a named register
 		auto inst = std::make_unique<ValueReal>(value);
 		inst->dependent(program->reg("head"));
 		for(auto& r: dependencies)

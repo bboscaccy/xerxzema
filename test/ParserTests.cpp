@@ -359,7 +359,7 @@ TEST(TestParser, TestSeqExpr)
 {
 
 	std::stringstream ss;
-	ss << "[ 1.0, 2.0, 3.0]";
+	ss << "#{ 1.0, 2.0, 3.0 }";
 	xerxzema::Lexer lexer(ss);
 
 	auto expr = xerxzema::expression(lexer);
