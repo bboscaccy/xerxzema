@@ -246,6 +246,16 @@ public:
 	void accept(AstVisitor& v);
 };
 
+class ListExpression : public Expression
+{
+public:
+	ListExpression(std::unique_ptr<Token>&& token, std::unique_ptr<Expression>&& items);
+
+	std::unique_ptr<Expression> items;
+	std::string show();
+	void accept(AstVisitor& v);
+};
+
 class InvalidNullDetonation : public Expression
 {
 public:
@@ -288,6 +298,7 @@ public:
 	virtual void visit(AssignExpression* e);
 	virtual void visit(NegateExpression* e);
 	virtual void visit(SequenceExpression* e);
+	virtual void visit(ListExpression* e);
 	virtual void visit(InvalidLeftDetonation* e);
 	virtual void visit(InvalidNullDetonation* e);
 	virtual void handle_default(Expression* ) = 0;

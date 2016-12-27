@@ -121,6 +121,24 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
 		}
 	}
+	if(token->type == TokenType::BraceBegin)
+	{
+		if(lexer.peek()->type == TokenType::BraceEnd)
+		{
+			//TODO unit expression
+		}
+		auto v = std::make_unique<ListExpression>(std::move(token), expression(lexer, 0));
+		if(lexer.peek()->type == TokenType::BraceEnd)
+		{
+			lexer.get();
+			return v;
+		}
+		else
+		{
+			emit_error(diag, "Missing closing '}'");
+			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
+		}
+	}
 	if(token->type == TokenType::BlockBegin)
 	{
 		auto b = std::make_unique<StatementBlock>(std::move(token));

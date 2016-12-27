@@ -366,3 +366,15 @@ TEST(TestParser, TestSeqExpr)
 	ASSERT_EQ(expr->show(), "(seq (arg-list (arg-list (real 1.0) (real 2.0)) (real 3.0)))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestListExpr)
+{
+
+	std::stringstream ss;
+	ss << "[ 1.0, 2.0, 3.0 ]";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(list (arg-list (arg-list (real 1.0) (real 2.0)) (real 3.0)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
