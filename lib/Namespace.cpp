@@ -198,26 +198,34 @@ InstructionDefinition* Namespace::resolve_instruction(const std::string &name,
 	{
 		for(auto& def : it->second)
 		{
-			auto target_types = def->input_types(this);
-			if(target_types.size() == inputs.size())
-			{
-				auto target = target_types.begin();
-				bool valid = true;
-				for(auto& type:inputs)
-				{
-					if(*target != type)
-					{
-						valid = false;
-						break;
-					}
-					target++;
-				}
-				if(valid)
-					return def.get();
-			}
+			if(def->match(inputs, this))
+			   return def.get();
 		}
 	}
 	return nullptr;
+}
+
+
+bool InstructionDefinition::match(const std::vector<Type *> &inputs, Namespace* parent)
+{
+	auto target_types = input_types(parent);
+	if(target_types.size() == inputs.size())
+	{
+		auto target = target_types.begin();
+		bool valid = true;
+		for(auto& type:inputs)
+		{
+			if(*target != type)
+			{
+				valid = false;
+				break;
+			}
+			target++;
+		}
+		if(valid)
+			return true;
+	}
+	return false;
 }
 
 ProgramCallDefinition::ProgramCallDefinition(Program* target): target(target) {}

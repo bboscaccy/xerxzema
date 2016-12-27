@@ -86,6 +86,7 @@ public:
 	virtual std::vector<Type*> input_types(Namespace* parent) = 0;
 	virtual std::vector<Type*> output_types(Namespace* parent) = 0;
 	virtual std::string name() = 0;
+	virtual bool match(const std::vector<Type*>& inputs, Namespace* parent);
 };
 
 template<class T>
