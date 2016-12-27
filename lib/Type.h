@@ -21,6 +21,7 @@ public:
 	virtual void copy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
 					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
 	virtual void destroy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,  llvm::Value* v);
+	virtual inline bool is_trivial() { return true; }
 };
 
 class ParameterizedType : public Type
@@ -39,6 +40,8 @@ public:
 	llvm::Type* type(llvm::LLVMContext& context);
 	std::unique_ptr<ParameterizedType> instantiate(const std::vector<Type*>& params);
 	void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val);
+	inline bool is_trivial() { return false; }
+
 private:
 	llvm::Type* cached_type;
 };

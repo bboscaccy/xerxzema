@@ -262,6 +262,19 @@ public:
 };
 
 
+class ArrayBuilder : public Instruction
+{
+public:
+	ArrayBuilder(Type* type);
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	inline std::string name() { return "array_builder";}
+protected:
+	Type* array_type;
+};
+
+
 DECL_INST(AddReal, "add")
 DECL_INST(SubReal, "sub")
 DECL_INST(MulReal, "mul")
@@ -273,5 +286,6 @@ DECL_INST(LtReal, "lt")
 DECL_INST(LeReal, "le")
 DECL_INST(GtReal, "gt")
 DECL_INST(GeReal, "ge")
+
 
 };

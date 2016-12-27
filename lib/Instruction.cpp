@@ -670,4 +670,70 @@ void Instruction::validate_mask()
 		reset_mask = 0;
 }
 
+ArrayBuilder::ArrayBuilder(Type* array_type) : array_type(array_type)
+{
+}
+
+void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+									  xerxzema::Program *program)
+{
+	auto out_struct = _outputs[0]->fetch_value_raw(context, builder); //get a pointer to this
+	auto data_ptr = builder.CreateStructGEP(_outputs[0]->type()->type(context),
+											out_struct, 0);
+	auto val_ptr = builder.CreateLoad(data_ptr);
+	auto ptr_value = builder.CreatePointerCast(val_ptr, llvm::Type::getInt64Ty(context));
+
+	//compare this to null
+	auto is_null = builder.CreateICmpEQ(ptr_value, builder.getInt64(0));
+
+	auto kill_block = llvm::BasicBlock::Create(context, "kill_array", program->function_value());
+	auto create_block = llvm::BasicBlock::Create(context, "create_array", program->function_value());
+
+	builder.CreateCondBr(is_null, create_block, kill_block);
+
+	builder.SetInsertPoint(kill_block);
+
+
+	auto mallocator = program->name_space()->get_external_function("malloc",
+																   program->current_module(),
+																   context);
+	//TODO move this to type destructor
+	auto deallocator = program->name_space()->get_external_function("free",
+																	program->current_module(),
+																	context);
+	if(array_type->is_trivial())
+	{
+		builder.CreateCall(deallocator, {val_ptr});
+		auto sz = llvm::ConstantExpr::getSizeOf(_outputs[0]->type()->type(context));
+		builder.CreateMemSet(out_struct, builder.getInt8(0), sz, 0);
+		builder.CreateBr(create_block);
+	}
+	else
+	{
+		//for each blah, destroy blah
+
+	}
+
+	//TODO
+	// we need an "after-head" sort of optimnization pass that can detect which items are only activated
+	// by head-fired registers and remove extra mask updates
+	auto alloc_size = llvm::ConstantExpr::getMul
+		(llvm::ConstantExpr::getSizeOf(array_type->type(context)),
+									   builder.getInt64(_inputs.size()));
+	auto new_ptr = builder.CreateCall(mallocator, {alloc_size });
+	auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
+	builder.CreateStore(cast, data_ptr);
+	auto dst_ptr = builder.CreateLoad(data_ptr);
+	for(size_t i = 0; i < _inputs.size(); i++)
+	{
+		//TODO detect single-use copy or move?
+		array_type->copy(context, builder, dst_ptr, _inputs[0]->fetch_value(context,
+																			builder));
+		//TODO
+		//hrm...
+		//increment pointer?
+	}
+
+}
+
 };

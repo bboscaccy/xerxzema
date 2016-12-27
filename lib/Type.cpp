@@ -144,9 +144,9 @@ llvm::Type* Array::type(llvm::LLVMContext& context)
 		return cached_type;
 
 	std::vector<llvm::Type*> arg_types;
-	arg_types.push_back(type_params[0]->type(context));
-	arg_types.push_back(llvm::Type::getInt64Ty(context));
-	arg_types.push_back(llvm::Type::getInt64Ty(context));
+	arg_types.push_back(type_params[0]->type(context)->getPointerTo());
+	arg_types.push_back(llvm::Type::getInt64Ty(context)); // number of elements
+	arg_types.push_back(llvm::Type::getInt64Ty(context)); // size of allocation
 	cached_type = llvm::StructType::create(context, arg_types, name());
 	return cached_type;
 }
