@@ -84,7 +84,7 @@ public:
 	virtual ~InstructionDefinition() = default;
 	virtual std::unique_ptr<Instruction> create() = 0;
 	virtual std::vector<Type*> input_types(Namespace* parent) = 0;
-	virtual std::vector<Type*> output_types(Namespace* parent) = 0;
+	virtual std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent) = 0;
 	virtual std::string name() = 0;
 	virtual bool match(const std::vector<Type*>& inputs, Namespace* parent);
 };
@@ -111,7 +111,7 @@ public:
 		}
 		return results;
 	}
-	std::vector<Type*> output_types(Namespace* parent)
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent)
 	{
 		std::vector<Type*> results;
 		for(auto& s: outs)
@@ -134,7 +134,7 @@ public:
 	ProgramCallDefinition(Program* target);
 	std::unique_ptr<Instruction> create();
 	std::vector<Type*> input_types(Namespace* parent);
-	std::vector<Type*> output_types(Namespace* parent);
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
 	std::string name();
 
 private:

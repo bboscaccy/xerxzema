@@ -147,7 +147,7 @@ bool Program::check_instruction(const std::string &name,
 		auto def = parent->resolve_instruction(name, input_types);
 		if(def)
 		{
-			auto output_types = def->output_types(parent);
+			auto output_types = def->output_types(input_types, parent);
 			//more comments?
 			//we can create extra outputs here if needed?
 			//probably issue a warning or something

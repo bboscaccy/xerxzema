@@ -43,7 +43,7 @@ TEST(TestInstructionDef, TestCreation)
 		("foobar", {"unit"}, {"real"});
 	auto v = fake_def.input_types(core);
 	ASSERT_EQ(v[0], core->type("unit"));
-	auto v1 = fake_def.output_types(core);
+	auto v1 = fake_def.output_types(v, core);
 	ASSERT_EQ(v1[0], core->type("real"));
 
 }

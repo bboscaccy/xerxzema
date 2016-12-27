@@ -249,7 +249,8 @@ std::vector<Type*> ProgramCallDefinition::input_types(Namespace* parent)
 	return types;
 }
 
-std::vector<Type*> ProgramCallDefinition::output_types(Namespace* parent)
+std::vector<Type*> ProgramCallDefinition::output_types(const std::vector<Type*>& inputs,
+													   Namespace* parent)
 {
 	std::vector<Type*> types;
 	for(auto& r:target->output_registers())
