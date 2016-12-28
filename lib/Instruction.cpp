@@ -6,6 +6,8 @@
 #include "Namespace.h"
 #include "Diagnostics.h"
 
+#include "llvm/IR/Constants.h"
+
 namespace xerxzema
 {
 
@@ -681,10 +683,9 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	auto data_ptr = builder.CreateStructGEP(_outputs[0]->type()->type(context),
 											out_struct, 0);
 	auto val_ptr = builder.CreateLoad(data_ptr);
-	auto ptr_value = builder.CreatePointerCast(val_ptr, llvm::Type::getInt64Ty(context));
-
-	//compare this to null
-	auto is_null = builder.CreateICmpEQ(ptr_value, builder.getInt64(0));
+	auto is_null = builder.CreateICmpEQ(val_ptr,
+										llvm::ConstantPointerNull::get
+										(array_type->type(context)->getPointerTo()));
 
 	auto kill_block = llvm::BasicBlock::Create(context, "kill_array", program->function_value());
 	auto create_block = llvm::BasicBlock::Create(context, "create_array", program->function_value());
@@ -724,14 +725,13 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
 	builder.CreateStore(cast, data_ptr);
 	auto dst_ptr = builder.CreateLoad(data_ptr);
+	auto next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(0));
 	for(size_t i = 0; i < _inputs.size(); i++)
 	{
 		//TODO detect single-use copy or move?
 		array_type->copy(context, builder, dst_ptr, _inputs[0]->fetch_value(context,
 																			builder));
-		//TODO
-		//hrm...
-		//increment pointer?
+		next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
 	}
 
 }
