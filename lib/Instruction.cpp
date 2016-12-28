@@ -734,6 +734,14 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 		next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
 	}
 
+	//set the array size and allocated size
+	auto size_ptr = builder.CreateStructGEP(_outputs[0]->type()->type(context),
+											out_struct, 1);
+	auto alloc_ptr = builder.CreateStructGEP(_outputs[0]->type()->type(context),
+											out_struct, 1);
+	builder.CreateStore(builder.getInt64(_inputs.size()), size_ptr);
+	builder.CreateStore(builder.getInt64(_inputs.size()), alloc_ptr);
+
 }
 
 };
