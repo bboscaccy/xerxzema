@@ -82,8 +82,10 @@ class InstructionDefinition
 {
 public:
 	virtual ~InstructionDefinition() = default;
-	virtual std::unique_ptr<Instruction> create() = 0;
-	virtual std::vector<Type*> input_types(Namespace* parent) = 0;
+	virtual std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+												const std::vector<Type *> &outputs) = 0;
+	//this is only used for the default match implementation
+	virtual std::vector<Type*> input_types(Namespace* parent);
 	virtual std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent) = 0;
 	virtual std::string name() = 0;
 	virtual bool match(const std::vector<Type*>& inputs, Namespace* parent);
@@ -99,7 +101,10 @@ public:
 	{
 	}
 
-	std::unique_ptr<Instruction> create() { return std::make_unique<T>(); }
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs)
+	{ return std::make_unique<T>(); }
+
 	std::string name() { return _name; }
 
 	std::vector<Type*> input_types(Namespace* parent)
@@ -132,7 +137,8 @@ class ProgramCallDefinition : public InstructionDefinition
 {
 public:
 	ProgramCallDefinition(Program* target);
-	std::unique_ptr<Instruction> create();
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs);
 	std::vector<Type*> input_types(Namespace* parent);
 	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
 	std::string name();
@@ -140,6 +146,16 @@ public:
 private:
 	Program* target;
 
+};
+
+class ArrayBuilderDefinition : public InstructionDefinition
+{
+public:
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs);
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
+	bool match(const std::vector<Type*>& inputs, Namespace* parent);
+	inline std::string name() { return "array"; }
 };
 
 template<class T>

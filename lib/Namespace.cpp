@@ -228,13 +228,19 @@ bool InstructionDefinition::match(const std::vector<Type *> &inputs, Namespace* 
 	return false;
 }
 
+std::vector<Type*> InstructionDefinition::input_types(Namespace* parent)
+{
+	return std::vector<Type*>();
+}
+
 ProgramCallDefinition::ProgramCallDefinition(Program* target): target(target) {}
 std::string ProgramCallDefinition::name()
 {
 	return target->program_name();
 }
 
-std::unique_ptr<Instruction> ProgramCallDefinition::create()
+std::unique_ptr<Instruction> ProgramCallDefinition::create(const std::vector<Type *> &inputs,
+														   const std::vector<Type *> &outputs)
 {
 	return std::make_unique<ProgramDirectCall>(target);
 }
@@ -258,6 +264,30 @@ std::vector<Type*> ProgramCallDefinition::output_types(const std::vector<Type*>&
 		types.push_back(r->type());
 	}
 	return types;
+}
+
+
+bool ArrayBuilderDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
+{
+	auto first_type = inputs[0];
+	for(auto& next_type:inputs)
+	{
+		if(next_type != first_type)
+			return false;
+	}
+	return true;
+}
+
+std::vector<Type*> ArrayBuilderDefinition::output_types(const std::vector<Type *> &inputs,
+														xerxzema::Namespace *parent)
+{
+	return std::vector<Type*>{parent->type("array", {inputs[0]})};
+}
+
+std::unique_ptr<Instruction> ArrayBuilderDefinition::create(const std::vector<Type *> &inputs,
+															const std::vector<Type *> &outputs)
+{
+	return std::make_unique<ArrayBuilder>(inputs[0]);
 }
 
 };

@@ -193,7 +193,7 @@ bool Program::check_instruction(const std::string &name,
 					}
 					it++;
 				}
-				auto inst = def->create();
+				auto inst = def->create(input_types, output_types);
 				for(auto& n:inputs)
 				{
 					if(n.sample)

@@ -5,7 +5,6 @@
 #include <sstream>
 #include "Namespace.h"
 #include "Diagnostics.h"
-
 #include "llvm/IR/Constants.h"
 
 namespace xerxzema

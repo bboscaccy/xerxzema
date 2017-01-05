@@ -104,6 +104,7 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<Delay>("delay", {"real"}, {"real"}));
 	core->add_instruction(create_def<Bang>("bang", {}, {"real"}));
 	core->add_instruction(create_def<Schedule>("schedule_absolute", {"int"}, {"unit"}));
+	core->add_instruction(std::make_unique<ArrayBuilderDefinition>());
 
 	add_external(std::make_unique<ExternalDefinition>
 				 ("scheduler", std::vector<Type*>(), core->type("opaque"), "", &scheduler_export));
