@@ -703,7 +703,8 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 																	context);
 	if(array_type->is_trivial())
 	{
-		builder.CreateCall(deallocator, {val_ptr});
+		auto void_cast = builder.CreatePointerCast(val_ptr, llvm::Type::getInt8PtrTy(context));
+		builder.CreateCall(deallocator, {void_cast});
 		auto sz = llvm::ConstantExpr::getSizeOf(_outputs[0]->type()->type(context));
 		builder.CreateMemSet(out_struct, builder.getInt8(0), sz, 0);
 		builder.CreateBr(create_block);
@@ -714,6 +715,7 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 
 	}
 
+	builder.SetInsertPoint(create_block);
 	//TODO
 	// we need an "after-head" sort of optimnization pass that can detect which items are only activated
 	// by head-fired registers and remove extra mask updates
@@ -728,8 +730,8 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	for(size_t i = 0; i < _inputs.size(); i++)
 	{
 		//TODO detect single-use copy or move?
-		array_type->copy(context, builder, dst_ptr, _inputs[0]->fetch_value(context,
-																			builder));
+		array_type->copy(context, builder, dst_ptr, _inputs[i]->fetch_value_raw(context,
+																				builder));
 		next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
 	}
 
