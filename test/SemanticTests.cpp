@@ -289,5 +289,23 @@ TEST(TestSemantic, DefaultHandlerTest)
 
 	auto p = ns->get_default_program();
 	ASSERT_EQ(1, p->instruction_listing().size());
+}
+
+TEST(TestSemantic, TestArrayBuilderSyntax)
+{
+	std::stringstream ss;
+	ss << "[2.0, x] -> y;";
+	xerxzema::Lexer lexer(ss);
+
+	xerxzema::World world;
+	auto ns = world.get_namespace("tests");
+
+	auto expr = xerxzema::expression(lexer);
+
+	xerxzema::HandleTopLevelExpression sema(ns);
+	expr->accept(sema);
+
+	auto p = ns->get_default_program();
+	ASSERT_EQ(1, p->instruction_listing().size());
 
 }

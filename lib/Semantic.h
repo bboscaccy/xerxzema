@@ -97,6 +97,7 @@ public:
 	void visit(GroupExpression* e);
 	void visit(BindExpression* e);
 	void visit(CallExpression* e);
+	void visit(ListExpression* e);
 	void handle_default(Expression* e);
 
 	inline std::vector<RegisterData> results() { return result; }

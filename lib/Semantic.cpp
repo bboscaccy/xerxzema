@@ -343,6 +343,16 @@ void HandleExpression::visit(xerxzema::CallExpression *e)
 	program->instruction(target, args.result, result, dependencies, e);
 }
 
+void HandleExpression::visit(xerxzema::ListExpression *e)
+{
+
+	HandleExpression args(program, e->items.get(), {}, dependencies);
+	args.process();
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("array", args.result, result, dependencies, e);
+}
+
 void HandleExpression::visit(xerxzema::GroupExpression *e)
 {
 	HandleExpression child(program, e->expr.get(), {}, dependencies);
