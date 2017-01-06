@@ -266,12 +266,14 @@ class ArrayBuilder : public Instruction
 {
 public:
 	ArrayBuilder(Type* type);
+	ArrayBuilder(Type* type, llvm::GlobalVariable* init);
 	void generate_operation(llvm::LLVMContext& context,
 							llvm::IRBuilder<> &builder,
 							Program* program);
 	inline std::string name() { return "array_builder";}
 protected:
 	Type* array_type;
+	llvm::GlobalVariable* initializer;
 };
 
 

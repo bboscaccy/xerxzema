@@ -676,7 +676,12 @@ void Instruction::validate_mask()
 		reset_mask = 0;
 }
 
-ArrayBuilder::ArrayBuilder(Type* array_type) : array_type(array_type)
+ArrayBuilder::ArrayBuilder(Type* array_type) : array_type(array_type), initializer(nullptr)
+{
+}
+
+ArrayBuilder::ArrayBuilder(Type* array_type, llvm::GlobalVariable* init) :
+	array_type(array_type), initializer(init)
 {
 }
 
@@ -731,13 +736,22 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
 	builder.CreateStore(cast, data_ptr);
 	auto dst_ptr = builder.CreateLoad(data_ptr);
-	auto next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(0));
-	for(size_t i = 0; i < _inputs.size(); i++)
+
+	//copy a global variable array in here inside of an elementwise build
+	if(initializer)
 	{
-		//TODO detect single-use copy or move?
-		array_type->copy(context, builder, program,
-						 dst_ptr, _inputs[i]->fetch_value_raw(context, builder));
-		next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
+
+	}
+	else
+	{
+		auto next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(0));
+		for(size_t i = 0; i < _inputs.size(); i++)
+		{
+			//TODO detect single-use copy or move?
+			array_type->copy(context, builder, program,
+							 dst_ptr, _inputs[i]->fetch_value_raw(context, builder));
+			next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
+		}
 	}
 
 	//set the array size and allocated size
