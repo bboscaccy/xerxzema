@@ -9,20 +9,21 @@ Type::Type()
 }
 
 void Type::move(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
-				llvm::Value *dst_ptr, llvm::Value *src_ptr)
+				Program* program, llvm::Value *dst_ptr, llvm::Value *src_ptr)
 {
 	auto v = builder.CreateLoad(src_ptr);
 	builder.CreateStore(v, dst_ptr);
 }
 
 void Type::copy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
-				llvm::Value *dst_ptr, llvm::Value *src_ptr)
+				Program* program, llvm::Value *dst_ptr, llvm::Value *src_ptr)
 {
 	auto v = builder.CreateLoad(src_ptr);
 	builder.CreateStore(v, dst_ptr);
 }
 
-void Type::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *v)
+void Type::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				   Program* program, llvm::Value *v)
 {
 
 }
@@ -38,7 +39,8 @@ llvm::Type* Bool::type(llvm::LLVMContext &context)
 }
 
 
-void Bool::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Bool::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				Program* program, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
@@ -53,7 +55,8 @@ std::string Unit::name()
 	return "unit";
 }
 
-void Unit::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Unit::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				Program* program, llvm::Value *value)
 {
 
 }
@@ -63,7 +66,8 @@ llvm::Type* Real::type(llvm::LLVMContext &context)
 	return llvm::Type::getDoubleTy(context);
 }
 
-void Real::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Real::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				Program* program, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantFP::get(type(context), 0), value);
 }
@@ -83,7 +87,8 @@ std::string Int::name()
 	return "int";
 }
 
-void Int::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Int::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+			   Program* program, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
@@ -98,7 +103,8 @@ llvm::Type* Byte::type(llvm::LLVMContext &context)
 	return llvm::Type::getInt8Ty(context);
 }
 
-void Byte::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Byte::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				Program* program, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
@@ -115,7 +121,8 @@ std::string Opaque::name()
 	return "opaque";
 }
 
-void Opaque::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *value)
+void Opaque::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				  Program* program, llvm::Value *value)
 {
 	builder.CreateStore(llvm::ConstantInt::get(type(context), 0), value);
 }
@@ -151,7 +158,8 @@ llvm::Type* Array::type(llvm::LLVMContext& context)
 	return cached_type;
 }
 
-void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::Value *val)
+void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+				 Program* program, llvm::Value *val)
 {
 	auto sz = llvm::ConstantExpr::getSizeOf(type(context));
 	builder.CreateMemSet(val, llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), 0),
@@ -159,4 +167,18 @@ void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder, llvm::V
 
 }
 
+void Array::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+					Program* program, llvm::Value *v)
+{
+	/* we need to be able to call externals here....
+	   somehow?
+	if(type_params[0]->is_trivial())
+	{
+		auto void_cast = builder.CreatePointerCast(v, llvm::Type::getInt8PtrTy(context));
+		builder.CreateCall(deallocator, {void_cast});
+		auto sz = llvm::ConstantExpr::getSizeOf(_outputs[0]->type()->type(context));
+		builder.CreateMemSet(out_struct, builder.getInt8(0), sz, 0);
+	}
+	*/
+}
 };

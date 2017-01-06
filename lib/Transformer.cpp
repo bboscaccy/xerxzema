@@ -117,7 +117,7 @@ llvm::Function* Transformer::generate_transformer(llvm::LLVMContext& context)
 		{
 			auto prev_ptr = builder.CreateStructGEP(prev_type, prev_arg, mapping.prev->offset());
 			auto next_ptr = builder.CreateStructGEP(next_type, next_arg, mapping.next->offset());
-			mapping.next->type()->copy(context, builder, next_ptr, prev_ptr);
+			mapping.next->type()->copy(context, builder, next, next_ptr, prev_ptr);
 		}
 	}
 

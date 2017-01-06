@@ -294,6 +294,8 @@ TEST(TestSemantic, DefaultHandlerTest)
 TEST(TestSemantic, TestArrayBuilderSyntax)
 {
 	std::stringstream ss;
+	//so essentially
+	//[foo] is really just shorthand for array(foo)
 	ss << "[2.0, x] -> y;";
 	xerxzema::Lexer lexer(ss);
 

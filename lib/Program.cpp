@@ -306,7 +306,7 @@ void Program::allocate_registers(llvm::LLVMContext& context, llvm::IRBuilder<>& 
 		{
 			auto value = builder.CreateAlloca(r->type()->type(context), nullptr, r->name());
 			r->value(value);
-			r->type()->init(context, builder, value); //this should only be done during head
+			r->type()->init(context, builder, this, value); //this should only be done during head
 		}
 	}
 	for(auto& i: instructions)
@@ -330,7 +330,7 @@ void Program::generate_exit_block(llvm::LLVMContext& context, llvm::IRBuilder<>&
 		if(r->type()->name() != "unit")
 		{
 			auto ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-			r->type()->copy(context, builder, ptr, r->fetch_value_raw(context, builder));
+			r->type()->copy(context, builder, this, ptr, r->fetch_value_raw(context, builder));
 		}
 	}
 	for(auto& r: instructions)
@@ -382,7 +382,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 		if(r->type()->name() != "unit")
 		{
 			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-			r->type()->copy(context, builder, r->fetch_value_raw(context, builder), ptr);
+			r->type()->copy(context, builder, this, r->fetch_value_raw(context, builder), ptr);
 		}
 	}
 	for(auto r: outputs)
@@ -390,7 +390,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 		if(r->type()->name() != "unit")
 		{
 			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-			r->type()->init(context, builder, ptr);
+			r->type()->init(context, builder, this, ptr);
 		}
 	}
 
@@ -414,7 +414,7 @@ llvm::BasicBlock* Program::generate_entry_block(llvm::LLVMContext& context,
 		if(r->type()->name() != "unit")
 		{
 			ptr = builder.CreateStructGEP(state_type, &*function->arg_begin(), r->offset());
-			r->type()->copy(context, builder,r->fetch_value_raw(context, builder), ptr);
+			r->type()->copy(context, builder,this, r->fetch_value_raw(context, builder), ptr);
 		}
 	}
 
@@ -692,7 +692,7 @@ llvm::Value* Program::create_closure(xerxzema::Register *reg, bool reinvoke,
 	if(reg->type()->name() != "unit")
 	{
 		auto dest_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
-		reg->type()->copy(context, builder, dest_ptr, arg_ptr);
+		reg->type()->copy(context, builder, this, dest_ptr, arg_ptr);
 	}
 
 	//update activation masks
@@ -764,7 +764,7 @@ void Program::destructor_gen(llvm::Module* module, llvm::LLVMContext& context)
 		if(reg->type()->name() != "unit")
 		{
 			auto site_ptr = builder.CreateStructGEP(state_type, state, reg->offset());
-			reg->type()->destroy(context, builder, site_ptr);
+			reg->type()->destroy(context, builder, this, site_ptr);
 		}
 	}
 	for(auto& inst:instructions)

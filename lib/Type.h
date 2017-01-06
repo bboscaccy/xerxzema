@@ -8,19 +8,21 @@
 
 namespace xerxzema
 {
-
+class Program;
 class Type
 {
 public:
 	Type();
 	virtual std::string name() = 0;
 	virtual llvm::Type* type(llvm::LLVMContext& context) = 0;
-	virtual void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val) = 0;
+	virtual void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+					  Program* program, llvm::Value* val) = 0;
 	virtual void move(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
-					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
+					  Program* program, llvm::Value* dst_ptr, llvm::Value* src_ptr);
 	virtual void copy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
-					  llvm::Value* dst_ptr, llvm::Value* src_ptr);
-	virtual void destroy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,  llvm::Value* v);
+					  Program* program, llvm::Value* dst_ptr, llvm::Value* src_ptr);
+	virtual void destroy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+						 Program* program, llvm::Value* v);
 	virtual inline bool is_trivial() { return true; }
 };
 
@@ -39,8 +41,11 @@ public:
 	std::string name();
 	llvm::Type* type(llvm::LLVMContext& context);
 	std::unique_ptr<ParameterizedType> instantiate(const std::vector<Type*>& params);
-	void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* val);
+	void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+			  Program* program, llvm::Value* val);
 	inline bool is_trivial() { return false; }
+	void destroy(llvm::LLVMContext& context, llvm::IRBuilder<>& builder,
+				 Program* program, llvm::Value* v);
 
 private:
 	llvm::Type* cached_type;
@@ -50,7 +55,8 @@ private:
 public:										 \
  std::string name();						 \
  llvm::Type* type(llvm::LLVMContext& context); \
- void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, llvm::Value* value);	};
+ void init(llvm::LLVMContext& context, llvm::IRBuilder<>& builder, \
+	Program* program, llvm::Value* value);	};
 
 DECL_TYPE(Bool)
 DECL_TYPE(Byte)

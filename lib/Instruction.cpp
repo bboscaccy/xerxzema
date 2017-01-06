@@ -249,7 +249,8 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 	builder.CreateCondBr(comp_value, arg0_block, arg1_block);
 
 	builder.SetInsertPoint(arg0_block);
-	_inputs[0]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+	_inputs[0]->type()->copy(context, builder, program,
+							 _outputs[0]->fetch_value_raw(context, builder),
 							 _inputs[0]->fetch_value_raw(context, builder));
 
 	for(auto& r:_outputs)
@@ -259,7 +260,8 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 	builder.CreateBr(next_block);
 
 	builder.SetInsertPoint(arg1_block);
-	_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+	_inputs[1]->type()->copy(context, builder, program,
+							 _outputs[0]->fetch_value_raw(context, builder),
 							 _inputs[1]->fetch_value_raw(context, builder));
 
 	for(auto& r:_outputs)
@@ -316,7 +318,8 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 	{
 		auto program_offset = target->input_registers()[in_counter]->offset();
 		auto value_ptr = builder.CreateStructGEP(target->state_type_value(), state, program_offset);
-		reg->type()->copy(context, builder, value_ptr, reg->fetch_value_raw(context, builder));
+		reg->type()->copy(context, builder, program,
+						  value_ptr, reg->fetch_value_raw(context, builder));
 		in_counter++;
 	}
 	auto call_ret = builder.CreateCall(fn, {state});
@@ -327,7 +330,8 @@ void ProgramDirectCall::generate_operation(llvm::LLVMContext &context, llvm::IRB
 	{
 		auto program_offset = target->output_registers()[out_counter]->offset();
 		auto value_ptr = builder.CreateStructGEP(target->state_type_value(), state, program_offset);
-		reg->type()->copy(context, builder, reg->fetch_value_raw(context, builder), value_ptr);
+		reg->type()->copy(context, builder, program,
+						  reg->fetch_value_raw(context, builder), value_ptr);
 		out_counter++;
 	}
 	builder.CreateStore(call_ret, state_value());
@@ -510,7 +514,7 @@ void Delay::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &bui
 	bool_ptr = builder.CreateStructGEP(_state_type, _state_value, 0);
 	builder.CreateStore(llvm::ConstantInt::get(bool_val->getType(), 1), bool_ptr);
 	auto delay_val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
-	_inputs[0]->type()->copy(context, builder, delay_val_ptr,
+	_inputs[0]->type()->copy(context, builder, program, delay_val_ptr,
 							 _inputs[0]->fetch_value_raw(context, builder));
 	builder.CreateBr(next_block);
 
@@ -518,8 +522,8 @@ void Delay::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &bui
 	delay_val_ptr = builder.CreateStructGEP(_state_type, _state_value, 1);
 	auto in_ptr = _inputs[0]->fetch_value_raw(context, builder);
 	auto out_ptr = _outputs[0]->fetch_value_raw(context, builder);
-	_inputs[0]->type()->copy(context, builder, out_ptr, delay_val_ptr);
-	_inputs[0]->type()->copy(context, builder, delay_val_ptr, in_ptr);
+	_inputs[0]->type()->copy(context, builder, program, out_ptr, delay_val_ptr);
+	_inputs[0]->type()->copy(context, builder, program, delay_val_ptr, in_ptr);
 
 	auto p = builder.CreateLoad(program->activation_counter_value());
 	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
@@ -552,7 +556,8 @@ void When::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 	builder.CreateCondBr(test_val, true_block, false_block);
 
 	builder.SetInsertPoint(true_block);
-	_inputs[1]->type()->copy(context, builder, _outputs[0]->fetch_value_raw(context, builder),
+	_inputs[1]->type()->copy(context, builder, program,
+							 _outputs[0]->fetch_value_raw(context, builder),
 							 _inputs[1]->fetch_value_raw(context, builder));
 
 	for(auto& r:_outputs)
@@ -593,7 +598,7 @@ void Cond::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &buil
 	builder.CreateStore(i, program->activation_counter_value());
 	if(_inputs.size() > 1)
 	{
-		_inputs[1]->type()->copy(context, builder,
+		_inputs[1]->type()->copy(context, builder, program,
 								 _outputs[0]->fetch_value_raw(context, builder),
 								 _inputs[1]->fetch_value_raw(context, builder));
 	}
@@ -730,8 +735,8 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	for(size_t i = 0; i < _inputs.size(); i++)
 	{
 		//TODO detect single-use copy or move?
-		array_type->copy(context, builder, dst_ptr, _inputs[i]->fetch_value_raw(context,
-																				builder));
+		array_type->copy(context, builder, program,
+						 dst_ptr, _inputs[i]->fetch_value_raw(context, builder));
 		next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(i));
 	}
 
