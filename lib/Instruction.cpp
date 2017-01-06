@@ -729,21 +729,30 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 	//TODO
 	// we need an "after-head" sort of optimnization pass that can detect which items are only activated
 	// by head-fired registers and remove extra mask updates
-	auto alloc_size = llvm::ConstantExpr::getMul
-		(llvm::ConstantExpr::getSizeOf(array_type->type(context)),
-									   builder.getInt64(_inputs.size()));
-	auto new_ptr = builder.CreateCall(mallocator, {alloc_size });
-	auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
-	builder.CreateStore(cast, data_ptr);
-	auto dst_ptr = builder.CreateLoad(data_ptr);
 
 	//copy a global variable array in here inside of an elementwise build
 	if(initializer)
 	{
+		auto element_count = initializer->getInitializer()->getType()->getArrayNumElements();
+		auto alloc_size = llvm::ConstantExpr::getMul
+			(llvm::ConstantExpr::getSizeOf(array_type->type(context)),
+			 element_count);
+		auto new_ptr = builder.CreateCall(mallocator, {alloc_size });
+		auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
+		builder.CreateStore(cast, data_ptr);
+		auto dst_ptr = builder.CreateLoad(data_ptr);
 
+		//memcpy and go?
 	}
 	else
 	{
+		auto alloc_size = llvm::ConstantExpr::getMul
+			(llvm::ConstantExpr::getSizeOf(array_type->type(context)),
+			 builder.getInt64(_inputs.size()));
+		auto new_ptr = builder.CreateCall(mallocator, {alloc_size });
+		auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
+		builder.CreateStore(cast, data_ptr);
+		auto dst_ptr = builder.CreateLoad(data_ptr);
 		auto next_ptr = builder.CreateGEP(dst_ptr, builder.getInt32(0));
 		for(size_t i = 0; i < _inputs.size(); i++)
 		{
