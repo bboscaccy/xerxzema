@@ -736,13 +736,12 @@ void ArrayBuilder::generate_operation(llvm::LLVMContext &context, llvm::IRBuilde
 		auto element_count = initializer->getInitializer()->getType()->getArrayNumElements();
 		auto alloc_size = llvm::ConstantExpr::getMul
 			(llvm::ConstantExpr::getSizeOf(array_type->type(context)),
-			 element_count);
+			 builder.getInt64(element_count));
 		auto new_ptr = builder.CreateCall(mallocator, {alloc_size });
 		auto cast = builder.CreatePointerCast(new_ptr, array_type->type(context)->getPointerTo());
 		builder.CreateStore(cast, data_ptr);
 		auto dst_ptr = builder.CreateLoad(data_ptr);
-
-		//memcpy and go?
+		builder.CreateMemCpy(dst_ptr, initializer, alloc_size, 0);
 	}
 	else
 	{
