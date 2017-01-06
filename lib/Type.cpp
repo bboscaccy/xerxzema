@@ -1,4 +1,6 @@
 #include "Type.h"
+#include "Program.h"
+#include "Namespace.h"
 
 namespace xerxzema
 {
@@ -170,15 +172,18 @@ void Array::init(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 void Array::destroy(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 					Program* program, llvm::Value *v)
 {
-	/* we need to be able to call externals here....
-	   somehow?
+	auto deallocator = program->name_space()->get_external_function("free",
+																	program->current_module(),
+																	context);
+	auto data_ptr = builder.CreateStructGEP(type(context), v, 0);
+	auto val_ptr = builder.CreateLoad(data_ptr);
+
 	if(type_params[0]->is_trivial())
 	{
-		auto void_cast = builder.CreatePointerCast(v, llvm::Type::getInt8PtrTy(context));
+		auto void_cast = builder.CreatePointerCast(val_ptr, llvm::Type::getInt8PtrTy(context));
 		builder.CreateCall(deallocator, {void_cast});
-		auto sz = llvm::ConstantExpr::getSizeOf(_outputs[0]->type()->type(context));
-		builder.CreateMemSet(out_struct, builder.getInt8(0), sz, 0);
+		auto sz = llvm::ConstantExpr::getSizeOf(type(context));
+		builder.CreateMemSet(v, builder.getInt8(0), sz, 0);
 	}
-	*/
 }
 };
