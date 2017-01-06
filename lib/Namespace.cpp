@@ -128,6 +128,11 @@ void Namespace::add_type(const std::string &name, std::unique_ptr<Type> &&type)
 	types.emplace(name, std::move(type));
 }
 
+void Namespace::add_type_alias(const std::string &name, xerxzema::Type *type)
+{
+	type_aliases[name] = type;
+}
+
 void Namespace::add_parameterized_type(const std::string &name,
 									   std::unique_ptr<ParameterizedType> &&type)
 {
@@ -138,6 +143,9 @@ Type* Namespace::type(const std::string& name)
 {
 	if(types.find(name) != types.end())
 		return types[name].get();
+
+	if(type_aliases.find(name) != type_aliases.end())
+		return type_aliases[name];
 
 	for(auto& ns : imports)
 	{

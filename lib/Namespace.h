@@ -29,6 +29,7 @@ public:
 	std::string full_name() const;
 	void import(Namespace* ns);
 	void add_type(const std::string& name, std::unique_ptr<Type>&& type);
+	void add_type_alias(const std::string& name, Type* type);
 	void add_parameterized_type(const std::string& name, std::unique_ptr<ParameterizedType>&& type);
 	Type* type(const std::string& name);
 	Type* type(const std::string& name, const std::vector<Type*> params);
@@ -66,6 +67,7 @@ private:
 	std::map<std::string, std::unique_ptr<Program>> programs;
 	std::vector<Namespace*> imports;
 	std::map<std::string, std::unique_ptr<Type>> types;
+	std::map<std::string, Type*> type_aliases;
 	std::map<std::string, std::unique_ptr<ParameterizedType>> parameterized_types;
 	std::map<std::string, std::unique_ptr<ParameterizedType>> parameterized_type_instances;
 	std::map<std::string, std::vector<std::unique_ptr<InstructionDefinition>>> instructions;
