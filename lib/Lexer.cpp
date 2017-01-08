@@ -110,6 +110,62 @@ bool Lexer::do_symbol()
 	return true;
 }
 
+bool Lexer::do_string()
+{
+	if(!input)
+		return false;
+
+	if(input.peek() != '"')
+		return false;
+
+	size_t start = col;
+	input.get();
+	col++;
+	while(input && input.peek() != '"')
+	{
+		auto c = input.get();
+		if(c == '\\')
+		{
+			col++;
+			if(input.peek() == '"')
+			{
+				buffer.push_back('"');
+				col++;
+			}
+			else if(input.peek() == 'n')
+			{
+				buffer.push_back('\n');
+				col++;
+			}
+			else if(input.peek() == 't')
+			{
+				buffer.push_back('\t');
+				col++;
+			}
+			else
+			{
+				buffer.push_back('\\');
+			}
+		}
+		else
+		{
+			buffer.push_back(c);
+			if(c == '\n')
+			{
+				col = 0;
+				line++;
+			}
+			else
+			{
+				col++;
+			}
+		}
+	}
+	token = std::make_unique<Token>(TokenType::StringConstant, line, start, buffer);
+	return true;
+
+}
+
 bool Lexer::do_lexical()
 {
 	if(!input)
@@ -548,6 +604,12 @@ void Lexer::read_next_token()
 		buffer.clear();
 	}
 	else if(do_operator())
+	{
+		*current_line += buffer;
+		token->line_data = current_line;
+		buffer.clear();
+	}
+	else if(do_string())
 	{
 		*current_line += buffer;
 		token->line_data = current_line;

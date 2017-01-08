@@ -15,6 +15,7 @@ enum class TokenType : char
 	Int,
 	Real,
 	Symbol,
+	StringConstant,
 	Add, // +
 	Bang, // +>
 	MergeStart, // +{
@@ -91,6 +92,7 @@ private:
 	bool do_operator();
 	bool do_lexical();
 	bool do_comment();
+	bool do_string();
 	void read_next_token();
 	std::istream& input;
 	std::vector<Token> _tokens;

@@ -197,3 +197,14 @@ TEST(TestLexer, TestSeqInitializer)
 	lex.get();
 
 }
+
+TEST(TestLexer, TestStringConst)
+{
+
+	std::stringstream ss;
+	ss << "\"this is a test\"";
+	xerxzema::Lexer lex(ss);
+	ASSERT_EQ(lex.peek()->type, xerxzema::TokenType::StringConstant);
+	lex.get();
+
+}
