@@ -15,7 +15,7 @@ enum class TokenType : char
 	Int,
 	Real,
 	Symbol,
-	StringConstant,
+	String,
 	Add, // +
 	Bang, // +>
 	MergeStart, // +{

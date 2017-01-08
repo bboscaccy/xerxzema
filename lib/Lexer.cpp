@@ -161,7 +161,12 @@ bool Lexer::do_string()
 			}
 		}
 	}
-	token = std::make_unique<Token>(TokenType::StringConstant, line, start, buffer);
+	if(input) //eat the trailing "
+	{
+		input.get();
+		col++;
+	}
+	token = std::make_unique<Token>(TokenType::String, line, start, buffer);
 	return true;
 
 }

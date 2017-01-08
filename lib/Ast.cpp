@@ -35,6 +35,22 @@ void RealExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+StringExpression::StringExpression(std::unique_ptr<Token>&& t) : Expression(std::move(t))
+{
+}
+
+std::string StringExpression::show()
+{
+	return "(string " + token->data + ")";
+}
+
+void StringExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
+
+
 BinaryExpression::BinaryExpression(std::unique_ptr<Token>&& t,
 								   std::unique_ptr<Expression>&& l,
 								   std::unique_ptr<Expression>&& r) :
@@ -450,6 +466,10 @@ void AstVisitor::visit(SymbolExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(RealExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(StringExpression *e)
 {
 	handle_default(e);
 }
