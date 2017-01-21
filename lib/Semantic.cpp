@@ -260,6 +260,25 @@ void HandleExpression::visit(xerxzema::RealExpression *e)
 			//A bit low level for right here...
 		}
 	}
+}
+
+void HandleExpression::visit(xerxzema::StringExpression *e)
+{
+	auto string_value = e->token->data;
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+
+	auto inst = std::make_unique<ValueString>(e->token->data);
+	inst->dependent(program->reg("head"));
+	for(auto& r: dependencies)
+			inst->dependent(r.reg);
+
+	inst->output(result[0].reg);
+	program->instruction(std::move(inst));
+
+	//TODO type check.
+	result[0].reg->type(program->name_space()->type("string"));
+
 
 }
 

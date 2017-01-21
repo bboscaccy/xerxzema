@@ -292,6 +292,16 @@ void ValueInt::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> 
 }
 
 
+ValueString::ValueString(const std::string& v):value(v) {}
+void ValueString::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+									 xerxzema::Program *program)
+{
+	auto string_value = builder.CreateGlobalString(value);
+	ArrayBuilder array_builder = ArrayBuilder(_outputs[0]->type(), string_value);
+	array_builder.output(_outputs[0]);
+	array_builder.generate_operation(context, builder, program);
+}
+
 ProgramDirectCall::ProgramDirectCall(Program* target) : target(target) {}
 llvm::Type* ProgramDirectCall::state_type(llvm::LLVMContext &context)
 {

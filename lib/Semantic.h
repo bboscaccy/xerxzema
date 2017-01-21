@@ -89,6 +89,7 @@ public:
 	void visit(SymbolExpression* e);
 	void visit(SampleExpression* e);
 	void visit(RealExpression* e);
+	void visit(StringExpression* e);
 	void visit(ArgListExpression* e);
 	void visit(AddExpression* e);
 	void visit(SubExpression* e);

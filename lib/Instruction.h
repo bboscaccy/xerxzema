@@ -133,6 +133,19 @@ private:
 	int64_t value;
 };
 
+class ValueString : public Instruction
+{
+public:
+	ValueString(const std::string& v);
+	void generate_operation(llvm::LLVMContext& context,	llvm::IRBuilder<> &builder,
+							Program* program);
+	inline std::string name() { return "value_string";}
+	inline std::string constant_description() { return value; }
+private:
+	std::string value;
+};
+
+
 class ProgramDirectCall : public Instruction
 {
 public:
