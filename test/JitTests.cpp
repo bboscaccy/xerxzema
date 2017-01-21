@@ -248,3 +248,20 @@ R"EOF(
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
 }
+
+TEST(TestJit, TestTraceStringHelloWorld)
+{
+	xerxzema::World world;
+	auto ns = world.get_namespace("test");
+	auto program_str =
+R"EOF(
+"you know what, i'm not saying hi..." -> x;
+trace(x);
+)EOF";
+	xerxzema::parse_input(program_str, ns);
+	world.jit()->dump_after_codegen();
+	world.jit()->compile_namespace(ns);
+	auto p = ns->get_default_program();
+	xerxzema::JitInvoke<void> invoker(world.jit(), p);
+	invoker();
+}

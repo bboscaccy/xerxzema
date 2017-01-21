@@ -632,16 +632,42 @@ void Bang::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &bui
 void Trace::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 							  Program *program)
 {
-	std::string input_str("(");
-	input_str += _inputs[0]->name();
-	input_str += ") %f\n";
-	auto format_str = builder.CreateGlobalString(input_str);
+	llvm::Value* format_str;
+
+	if(_inputs[0]->type()->name() == "real")
+	{
+		std::string input_str("(");
+		input_str += _inputs[0]->name();
+		input_str += ") %f\n";
+		format_str = builder.CreateGlobalString(input_str);
+	}
+	else if(_inputs[0]->type() == program->name_space()->type("string"))
+	{
+		std::string input_str("(");
+		input_str += _inputs[0]->name();
+		input_str += ") %s\n";
+		format_str = builder.CreateGlobalString(input_str);
+	}
 
 	auto format_addr = builder.CreateInBoundsGEP(format_str,
 										 {builder.getInt32(0), builder.getInt32(0)});
 
-	auto fn = program->name_space()->get_external_function("print", program->current_module(), context);
-	builder.CreateCall(fn, {format_addr, _inputs[0]->fetch_value(context, builder)});
+	auto fn = program->name_space()->get_external_function("print",
+														   program->current_module(), context);
+
+	if(_inputs[0]->type() == program->name_space()->type("string"))
+	{
+		//TODO other array types and user defined types?
+		auto array_ptr = _inputs[0]->fetch_value_raw(context, builder);
+		auto c_str = builder.CreateLoad
+			(builder.CreateStructGEP(_inputs[0]->type()->type(context), array_ptr, 0));
+
+		builder.CreateCall(fn, {format_addr, c_str});
+	}
+	else
+	{
+		builder.CreateCall(fn, {format_addr, _inputs[0]->fetch_value(context, builder)});
+	}
 }
 
 void Trace::generate_prolouge(llvm::LLVMContext &context,

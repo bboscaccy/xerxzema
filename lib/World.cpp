@@ -101,6 +101,8 @@ void World::create_core_namespace()
 
 	//TODO create custom instruction builders for our control flow and debug operations.
 	core->add_instruction(create_def<Trace>("trace", {"real"}, {"unit"}));
+	core->add_instruction(create_def<Trace>("trace", {"string"}, {"unit"}));
+
 	core->add_instruction(create_def<Merge>("merge", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<Cond>("cond", {"bool", "real"}, {"real"}));
 	core->add_instruction(create_def<When>("when", {"bool", "real"}, {"real"}));
