@@ -323,6 +323,11 @@ void HandleExpression::visit(xerxzema::DivExpression *e)
 	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "div");
 }
 
+void HandleExpression::visit(xerxzema::LtExpression *e)
+{
+	do_binary_instruction(e, e->lhs.get(), e->rhs.get(), "lt");
+}
+
 void HandleExpression::do_binary_instruction(Expression* parent, Expression* l,
 											 Expression* r, const std::string& op)
 {

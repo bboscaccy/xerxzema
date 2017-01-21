@@ -95,6 +95,7 @@ public:
 	void visit(SubExpression* e);
 	void visit(MulExpression* e);
 	void visit(DivExpression* e);
+	void visit(LtExpression* e);
 	void visit(GroupExpression* e);
 	void visit(BindExpression* e);
 	void visit(CallExpression* e);

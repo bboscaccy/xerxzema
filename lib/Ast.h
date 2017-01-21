@@ -175,6 +175,15 @@ public:
 	void accept(AstVisitor& v);
 };
 
+class LtExpression : public BinaryExpression
+{
+public:
+	LtExpression(std::unique_ptr<Token>&& token,
+				  std::unique_ptr<Expression>&& lhs, std::unique_ptr<Expression>&& rhs);
+	std::string show();
+	void accept(AstVisitor& v);
+};
+
 class ArgListExpression : public BinaryExpression
 {
 public:
@@ -299,6 +308,7 @@ public:
 	virtual void visit(DivExpression* e);
 	virtual void visit(ModExpression* e);
 	virtual void visit(PowExpression* e);
+	virtual void visit(LtExpression* e);
 	virtual void visit(ArgListExpression* e);
 	virtual void visit(GroupExpression* e);
 	virtual void visit(SampleExpression* e);

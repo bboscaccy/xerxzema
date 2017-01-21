@@ -149,6 +149,26 @@ void PowExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+
+LtExpression::LtExpression(std::unique_ptr<Token>&& t,
+							 std::unique_ptr<Expression>&& l,
+							 std::unique_ptr<Expression>&& r) :
+	BinaryExpression(std::move(t), std::move(l), std::move(r))
+
+{
+}
+
+std::string LtExpression::show()
+{
+	return "(pow " + lhs->show() + " " + rhs->show() + ")";
+}
+
+void LtExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
+
 AddExpression::AddExpression(std::unique_ptr<Token>&& t,
 							 std::unique_ptr<Expression>&& l,
 							 std::unique_ptr<Expression>&& r) :
@@ -498,6 +518,10 @@ void AstVisitor::visit(ModExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(PowExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(LtExpression *e)
 {
 	handle_default(e);
 }

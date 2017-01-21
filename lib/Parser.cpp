@@ -46,6 +46,8 @@ int left_bind(Token* token)
 		return 0;
 	if(token->type == TokenType::String)
 		return 0;
+	if(token->type == TokenType::Lt)
+		return 6;
 	if(token->type == TokenType::Add)
 		return 10;
 	if(token->type == TokenType::Sub)
@@ -204,6 +206,9 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 	if(token->type == TokenType::Pow)
 		return std::make_unique<PowExpression>(std::move(token),
 											   std::move(expr), expression(lexer, 29));
+	if(token->type == TokenType::Lt)
+		return std::make_unique<LtExpression>(std::move(token),
+											   std::move(expr), expression(lexer, 6));
 	if(token->type == TokenType::Delimit)
 		return std::make_unique<AnnotationExpression>(std::move(token),
 													  std::move(expr), expression(lexer, 100));

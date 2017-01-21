@@ -113,6 +113,34 @@ prog foo(i0:real, i1:real) -> bye:real
 	ASSERT_EQ(invoker(1,2), 3);
 }
 
+TEST(TestJit, TestWhenShortSyntax)
+{
+
+	xerxzema::World world;
+	auto jit = world.jit();
+	auto program_str =
+R"EOF(
+prog foo(i0:real, i1:real) -> bye:real
+{
+    when(i0 < i1, i0) -> x;
+    x + i1 -> bye;
+    trace(bye);
+    trace(x);
+}
+)EOF";
+
+	auto ns = world.get_namespace("core");
+	xerxzema::parse_input(program_str, ns);
+	auto p = ns->get_program("foo");
+	world.jit()->compile_namespace(ns);
+
+	xerxzema::JitInvoke<double, double, double> invoker(jit, p);
+	ASSERT_EQ(invoker(1,2), 3);
+	ASSERT_EQ(invoker(2,1), 2);
+	ASSERT_EQ(invoker(2,1), 2);
+	ASSERT_EQ(invoker(1,2), 3);
+}
+
 TEST(TestJit, TestPow)
 {
 	xerxzema::World world;
