@@ -298,4 +298,32 @@ std::unique_ptr<Instruction> ArrayBuilderDefinition::create(const std::vector<Ty
 	return std::make_unique<ArrayBuilder>(inputs[0]);
 }
 
+
+bool WhenDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
+{
+
+	if(inputs.size() != 2)
+		return false;
+
+	auto first_type = inputs[0];
+	if(first_type->name() != "bool")
+		return false;
+
+	return true;
+}
+
+std::vector<Type*> WhenDefinition::output_types(const std::vector<Type *> &inputs,
+												xerxzema::Namespace *parent)
+{
+	return std::vector<Type*>{inputs[1]};
+}
+
+std::unique_ptr<Instruction> WhenDefinition::create(const std::vector<Type *> &inputs,
+													const std::vector<Type *> &outputs)
+{
+	return std::make_unique<When>();
+}
+
+
+
 };

@@ -160,6 +160,17 @@ public:
 	inline std::string name() { return "array"; }
 };
 
+class WhenDefinition : public InstructionDefinition
+{
+public:
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs);
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
+	bool match(const std::vector<Type*>& inputs, Namespace* parent);
+	inline std::string name() { return "when"; }
+};
+
+
 template<class T>
 std::unique_ptr<BasicDefinition<T>> create_def(const std::string& name,
 											   const std::vector<std::string>& inputs,

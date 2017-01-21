@@ -84,32 +84,27 @@ TEST(TestJit, TestDelay)
 	}
 }
 
-TEST(TestJit, TestWhen)
+TEST(TestJit, TestWhenVerboseSyntax)
 {
 
 	xerxzema::World world;
 	auto jit = world.jit();
-	auto p = world.get_namespace("core")->get_program("test");
-	p->add_input("i0", world.get_namespace("core")->type("real"));
-	p->add_input("i1", world.get_namespace("core")->type("real"));
-	p->add_output("bye", world.get_namespace("core")->type("real"));
+	auto program_str =
+R"EOF(
+prog foo(i0:real, i1:real) -> bye:real
+{
+    lt(i0, i1) -> is_lt;
+    when(is_lt, i0) -> x;
+    x + i1 -> bye;
+    trace(bye);
+    trace(x);
+}
+)EOF";
 
-	auto x = p->reg("x");
-	x->type(world.get_namespace("core")->type("real"));
-
-	p->instruction("lt", {"i0", "i1"}, {"cmp"});
-	auto when = std::make_unique<xerxzema::When>();
-	when->input(p->reg("cmp"));
-	when->input(p->reg("i0"));
-	when->output(p->reg("x"));
-	p->instruction(std::move(when));
-
-	p->instruction("add", {"x", "i1"}, {"bye"});
-
-	p->instruction("trace", {"bye"}, {});
-	p->instruction("trace", {"x"}, {});
-
-	jit->compile_namespace(world.get_namespace("core"));
+	auto ns = world.get_namespace("core");
+	xerxzema::parse_input(program_str, ns);
+	auto p = ns->get_program("foo");
+	world.jit()->compile_namespace(ns);
 
 	xerxzema::JitInvoke<double, double, double> invoker(jit, p);
 	ASSERT_EQ(invoker(1,2), 3);
@@ -255,7 +250,7 @@ TEST(TestJit, TestTraceStringHelloWorld)
 	auto ns = world.get_namespace("test");
 	auto program_str =
 R"EOF(
-"you know what, i'm not saying hi..." -> x;
+"you know what? i will not saying hi..." -> x;
 trace(x);
 )EOF";
 	xerxzema::parse_input(program_str, ns);
