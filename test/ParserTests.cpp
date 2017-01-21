@@ -390,3 +390,15 @@ TEST(TestParser, TestStringExpr)
 	ASSERT_EQ(expr->show(), "(string hello world!)");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestWhenExpr)
+{
+
+	std::stringstream ss;
+	ss << " +? x, y -> z";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(bind (when (arg-list (symbol x) (symbol y))) (symbol z))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

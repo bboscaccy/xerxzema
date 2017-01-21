@@ -98,6 +98,7 @@ public:
 	void visit(LtExpression* e);
 	void visit(GroupExpression* e);
 	void visit(BindExpression* e);
+	void visit(WhenExpression* e);
 	void visit(CallExpression* e);
 	void visit(ListExpression* e);
 	void handle_default(Expression* e);

@@ -122,7 +122,7 @@ TEST(TestJit, TestWhenShortSyntax)
 R"EOF(
 prog foo(i0:real, i1:real) -> bye:real
 {
-    when(i0 < i1, i0) -> x;
+    +? i0 < i1, i0 -> x;
     x + i1 -> bye;
     trace(bye);
     trace(x);

@@ -72,6 +72,8 @@ int left_bind(Token* token)
 		return 1000;
 	if(token->type == TokenType::SeqBegin)
 		return 1000;
+	if(token->type == TokenType::When)
+		return 1000;
 	if(token->type == TokenType::Term)
 		return 1;
 	return -1;
@@ -170,6 +172,13 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		auto instructions = expression(lexer, 0);
 		return std::make_unique<WithStatement>(std::move(token),
 											   std::move(clause), std::move(instructions));
+	}
+	if(token->type == TokenType::When)
+	{
+		//if this is zero it will steal the bind operator
+		//which we do not want...
+		auto arg_list = expression(lexer, 1);
+		return std::make_unique<WhenExpression>(std::move(token), std::move(arg_list));
 	}
 	if(token->type == TokenType::ProgKeyword ||
 	   token->type == TokenType::UgenKeyword ||
