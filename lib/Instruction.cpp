@@ -297,7 +297,7 @@ void ValueString::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder
 									 xerxzema::Program *program)
 {
 	auto string_value = builder.CreateGlobalString(value);
-	ArrayBuilder array_builder = ArrayBuilder(_outputs[0]->type(), string_value);
+	ArrayBuilder array_builder = ArrayBuilder(program->name_space()->type("byte"), string_value);
 	array_builder.output(_outputs[0]);
 	array_builder.generate_operation(context, builder, program);
 }

@@ -232,3 +232,19 @@ array(1.0, 2.0, 3.0) -> x;
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
 }
+
+TEST(TestJit, TestStringCreation)
+{
+	xerxzema::World world;
+	auto ns = world.get_namespace("test");
+	auto program_str =
+R"EOF(
+"hi everybody" -> x;
+)EOF";
+	xerxzema::parse_input(program_str, ns);
+	world.jit()->dump_after_codegen();
+	world.jit()->compile_namespace(ns);
+	auto p = ns->get_default_program();
+	xerxzema::JitInvoke<void> invoker(world.jit(), p);
+	invoker();
+}
