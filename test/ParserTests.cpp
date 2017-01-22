@@ -402,3 +402,15 @@ TEST(TestParser, TestWhenExpr)
 	ASSERT_EQ(expr->show(), "(bind (when (arg-list (symbol x) (symbol y))) (symbol z))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestBangExpr)
+{
+
+	std::stringstream ss;
+	ss << " +> x";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(bang (symbol x))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

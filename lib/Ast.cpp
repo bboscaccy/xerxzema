@@ -275,6 +275,22 @@ void SampleExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+BangExpression::BangExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& e) :
+	expr(std::move(e)), Expression(std::move(t))
+{
+}
+
+std::string BangExpression::show()
+{
+	return "(bang " + expr->show() + ")";
+}
+
+void BangExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 std::string CallExpression::show()
 {
 	if(args)
@@ -551,6 +567,10 @@ void AstVisitor::visit(GroupExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(SampleExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(BangExpression *e)
 {
 	handle_default(e);
 }

@@ -223,6 +223,16 @@ public:
 	void accept(AstVisitor& v);
 };
 
+class BangExpression : public Expression
+{
+public:
+	BangExpression(std::unique_ptr<Token>&& token,
+				   std::unique_ptr<Expression>&& expr);
+	std::unique_ptr<Expression> expr;
+	std::string show();
+	void accept(AstVisitor& v);
+};
+
 class CallExpression : public Expression
 {
 public:
@@ -322,6 +332,7 @@ public:
 	virtual void visit(ArgListExpression* e);
 	virtual void visit(GroupExpression* e);
 	virtual void visit(SampleExpression* e);
+	virtual void visit(BangExpression* e);
 	virtual void visit(CallExpression* e);
 	virtual void visit(BindExpression* e);
 	virtual void visit(WhenExpression* e);
