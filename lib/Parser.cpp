@@ -76,6 +76,8 @@ int left_bind(Token* token)
 		return 1000;
 	if(token->type == TokenType::When)
 		return 1000;
+	if(token->type == TokenType::Cond)
+		return 1000;
 	if(token->type == TokenType::Term)
 		return 1;
 	return -1;
@@ -155,7 +157,7 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 	{
 		if(lexer.peek()->type == TokenType::BraceEnd)
 		{
-			//TODO unit expression
+			//TODO is an empty array constructor supported? idk...
 		}
 		auto v = std::make_unique<ListExpression>(std::move(token), expression(lexer, 0));
 		if(lexer.peek()->type == TokenType::BraceEnd)
@@ -201,6 +203,11 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		//which we do not want...
 		auto arg_list = expression(lexer, 1);
 		return std::make_unique<WhenExpression>(std::move(token), std::move(arg_list));
+	}
+	if(token->type == TokenType::Cond)
+	{
+		auto arg_list = expression(lexer, 1);
+		return std::make_unique<CondExpression>(std::move(token), std::move(arg_list));
 	}
 	if(token->type == TokenType::ProgKeyword ||
 	   token->type == TokenType::UgenKeyword ||

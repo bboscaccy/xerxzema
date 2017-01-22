@@ -272,6 +272,15 @@ public:
 	void accept(AstVisitor& v);
 };
 
+class CondExpression : public Expression
+{
+public:
+	CondExpression(std::unique_ptr<Token>&& token,
+				   std::unique_ptr<Expression>&& args);
+	std::unique_ptr<Expression> args;
+	std::string show();
+	void accept(AstVisitor& v);
+};
 
 class SequenceExpression : public Expression
 {
@@ -347,6 +356,7 @@ public:
 	virtual void visit(CallExpression* e);
 	virtual void visit(BindExpression* e);
 	virtual void visit(WhenExpression* e);
+	virtual void visit(CondExpression* e);
 	virtual void visit(AssignExpression* e);
 	virtual void visit(NegateExpression* e);
 	virtual void visit(SequenceExpression* e);

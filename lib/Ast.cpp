@@ -354,6 +354,21 @@ void WhenExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+CondExpression::CondExpression(std::unique_ptr<Token>&& t,
+							   std::unique_ptr<Expression>&& a):
+	Expression(std::move(t)), args(std::move(a))
+{
+}
+
+std::string CondExpression::show()
+{
+	return "(cond " + args->show() + ")";
+}
+
+void CondExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
 
 InvalidNullDetonation::InvalidNullDetonation(std::unique_ptr<Token>&& t) :
 	Expression(std::move(t))
@@ -599,6 +614,10 @@ void AstVisitor::visit(BindExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(WhenExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(CondExpression *e)
 {
 	handle_default(e);
 }
