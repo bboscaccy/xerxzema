@@ -70,14 +70,6 @@ int left_bind(Token* token)
 		return 100;
 	if(token->type == TokenType::GroupBegin)
 		return 1000;
-	if(token->type == TokenType::SeqBegin)
-		return 1000;
-	if(token->type == TokenType::MergeStart)
-		return 1000;
-	if(token->type == TokenType::When)
-		return 1000;
-	if(token->type == TokenType::Cond)
-		return 1000;
 	if(token->type == TokenType::Term)
 		return 1;
 	return -1;
@@ -283,7 +275,7 @@ std::unique_ptr<Expression> left_denotation(Lexer& lexer, std::unique_ptr<Expres
 			return std::make_unique<InvalidLeftDetonation>(std::move(v->token), std::move(expr));
 		}
 	}
-	emit_error(token.get(), "I can't understand this");
+	emit_error(token.get(), "I can't understand this (ld)");
 	return std::make_unique<InvalidLeftDetonation>(std::move(token), std::move(expr));
 }
 
