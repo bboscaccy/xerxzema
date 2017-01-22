@@ -324,6 +324,32 @@ std::unique_ptr<Instruction> WhenDefinition::create(const std::vector<Type *> &i
 	return std::make_unique<When>();
 }
 
+bool CondDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
+{
+
+	if(inputs.size() != 2)
+		return false;
+
+	auto first_type = inputs[0];
+	if(first_type->name() != "bool")
+		return false;
+
+	return true;
+}
+
+std::vector<Type*> CondDefinition::output_types(const std::vector<Type *> &inputs,
+												xerxzema::Namespace *parent)
+{
+	return std::vector<Type*>{inputs[1]};
+}
+
+std::unique_ptr<Instruction> CondDefinition::create(const std::vector<Type *> &inputs,
+													const std::vector<Type *> &outputs)
+{
+	return std::make_unique<Cond>();
+}
+
+
 
 bool MergeDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
 {

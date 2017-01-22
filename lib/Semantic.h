@@ -100,6 +100,7 @@ public:
 	void visit(BangExpression* e);
 	void visit(BindExpression* e);
 	void visit(WhenExpression* e);
+	void visit(CondExpression* e);
 	void visit(CallExpression* e);
 	void visit(ListExpression* e);
 	void handle_default(Expression* e);

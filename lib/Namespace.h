@@ -170,6 +170,16 @@ public:
 	inline std::string name() { return "when"; }
 };
 
+class CondDefinition : public InstructionDefinition
+{
+public:
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs);
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
+	bool match(const std::vector<Type*>& inputs, Namespace* parent);
+	inline std::string name() { return "when"; }
+};
+
 
 class MergeDefinition : public InstructionDefinition
 {

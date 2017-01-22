@@ -372,6 +372,15 @@ void HandleExpression::visit(xerxzema::WhenExpression* e)
 	program->instruction("when", args.result, result);
 }
 
+void HandleExpression::visit(xerxzema::CondExpression* e)
+{
+	HandleExpression args(program, e->args.get(), {}, dependencies);
+	args.process();
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("cond", args.result, result);
+}
+
 void HandleExpression::visit(xerxzema::CallExpression *e)
 {
 	if(!e->target->is_a<SymbolExpression>())
