@@ -101,6 +101,7 @@ public:
 	void visit(BindExpression* e);
 	void visit(WhenExpression* e);
 	void visit(CondExpression* e);
+	void visit(DelayExpression* e);
 	void visit(MergeExpression* e);
 	void visit(SequenceExpression* e);
 	void visit(CallExpression* e);
