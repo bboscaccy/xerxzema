@@ -325,5 +325,29 @@ std::unique_ptr<Instruction> WhenDefinition::create(const std::vector<Type *> &i
 }
 
 
+bool MergeDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
+{
+	auto first_type = inputs[0];
+	for(auto& next_type:inputs)
+	{
+		if(next_type != first_type)
+			return false;
+	}
+	return true;
+}
+
+std::vector<Type*> MergeDefinition::output_types(const std::vector<Type *> &inputs,
+														xerxzema::Namespace *parent)
+{
+	return std::vector<Type*>{inputs[0]};
+}
+
+std::unique_ptr<Instruction> MergeDefinition::create(const std::vector<Type *> &inputs,
+															const std::vector<Type *> &outputs)
+{
+	return std::make_unique<Merge>();
+}
+
+
 
 };

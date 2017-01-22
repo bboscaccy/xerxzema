@@ -414,3 +414,15 @@ TEST(TestParser, TestBangExpr)
 	ASSERT_EQ(expr->show(), "(bang (symbol x))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestMergeExpr)
+{
+
+	std::stringstream ss;
+	ss << "+{ x, y ,z }";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(merge (arg-list (arg-list (symbol x) (symbol y)) (symbol z)))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

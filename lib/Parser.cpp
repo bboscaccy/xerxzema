@@ -72,6 +72,8 @@ int left_bind(Token* token)
 		return 1000;
 	if(token->type == TokenType::SeqBegin)
 		return 1000;
+	if(token->type == TokenType::MergeStart)
+		return 1000;
 	if(token->type == TokenType::When)
 		return 1000;
 	if(token->type == TokenType::Term)
@@ -131,6 +133,24 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
 		}
 	}
+	if(token->type == TokenType::MergeStart)
+	{
+		if(lexer.peek()->type == TokenType::BlockEnd)
+		{
+			//TODO unit expression
+		}
+		auto v = std::make_unique<MergeExpression>(std::move(token), expression(lexer, 0));
+		if(lexer.peek()->type == TokenType::BlockEnd)
+		{
+			lexer.get();
+			return v;
+		}
+		else
+		{
+			emit_error(diag, "Missing closing '}'");
+			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
+		}
+	}
 	if(token->type == TokenType::BraceBegin)
 	{
 		if(lexer.peek()->type == TokenType::BraceEnd)
@@ -145,7 +165,7 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		}
 		else
 		{
-			emit_error(diag, "Missing closing '}'");
+			emit_error(diag, "Missing closing ']'");
 			return std::make_unique<InvalidNullDetonation>(std::move(v->token));
 		}
 	}

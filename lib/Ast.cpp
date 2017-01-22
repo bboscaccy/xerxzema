@@ -493,6 +493,22 @@ std::string ListExpression::show()
 	return "(list " + items->show() + ")";
 }
 
+MergeExpression::MergeExpression(std::unique_ptr<Token>&& d,
+									   std::unique_ptr<Expression>&& i) :
+	Expression(std::move(d)), items(std::move(i))
+{
+}
+
+void MergeExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
+std::string MergeExpression::show()
+{
+	return "(merge " + items->show() + ")";
+}
+
 std::string Expression::show()
 {
 	return "unimplemented";
@@ -599,6 +615,10 @@ void AstVisitor::visit(SequenceExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(ListExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(MergeExpression *e)
 {
 	handle_default(e);
 }

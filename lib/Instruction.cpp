@@ -233,6 +233,7 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 							  Program* program,
 							  llvm::BasicBlock *next_block)
 {
+	//TODO make this work with more than 2 inputs...
 	builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
 	auto p = builder.CreateLoad(program->activation_counter_value());
 	auto i = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
@@ -243,8 +244,7 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 
 	auto mask_value = builder.CreateLoad(_value);
 	auto arg0 = builder.CreateAnd(mask_value, 1);
-	auto comp_value = builder.CreateICmpUGT(arg0,
-											 llvm::ConstantInt::get(context, llvm::APInt(16, 0)));
+	auto comp_value = builder.CreateICmpUGT(arg0, builder.getInt16(0));
 
 	builder.CreateCondBr(comp_value, arg0_block, arg1_block);
 
