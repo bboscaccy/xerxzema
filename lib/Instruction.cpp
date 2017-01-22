@@ -272,6 +272,26 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 
 }
 
+void Seq::generate_check(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+						 xerxzema::Program *program, llvm::BasicBlock *check_block,
+						 llvm::BasicBlock *op_block, llvm::BasicBlock *next_block)
+{
+	//TODO
+}
+
+void Seq::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							 xerxzema::Program *program)
+{
+	//TODO
+}
+
+void Seq::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
+							xerxzema::Program *program, llvm::BasicBlock *next_block)
+{
+	//TODO
+}
+
+
 
 ValueReal::ValueReal(double v):value(v)	{}
 void ValueReal::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,

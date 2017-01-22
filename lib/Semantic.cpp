@@ -381,6 +381,15 @@ void HandleExpression::visit(xerxzema::MergeExpression* e)
 	program->instruction("merge", args.result, result);
 }
 
+void HandleExpression::visit(xerxzema::SequenceExpression* e)
+{
+	HandleExpression args(program, e->items.get(), {}, dependencies);
+	args.process();
+	if(result.size() == 0)
+		result.push_back(program->temp_reg());
+	program->instruction("seq", args.result, result);
+}
+
 void HandleExpression::visit(xerxzema::CondExpression* e)
 {
 	HandleExpression args(program, e->args.get(), {}, dependencies);

@@ -177,9 +177,8 @@ public:
 										const std::vector<Type *> &outputs);
 	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
 	bool match(const std::vector<Type*>& inputs, Namespace* parent);
-	inline std::string name() { return "when"; }
+	inline std::string name() { return "cond"; }
 };
-
 
 class MergeDefinition : public InstructionDefinition
 {
@@ -189,6 +188,16 @@ public:
 	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
 	bool match(const std::vector<Type*>& inputs, Namespace* parent);
 	inline std::string name() { return "merge"; }
+};
+
+class SeqDefinition : public InstructionDefinition
+{
+public:
+	std::unique_ptr<Instruction> create(const std::vector<Type *> &inputs,
+										const std::vector<Type *> &outputs);
+	std::vector<Type*> output_types(const std::vector<Type*>& inputs, Namespace* parent);
+	bool match(const std::vector<Type*>& inputs, Namespace* parent);
+	inline std::string name() { return "seq"; }
 };
 
 

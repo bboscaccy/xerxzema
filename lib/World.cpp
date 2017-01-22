@@ -113,6 +113,7 @@ void World::create_core_namespace()
 	core->add_instruction(std::make_unique<WhenDefinition>());
 	core->add_instruction(std::make_unique<CondDefinition>());
 	core->add_instruction(std::make_unique<MergeDefinition>());
+	core->add_instruction(std::make_unique<SeqDefinition>());
 
 
 	add_external(std::make_unique<ExternalDefinition>

@@ -274,6 +274,26 @@ public:
 	inline std::string name() { return "merge";}
 };
 
+class Seq : public Instruction
+{
+public:
+	void generate_check(llvm::LLVMContext& context,
+						llvm::IRBuilder<> &builder,
+						Program* program,
+						llvm::BasicBlock* check_block,
+						llvm::BasicBlock* op_block,
+						llvm::BasicBlock* next_block);
+
+	void generate_operation(llvm::LLVMContext& context,
+							llvm::IRBuilder<> &builder,
+							Program* program);
+	void generate_prolouge(llvm::LLVMContext& context,
+						   llvm::IRBuilder<> &builder,
+						   Program* program,
+						   llvm::BasicBlock* next_block);
+	inline std::string name() { return "seq";}
+};
+
 
 class ArrayBuilder : public Instruction
 {
