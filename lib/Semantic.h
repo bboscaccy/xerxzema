@@ -97,6 +97,7 @@ public:
 	void visit(DivExpression* e);
 	void visit(LtExpression* e);
 	void visit(GroupExpression* e);
+	void visit(BangExpression* e);
 	void visit(BindExpression* e);
 	void visit(WhenExpression* e);
 	void visit(CallExpression* e);

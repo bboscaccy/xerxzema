@@ -107,7 +107,6 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<Merge>("merge", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<Cond>("cond", {"bool", "real"}, {"real"}));
 	core->add_instruction(create_def<Delay>("delay", {"real"}, {"real"}));
-	core->add_instruction(create_def<Bang>("bang", {}, {"real"}));
 
 	core->add_instruction(create_def<Schedule>("schedule_absolute", {"int"}, {"unit"}));
 

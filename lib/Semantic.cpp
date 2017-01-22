@@ -342,6 +342,18 @@ void HandleExpression::do_binary_instruction(Expression* parent, Expression* l,
 						 parent);
 }
 
+void HandleExpression::visit(BangExpression* e)
+{
+	HandleExpression args(program, e->expr.get(), {}, dependencies);
+	args.process();
+	auto inst = std::make_unique<Bang>();
+	for(auto& reg:result)
+		inst->output(reg.reg);
+	for(auto& reg:dependencies)
+		inst->dependent(reg.reg);
+	program->instruction(std::move(inst));
+}
+
 void HandleExpression::visit(xerxzema::BindExpression *e)
 {
 	HandleExpression rhs(program, e->rhs.get(), {}, dependencies);
