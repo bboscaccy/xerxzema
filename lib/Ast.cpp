@@ -275,6 +275,22 @@ void SampleExpression::accept(xerxzema::AstVisitor &v)
 	v.visit(this);
 }
 
+DelayExpression::DelayExpression(std::unique_ptr<Token>&& t,
+								   std::unique_ptr<Expression>&& e) :
+	expr(std::move(e)), Expression(std::move(t))
+{
+}
+
+std::string DelayExpression::show()
+{
+	return "(delay " + expr->show() + ")";
+}
+
+void DelayExpression::accept(xerxzema::AstVisitor &v)
+{
+	v.visit(this);
+}
+
 BangExpression::BangExpression(std::unique_ptr<Token>&& t,
 								   std::unique_ptr<Expression>&& e) :
 	expr(std::move(e)), Expression(std::move(t))
@@ -598,6 +614,10 @@ void AstVisitor::visit(GroupExpression *e)
 	handle_default(e);
 }
 void AstVisitor::visit(SampleExpression *e)
+{
+	handle_default(e);
+}
+void AstVisitor::visit(DelayExpression *e)
 {
 	handle_default(e);
 }

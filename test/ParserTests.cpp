@@ -438,3 +438,15 @@ TEST(TestParser, TestCondExpr)
 	ASSERT_EQ(expr->show(), "(bind (cond (arg-list (symbol x) (symbol y))) (symbol z))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestDelayExpr)
+{
+
+	std::stringstream ss;
+	ss << "~~~x -> y";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(bind (delay (delay (delay (symbol x)))) (symbol y))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}

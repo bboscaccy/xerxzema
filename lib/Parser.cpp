@@ -97,6 +97,8 @@ std::unique_ptr<Expression> null_denotation(Lexer& lexer, std::unique_ptr<Token>
 		return std::make_unique<NegateExpression>(std::move(token), expression(lexer, 1000));
 	if(token->type == TokenType::Sample)
 		return std::make_unique<SampleExpression>(std::move(token), expression(lexer, 1000));
+	if(token->type == TokenType::Delay)
+		return std::make_unique<DelayExpression>(std::move(token), expression(lexer, 1000));
 	if(token->type == TokenType::Bang)
 		return std::make_unique<BangExpression>(std::move(token), expression(lexer, 1000));
 	if(token->type == TokenType::GroupBegin)
