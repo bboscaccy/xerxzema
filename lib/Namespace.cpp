@@ -350,6 +350,26 @@ std::unique_ptr<Instruction> CondDefinition::create(const std::vector<Type *> &i
 }
 
 
+bool DelayDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
+{
+
+	if(inputs.size() != 1)
+		return false;
+	return true;
+}
+
+std::vector<Type*> DelayDefinition::output_types(const std::vector<Type *> &inputs,
+												xerxzema::Namespace *parent)
+{
+	return std::vector<Type*>{inputs[0]};
+}
+
+std::unique_ptr<Instruction> DelayDefinition::create(const std::vector<Type *> &inputs,
+													const std::vector<Type *> &outputs)
+{
+	return std::make_unique<Delay>();
+}
+
 
 bool MergeDefinition::match(const std::vector<Type *> &inputs, xerxzema::Namespace *parent)
 {

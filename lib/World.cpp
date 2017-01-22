@@ -103,9 +103,6 @@ void World::create_core_namespace()
 	core->add_instruction(create_def<Trace>("trace", {"real"}, {"unit"}));
 	core->add_instruction(create_def<Trace>("trace", {"string"}, {"unit"}));
 
-	//this is going to support N operands like array does.
-	core->add_instruction(create_def<Delay>("delay", {"real"}, {"real"}));
-
 	core->add_instruction(create_def<Schedule>("schedule_absolute", {"int"}, {"unit"}));
 
 	core->add_instruction(std::make_unique<ArrayBuilderDefinition>());
@@ -114,6 +111,7 @@ void World::create_core_namespace()
 	core->add_instruction(std::make_unique<CondDefinition>());
 	core->add_instruction(std::make_unique<MergeDefinition>());
 	core->add_instruction(std::make_unique<SeqDefinition>());
+	core->add_instruction(std::make_unique<DelayDefinition>());
 
 
 	add_external(std::make_unique<ExternalDefinition>
