@@ -288,3 +288,29 @@ trace(x);
 	xerxzema::JitInvoke<void> invoker(world.jit(), p);
 	invoker();
 }
+
+TEST(TestJit, TestSeqConst)
+{
+	xerxzema::World world;
+	auto ns = world.get_namespace("test");
+	auto program_str =
+R"EOF(
+prog stream(y:real) -> x:real
+{
+    0.0 -> x;
+    #{0.0, y, x*2.0 } -> x;
+    trace(x);
+}
+)EOF";
+	xerxzema::parse_input(program_str, ns);
+	world.jit()->dump_after_codegen();
+	world.jit()->compile_namespace(ns);
+	auto p = ns->get_program("stream");
+	xerxzema::JitInvoke<double, double> invoker(world.jit(), p);
+	invoker(1.0);
+	invoker(1.0);
+	invoker(1.0);
+	invoker(1.0);
+	invoker(1.0);
+	invoker(1.0);
+}

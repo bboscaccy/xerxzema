@@ -272,23 +272,88 @@ void Merge::generate_prolouge(llvm::LLVMContext &context,
 
 }
 
-void Seq::generate_check(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
-						 xerxzema::Program *program, llvm::BasicBlock *check_block,
-						 llvm::BasicBlock *op_block, llvm::BasicBlock *next_block)
+llvm::Type* Seq::state_type(llvm::LLVMContext &context)
 {
-	//TODO
+	if(_state_type)
+		return _state_type;
+
+	_state_type = llvm::Type::getInt8Ty(context);
+	return _state_type;
+
 }
 
 void Seq::generate_operation(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
 							 xerxzema::Program *program)
 {
-	//TODO
+
 }
 
 void Seq::generate_prolouge(llvm::LLVMContext &context, llvm::IRBuilder<> &builder,
-							xerxzema::Program *program, llvm::BasicBlock *next_block)
+							xerxzema::Program *program, llvm::BasicBlock* next_block)
 {
-	//TODO
+
+	std::vector<llvm::BasicBlock*> action_blocks;
+	std::vector<llvm::BasicBlock*> check_blocks;
+	for(auto& reg:_inputs)
+	{
+		emit_debug(reg->name());
+		action_blocks.push_back(llvm::BasicBlock::Create(context,
+												  "action_seq",
+												  program->function_value()));
+		check_blocks.push_back(llvm::BasicBlock::Create(context,
+												  "check_seq",
+												  program->function_value()));
+	}
+
+	builder.CreateBr(check_blocks[0]);
+
+	int8_t i = 0;
+	for(auto& b:check_blocks)
+	{
+		builder.SetInsertPoint(b);
+		auto current_state = builder.CreateLoad(_state_value);
+		auto cmp_value = builder.CreateICmpEQ(current_state, builder.getInt8(i));
+		if(i == check_blocks.size() - 1)
+		{
+			builder.CreateCondBr(cmp_value, action_blocks[i], next_block);
+		}
+		else
+		{
+			builder.CreateCondBr(cmp_value, action_blocks[i], check_blocks[i+1]);
+		}
+		i++;
+	}
+
+	i = 0;
+
+	for(auto& b:action_blocks)
+	{
+		builder.SetInsertPoint(b);
+		auto in_ptr = _inputs[i]->fetch_value_raw(context, builder);
+		auto out_ptr = _outputs[0]->fetch_value_raw(context, builder);
+		_inputs[i]->type()->copy(context, builder, program, out_ptr, in_ptr);
+
+		emit_debug(std::to_string(i));
+		if(i != check_blocks.size() - 1)
+		{
+			auto current_state = builder.CreateLoad(_state_value);
+			auto new_state = builder.CreateAdd(current_state, builder.getInt8(1));
+			builder.CreateStore(new_state, _state_value);
+		}
+
+		//do regular activations here...
+		auto p = builder.CreateLoad(program->activation_counter_value());
+		auto inc = builder.CreateAdd(p, llvm::ConstantInt::get(context, llvm::APInt(64,1)));
+		builder.CreateStore(inc, program->activation_counter_value());
+		builder.CreateStore(llvm::ConstantInt::get(context, llvm::APInt(16, reset_mask)), _value);
+		for(auto& r:_outputs)
+		{
+			r->do_activations(context, builder);
+		}
+
+		builder.CreateBr(next_block);
+		i++;
+	}
 }
 
 

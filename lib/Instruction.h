@@ -277,13 +277,7 @@ public:
 class Seq : public Instruction
 {
 public:
-	void generate_check(llvm::LLVMContext& context,
-						llvm::IRBuilder<> &builder,
-						Program* program,
-						llvm::BasicBlock* check_block,
-						llvm::BasicBlock* op_block,
-						llvm::BasicBlock* next_block);
-
+	llvm::Type* state_type(llvm::LLVMContext& context);
 	void generate_operation(llvm::LLVMContext& context,
 							llvm::IRBuilder<> &builder,
 							Program* program);

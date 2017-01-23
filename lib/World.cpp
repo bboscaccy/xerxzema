@@ -87,6 +87,7 @@ void World::create_core_namespace()
 	core->add_parameterized_type("array", std::make_unique<Array>());
 	core->add_type_alias("string", core->type("array", {core->type("byte")}));
 	core->add_instruction(create_def<Instruction>("nop", {"unit"}, {"unit"}));
+
 	core->add_instruction(create_def<AddReal>("add", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<SubReal>("sub", {"real", "real"}, {"real"}));
 	core->add_instruction(create_def<MulReal>("mul", {"real", "real"}, {"real"}));
