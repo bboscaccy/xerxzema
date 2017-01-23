@@ -33,7 +33,15 @@ std::unique_ptr<Expression> expression(Lexer& lexer, int right_bind)
 	while(right_bind < left_bind(lexer.peek()))
 	{
 		token = lexer.get(); //advance
-		left = left_denotation(lexer, std::move(left), std::move(token));
+		if(token->type == TokenType::Term) //end parser here and don't attempt to continue.
+		{
+			left = left_denotation(lexer, std::move(left), std::move(token));
+			return left;
+		}
+		else
+		{
+			left = left_denotation(lexer, std::move(left), std::move(token));
+		}
 	}
 	return left;
 }
