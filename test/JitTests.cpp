@@ -298,7 +298,7 @@ R"EOF(
 prog stream(y:real) -> x:real
 {
     0.0 -> x;
-    #{0.0, y, x*2.0 } -> x;
+    #{ 0.0, y, x*2.0 } -> x;
     trace(x);
 }
 )EOF";

@@ -160,7 +160,7 @@ LtExpression::LtExpression(std::unique_ptr<Token>&& t,
 
 std::string LtExpression::show()
 {
-	return "(pow " + lhs->show() + " " + rhs->show() + ")";
+	return "(lt " + lhs->show() + " " + rhs->show() + ")";
 }
 
 void LtExpression::accept(xerxzema::AstVisitor &v)

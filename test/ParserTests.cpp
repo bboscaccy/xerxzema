@@ -450,3 +450,29 @@ TEST(TestParser, TestDelayExpr)
 	ASSERT_EQ(expr->show(), "(bind (delay (delay (delay (symbol x)))) (symbol y))");
 	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
 }
+
+TEST(TestParser, TestCondSubExpr)
+{
+
+	//TODO add proper parser support for this...
+	std::stringstream ss;
+	ss << "? x < 1.0 {+> y; +> z;}";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	//ASSERT_EQ(expr->show(), "");
+	//ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
+
+
+TEST(TestParser, TestWhenBangExpr)
+{
+
+	std::stringstream ss;
+	ss << " +? x -> z";
+	xerxzema::Lexer lexer(ss);
+
+	auto expr = xerxzema::expression(lexer);
+	ASSERT_EQ(expr->show(), "(bind (when (symbol x)) (symbol z))");
+	ASSERT_EQ(lexer.peek()->type, xerxzema::TokenType::Eof);
+}
